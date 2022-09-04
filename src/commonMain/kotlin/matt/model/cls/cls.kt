@@ -2,8 +2,8 @@ package matt.model.cls
 
 enum class ClassModifier {
   SEALED,
-  ABSTRACT,
-  OPEN,
+  ABSTRACT_NOT_SEALED,
+  OPEN_NOT_ABSTRACT_NOT_SEALED,
   OBJECT,
   DATA,
   VALUE,
@@ -11,6 +11,6 @@ enum class ClassModifier {
   INTERFACE,
   FUN_INTERFACE,
   INNER,
-  FINAL
+  FINAL_NOT_OBJECT
 }
 
