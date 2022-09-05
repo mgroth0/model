@@ -1,5 +1,6 @@
 package matt.model.single
 
+import kotlin.jvm.Synchronized
 import kotlin.reflect.KClass
 
 open class Singleton {
@@ -14,4 +15,36 @@ open class Singleton {
 	  instanced.add(this::class)
 	}
   }
+}
+
+abstract class SingleCallBase{
+
+  var called: Boolean = false
+	@Synchronized get
+	@Synchronized protected set
+
+
+
+}
+
+class SingleCall(protected val op: ()->Unit = {}): SingleCallBase() {
+
+  @Synchronized
+  operator fun invoke() {
+	require(!called)
+	op()
+	called = true
+  }
+
+
+}
+
+class SingleCallWithArg<A>( val op: (A) -> Unit = {}): SingleCallBase() {
+  @Synchronized
+  operator fun invoke(arg: A) {
+	require(!called)
+	op(arg)
+	called = true
+  }
+
 }
