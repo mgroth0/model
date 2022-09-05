@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
 
 
 /*13*/
-fun KClass<*>.distinctType() = when {
+fun KClass<*>.typeType() = when {
   objectInstance != null -> ObjectType
   isFun                  -> FunInterface
   java.isInterface       -> when {
