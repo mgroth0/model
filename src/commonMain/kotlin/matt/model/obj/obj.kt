@@ -22,19 +22,7 @@ open class Unique<I: Any>(
 	"${this::class.simpleName} $id: $name"
 }
 
-fun newId(
-  vararg against: List<Identified<Int>>
-): Int {
-  println("WARNING: " + "what if i delete the highest? i need to keep a record of nextID instead of this".uppercase())
-  return against.flatMap { it }.maxOf { it.id } + 1
-}
 
-fun new_id(
-  vararg against: List<MaybeIdentified<Int>>
-): Int {
-  println("WARNING: " + "what if i delete the highest? i need to keep a record of nextID instead of this".uppercase())
-  return against.flatMap { it }.maxOf { it.id!! } + 1
-}
 
 interface DSL
 
