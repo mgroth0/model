@@ -10,5 +10,4 @@ abstract class IdentifiedList(val list: List<MaybeIdentified<Int>>): List<MaybeI
     println("WARNING: MUST SAVE THE IdentifiedList NOW!")
 	return nextNewID.also { nextNewID += 1 }
   }
-
 }
