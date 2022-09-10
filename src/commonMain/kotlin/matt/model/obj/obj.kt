@@ -9,9 +9,12 @@ interface MaybeIdentified<I: Any> {
   val id: I?
 }
 
+interface ConstNamed {
+  val name: String
+}
+
 interface Named {
   var name: String
-
 }
 
 open class Unique<I: Any>(
