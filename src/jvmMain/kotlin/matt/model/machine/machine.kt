@@ -4,21 +4,22 @@ import matt.lang.shutdown.duringShutdown
 
 abstract class Machine {
 
-  init {
-	duringShutdown {
-	  shutdown()
-	}
-  }
-
+  private var didFirstBoot = false
   private var on: Boolean = false
 
   @Synchronized fun start() {
+	if (!didFirstBoot) {
+	  duringShutdown {
+		shutdown()
+	  }
+	}
 	if (!on) boot()
+	didFirstBoot = true
 	on = true
   }
 
   @Synchronized fun shutdown() {
-	if (on) unboot()
+	if (on) unBoot()
 	on = false
   }
 
@@ -28,5 +29,5 @@ abstract class Machine {
   }
 
   protected abstract fun boot()
-  protected abstract fun unboot()
+  protected abstract fun unBoot()
 }
