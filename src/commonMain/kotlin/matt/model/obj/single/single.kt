@@ -1,4 +1,4 @@
-package matt.model.single
+package matt.model.obj.single
 
 import kotlin.jvm.Synchronized
 import kotlin.reflect.KClass

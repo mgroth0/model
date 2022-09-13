@@ -1,4 +1,4 @@
-package matt.model.keypass
+package matt.model.flowlogic.keypass
 
 import kotlin.jvm.Synchronized
 

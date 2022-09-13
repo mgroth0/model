@@ -1,4 +1,4 @@
-package matt.model.recursionblocker
+package matt.model.flowlogic.recursionblocker
 
 class RecursionBlocker() {
   private var inBlock = false
