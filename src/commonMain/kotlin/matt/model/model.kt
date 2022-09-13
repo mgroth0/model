@@ -22,12 +22,18 @@ enum class ExitStatus {
 //}
 
 
-
 interface Converter<A, B> {
   fun convertToB(a: A): B
   fun A.toB() = convertToB(this)
   fun convertToA(b: B): A
   fun B.toA() = convertToA(this)
+}
+
+interface StringConverter<T>: Converter<String, T> {
+  fun toString(t: T): String
+  fun fromString(s: String): T
+  override fun convertToA(b: T): String = toString(b)
+  override fun convertToB(a: String) = fromString(a)
 }
 
 
