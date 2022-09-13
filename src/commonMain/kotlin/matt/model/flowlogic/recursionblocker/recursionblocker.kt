@@ -1,6 +1,6 @@
 package matt.model.flowlogic.recursionblocker
 
-class RecursionBlocker() {
+class RecursionBlocker {
   private var inBlock = false
   fun with(op: ()->Unit) {
 	if (inBlock) return

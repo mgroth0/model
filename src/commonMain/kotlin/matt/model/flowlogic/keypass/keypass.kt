@@ -8,17 +8,21 @@ class KeyPass {
 	@Synchronized private set
 	@Synchronized get
 
-  @Synchronized fun with(op: ()->Unit) {
+  @Synchronized
+  fun <R> with(op: ()->R): R {
 	isHeld = true
-	op()
+	val r = op()
 	isHeld = false
+	return r
   }
 
+  @Synchronized
   fun hold() {
 	require(!isHeld)
 	isHeld = true
   }
 
+  @Synchronized
   fun release() {
 	require(isHeld)
 	isHeld = false
