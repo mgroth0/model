@@ -36,5 +36,16 @@ interface StringConverter<T>: Converter<String, T> {
   override fun convertToB(a: String) = fromString(a)
 }
 
+object MyNumberStringConverter: StringConverter<Number> {
+  override fun toString(t: Number): String {
+	return t.toString()
+  }
+
+  override fun fromString(s: String): Number {
+	return s.toDouble()
+  }
+
+}
+
 
 data class PixelIndex(val x: Int, val y: Int)
