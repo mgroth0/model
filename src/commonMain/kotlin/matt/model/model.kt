@@ -36,6 +36,11 @@ interface StringConverter<T>: Converter<String, T> {
   override fun convertToB(a: String) = fromString(a)
 }
 
+object IntStringConverter: StringConverter<Int> {
+  override fun toString(t: Int) = t.toString()
+  override fun fromString(s: String) = s.toInt()
+}
+
 object MyNumberStringConverter: StringConverter<Number> {
   override fun toString(t: Number): String {
 	return t.toString()
@@ -49,3 +54,26 @@ object MyNumberStringConverter: StringConverter<Number> {
 
 
 data class PixelIndex(val x: Int, val y: Int)
+
+
+fun <T> toStringConverter(op: (T)->String) = object: StringConverter<T> {
+  override fun toString(t: T): String {
+	return op(t)
+  }
+
+  override fun fromString(s: String): T {
+	TODO("Not yet implemented")
+  }
+
+}
+
+fun <T> fromStringConverter(op: (String)->T) = object: StringConverter<T> {
+  override fun toString(t: T): String {
+	TODO("Not yet implemented")
+  }
+
+  override fun fromString(s: String): T {
+	return op(s)
+  }
+
+}
