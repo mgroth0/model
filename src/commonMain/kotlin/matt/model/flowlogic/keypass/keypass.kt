@@ -8,6 +8,8 @@ class KeyPass {
 	@Synchronized private set
 	@Synchronized get
 
+  val isNotHeld get() = !isHeld
+
   @Synchronized
   fun <R> with(op: ()->R): R {
 	isHeld = true
