@@ -1,11 +1,14 @@
 package matt.model.machine
 
 import matt.lang.shutdown.duringShutdown
+import matt.lang.toStringBuilder
 
 abstract class Machine {
 
   private var didFirstBoot = false
   private var on: Boolean = false
+
+  override fun toString() = toStringBuilder(::on)
 
   @Synchronized fun start() {
 	if (!didFirstBoot) {
@@ -19,6 +22,7 @@ abstract class Machine {
   }
 
   @Synchronized fun shutdown() {
+	println("shutting down $this")
 	if (on) unBoot()
 	on = false
   }
