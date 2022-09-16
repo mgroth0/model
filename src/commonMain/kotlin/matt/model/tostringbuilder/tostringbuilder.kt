@@ -5,7 +5,7 @@ package matt.model.tostringbuilder
 import kotlin.reflect.KClass
 
 fun Any.toStringBuilder(
-  map: Map<String, Any?>
+  map: Map<String, Any?> = mapOf()
 ): String {
   val realMap = map.toMutableMap()
   if (realMap.isEmpty()) {
