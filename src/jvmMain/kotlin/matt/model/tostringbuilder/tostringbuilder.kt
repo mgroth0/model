@@ -15,9 +15,6 @@ fun Any.toStringBuilder(
   })
 }
 
-fun Any.toStringBuilder(
-  vararg kvPairs: Pair<String, Any?>
-) = toStringBuilder(mapOf(*kvPairs))
 
 
 //fun Any.matt.model.tostringbuilder.toStringBuilder(vararg values: Pair<String, Any?>): String {

@@ -5,6 +5,11 @@ package matt.model.tostringbuilder
 import kotlin.reflect.KClass
 
 fun Any.toStringBuilder(
+  vararg kvPairs: Pair<String, Any?>
+) = toStringBuilder(mapOf(*kvPairs))
+
+
+fun Any.toStringBuilder(
   map: Map<String, Any?> = mapOf()
 ): String {
   val realMap = map.toMutableMap()
