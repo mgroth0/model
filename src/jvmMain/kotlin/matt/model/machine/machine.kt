@@ -1,7 +1,6 @@
 package matt.model.machine
 
 import matt.lang.shutdown.duringShutdown
-import matt.lang.toStringBuilder
 
 abstract class Machine {
 
