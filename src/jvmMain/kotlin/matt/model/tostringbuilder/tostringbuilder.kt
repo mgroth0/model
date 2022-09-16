@@ -1,3 +1,5 @@
+@file:JvmName("ToStringBuilderJvmKt")
+
 package matt.model.tostringbuilder
 
 import kotlin.reflect.KClass
