@@ -9,4 +9,6 @@ class SimpleLatch {
   fun await() = latch.await()
   fun await(timeout: Duration) = latch.await(timeout.inWholeMilliseconds, MILLISECONDS)
   fun open() = latch.countDown()
+  val isOpen get() = latch.count == 0L
+  val isClosed get() = !isOpen
 }
