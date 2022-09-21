@@ -1,9 +1,16 @@
 package matt.model.lazy
 
+import kotlinx.datetime.Clock
+import matt.lang.go
+import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.Synchronized
 
 private object EMPTY
+
+@OptIn(ExperimentalContracts::class)
 class DependentValue<V>(op: ()->V) {
+
+  var stopwatch: String? = null
   private var lastCalculated: Any? = EMPTY
   private var valid: Boolean = false
 
@@ -20,8 +27,12 @@ class DependentValue<V>(op: ()->V) {
 
   @Synchronized
   fun calc() {
+	val t = if (stopwatch != null) Clock.System.now() else null
 	lastCalculated = op()
 	valid = true
+	t?.go {
+	  println("stopwatch\t${(Clock.System.now() - t)}\t$stopwatch")
+	}
   }
 
 

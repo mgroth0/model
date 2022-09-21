@@ -4,7 +4,7 @@ import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 import kotlin.time.Duration
 
-class Debugger {
+class Debugger(private val enable: Boolean = true) {
   private var lastThingDoneTime = System.currentTimeMillis()
   var lastThingDone = "${Debugger::class.simpleName} created"
 	set(value) {
@@ -25,7 +25,7 @@ class Debugger {
   private fun start(
 	refreshMillis: Long, thresholdMillis: Long
   ) {
-	thread(isDaemon = true) {
+	if (enable) thread(isDaemon = true) {
 	  while (true) {
 		if (System.currentTimeMillis() - lastThingDoneTime > thresholdMillis) {
 		  freezeDetected = true
