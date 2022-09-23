@@ -1,8 +1,9 @@
 package matt.model.code
 
-interface Code {
-
+interface Code<C: Code<C>> {
+  val code: String
+  fun formatted(): C
 }
-interface CodeGenerator<C: Code> {
-  val product: C
+interface CodeGenerator<C: Code<C>> {
+  fun generate(): C
 }
