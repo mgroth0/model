@@ -22,11 +22,38 @@ fun <T> fromStringConverter(op: (String)->T) = object: StringConverter<T> {
 
 }
 
+
+object NullToBlankStringConverter: StringConverter<String?> {
+  val inverted by lazy { invert() }
+  override fun toString(t: String?): String {
+	return t ?: ""
+  }
+
+  override fun fromString(s: String): String {
+	return s
+  }
+
+}
+
 interface Converter<A, B> {
   fun convertToB(a: A): B
   fun A.toB() = convertToB(this)
   fun convertToA(b: B): A
   fun B.toA() = convertToA(this)
+  fun invert(): Converter<B, A> {
+	val outer = this
+	return object: Converter<B, A> {
+
+	  override fun convertToB(a: B): A {
+		return outer.convertToA(a)
+	  }
+
+	  override fun convertToA(b: A): B {
+		return outer.convertToB(b)
+	  }
+
+	}
+  }
 }
 
 interface StringConverter<T>: Converter<String, T> {
