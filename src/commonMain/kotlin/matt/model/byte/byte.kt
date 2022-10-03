@@ -9,6 +9,18 @@ import matt.model.byte.ByteSize.ByteUnit.TB
 import kotlin.jvm.JvmName
 
 
+val Int.bytes get() = ByteSize(this)
+val Int.killobytes get() = ByteSize(this * KB.size)
+val Int.megabytes get() = ByteSize(this * MB.size)
+val Int.gigabytes get() = ByteSize(this * GB.size)
+val Int.terabytes get() = ByteSize(this * TB.size)
+
+val Long.bytes get() = ByteSize(this)
+val Long.killobytes get() = ByteSize(this * KB.size)
+val Long.megabytes get() = ByteSize(this * MB.size)
+val Long.gigabytes get() = ByteSize(this * GB.size)
+val Long.terabytes get() = ByteSize(this * TB.size)
+
 data class ByteSize(val bytes: Long): Comparable<ByteSize> {
   constructor(bytes: Number): this(bytes.toLong())
 
@@ -40,6 +52,8 @@ data class ByteSize(val bytes: Long): Comparable<ByteSize> {
   operator fun plus(other: ByteSize) = ByteSize(bytes + other.bytes)
   operator fun minus(other: ByteSize) = ByteSize(bytes - other.bytes)
 }
+
+
 
 
 @OptIn(kotlin.experimental.ExperimentalTypeInference::class)
