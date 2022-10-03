@@ -2,21 +2,26 @@ package matt.model.loopthread
 
 import kotlin.time.Duration
 
-class DaemonLoop(sleep: Duration, private val op: DaemonLoop.()->Unit): Thread() {
-  private val sleepMS = sleep.inWholeMilliseconds
+
+class MutableRefreshTimeDaemonLoop(sleep: Duration, op: DaemonLoop.()->Unit): DaemonLoop(sleep, op) {
+  public override var sleepMS = super.sleepMS
+}
+
+open class DaemonLoop(sleep: Duration, protected val op: DaemonLoop.()->Unit): Thread() {
+
+  protected open val sleepMS = sleep.inWholeMilliseconds
+
+  private var shouldContinue: Boolean = true
+
+  fun signalToStop() {
+	shouldContinue = false
+  }
 
   init {
 	isDaemon = true
   }
 
-
-
-  private var shouldContinue: Boolean = false
-  fun signalToStop() {
-	shouldContinue = false
-  }
-
-  override fun run() {
+  final override fun run() {
 	while (shouldContinue) {
 	  op()
 	  sleep(sleepMS)

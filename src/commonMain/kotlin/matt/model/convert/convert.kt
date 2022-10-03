@@ -1,5 +1,8 @@
 package matt.model.convert
 
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+
 fun <T> toStringConverter(op: (T)->String) = object: StringConverter<T> {
   override fun toString(t: T): String {
 	return op(t)
@@ -24,7 +27,6 @@ fun <T> fromStringConverter(op: (String)->T) = object: StringConverter<T> {
 
 
 object NullToBlankStringConverter: StringConverter<String?> {
-  val inverted by lazy { invert() }
   override fun toString(t: String?): String {
 	return t ?: ""
   }
@@ -36,13 +38,22 @@ object NullToBlankStringConverter: StringConverter<String?> {
 }
 
 interface Converter<A, B> {
+
+  companion object {
+	/*TODO: should be WeakMap*/
+	val invertedConverters = mutableMapOf<Converter<*, *>, Converter<*, *>>()
+  }
+
   fun convertToB(a: A): B
   fun A.toB() = convertToB(this)
   fun convertToA(b: B): A
   fun B.toA() = convertToA(this)
   fun invert(): Converter<B, A> {
+	val i = invertedConverters[this]
+	@Suppress("UNCHECKED_CAST")
+	if (i != null) return i as Converter<B, A>
 	val outer = this
-	return object: Converter<B, A> {
+	val inv = object: Converter<B, A> {
 
 	  override fun convertToB(a: B): A {
 		return outer.convertToA(a)
@@ -53,6 +64,8 @@ interface Converter<A, B> {
 	  }
 
 	}
+	invertedConverters[this] = inv
+	return inv
   }
 }
 
@@ -75,6 +88,27 @@ object MyNumberStringConverter: StringConverter<Number> {
 
   override fun fromString(s: String): Number {
 	return s.toDouble()
+  }
+}
+
+
+object LongMillisConverter: Converter<Long, Duration> {
+  override fun convertToB(a: Long): Duration {
+	return a.milliseconds
+  }
+
+  override fun convertToA(b: Duration): Long {
+	return b.inWholeMilliseconds
+  }
+}
+
+object DoubleLongConverter: Converter<Double, Long> {
+  override fun convertToB(a: Double): Long {
+	return a.toLong()
+  }
+
+  override fun convertToA(b: Long): Double {
+	return b.toDouble()
   }
 
 }
