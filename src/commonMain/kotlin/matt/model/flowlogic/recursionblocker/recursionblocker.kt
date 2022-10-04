@@ -8,4 +8,5 @@ class RecursionBlocker {
 	op()
 	inBlock = false
   }
+  operator fun invoke(op: () -> Unit) = with(op)
 }

@@ -24,7 +24,11 @@ open class DaemonLoop(sleep: Duration, protected val op: DaemonLoop.()->Unit): T
   final override fun run() {
 	while (shouldContinue) {
 	  op()
-	  sleep(sleepMS)
+	  try {
+		sleep(sleepMS)
+	  } catch (e: InterruptedException) {
+		if (shouldContinue) throw e
+	  }
 	}
   }
 }
