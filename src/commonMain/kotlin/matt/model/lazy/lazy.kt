@@ -2,12 +2,10 @@ package matt.model.lazy
 
 import kotlinx.datetime.Clock
 import matt.lang.go
-import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.Synchronized
 
 private object EMPTY
 
-@OptIn(ExperimentalContracts::class)
 class DependentValue<V>(op: ()->V) {
 
   var stopwatch: String? = null
