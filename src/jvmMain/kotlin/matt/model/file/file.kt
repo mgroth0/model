@@ -1,4 +1,5 @@
 @file:JavaIoFileIsOk
+
 package matt.model.file
 
 import matt.model.ok.JavaIoFileIsOk
@@ -8,3 +9,5 @@ import java.io.File
 interface IDFile: FilePath {
   val idFile: File
 }
+
+interface IDFolder: IDFile, FolderPath
