@@ -1,5 +1,6 @@
 package matt.model.convert
 
+import matt.model.byte.ByteSize
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -112,3 +113,26 @@ object DoubleLongConverter: Converter<Double, Long> {
   }
 
 }
+
+
+val BYTE_SIZE_FORMATTER = object: StringConverter<Number> {
+  override fun toString(t: Number): String {
+	return ByteSize(t.toLong()).toString()
+  }
+
+  override fun fromString(s: String) = TODO()
+}
+
+
+
+
+val RATIO_TO_PERCENT_FORMATTER_NO_DECIMAL = object: StringConverter<Number> {
+  override fun toString(t: Number): String {
+	return (t.toDouble()*100).toInt().toString() + "%"
+  }
+
+  override fun fromString(s: String) = TODO()
+}
+
+
+
