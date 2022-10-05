@@ -1,8 +1,5 @@
 package matt.model.sys
 
-import matt.lang.NOT_IMPLEMENTED
-import matt.lang.err
-
 sealed interface OS {
   val caseSensitive: Boolean
   val pathSep: String
@@ -79,9 +76,9 @@ object WINDOWS_11_PAR_WORK: WindowsMachine(
 )
 
 object GAMING_WINDOWS: WindowsMachine(
-  getHomeDir = { err("idk what the homedir of gaming windows is") },
+  getHomeDir = { error("idk what the homedir of gaming windows is") },
   getRegisteredDir = {
-	err(
+	error(
 	  "idk what the registered dir of gaming windows is, btw, delete .registeredDir file on windows home folder"
 	)
   }
@@ -140,8 +137,8 @@ class OpenMindSlurmNode(val n: Int): OpenMindNode()
 //)
 
 class VagrantLinuxMachine: LinuxMachine(
-  getHomeDir = { NOT_IMPLEMENTED },
-  getRegisteredDir = { NOT_IMPLEMENTED },
+  getHomeDir = { TODO() },
+  getRegisteredDir = { TODO() },
 )
 
 class UnknownLinuxMachine(val hostname: String, homeDir: String): LinuxMachine(
