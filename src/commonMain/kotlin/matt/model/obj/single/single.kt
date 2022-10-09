@@ -3,7 +3,7 @@ package matt.model.obj.single
 import kotlin.jvm.Synchronized
 import kotlin.reflect.KClass
 
-private val singletons = mutableSetOf<KClass<*>>()
+internal val singletons = mutableSetOf<KClass<*>>()
 
 @Synchronized
 fun Any.registerSingleton() {
