@@ -1,101 +1,172 @@
-@file: JvmName("RunJvmKt")
+//@file: JvmName("RunJvmKt")
 
 package matt.model.obsmod.run
 
-import matt.lang.go
-import matt.lang.scope
-import matt.log.profile.ExceptionHandler
-import matt.log.profile.ExceptionResponse
-import matt.log.profile.StructuredExceptionHandler
-import matt.log.profile.defaultExceptionHandler
+import matt.log.profile.err.ExceptionHandler
+import matt.log.profile.err.ExceptionResponse
+import matt.log.profile.err.StructuredExceptionHandler
+import matt.log.profile.err.defaultExceptionHandler
+import matt.log.profile.err.with
 import matt.model.errreport.Report
 import matt.model.flowlogic.controlflowstatement.ControlFlow
-import matt.model.flowlogic.controlflowstatement.ControlFlow.CONTINUE
-import matt.model.successorfail.SuccessOrFail
-import matt.model.successorfail.SuccessOrFail.FAIL
-import matt.model.successorfail.SuccessOrFail.SUCCESS
+import matt.model.obsmod.run.Proceeding.Status
+import matt.model.obsmod.run.Proceeding.Status.OFF
+import matt.model.obsmod.run.Proceeding.Status.RUNNING
+import matt.model.obsmod.run.Proceeding.Status.STARTING
+import matt.model.obsmod.run.Proceeding.Status.STOPPING
+import matt.model.successorfail.Fail
+import matt.model.successorfail.Success
 import matt.obs.bindings.bool.ObsB
+import matt.obs.bindings.comp.eq
+import matt.obs.prop.ObsVal
 import matt.obs.prop.VarProp
 import matt.sys.loopthread.MutableRefreshTimeDaemonLoop
 import kotlin.concurrent.thread
 import kotlin.time.Duration
 
+
 abstract class ProceedingImpl: Proceeding {
-  protected val runningProp = VarProp(false)
-  override val running: ObsB = runningProp
+  protected val statusProp = VarProp(OFF)
+  override val status: ObsVal<Status> = statusProp
+  protected val messageProp = VarProp("")
+  override val message: ObsVal<String> = messageProp
+  val isOff by lazy { status.eq(OFF) }
+  val isRunning by lazy { status.eq(RUNNING) }
 }
 
 
-abstract class ManualProceeding: ProceedingImpl() {
-  protected abstract fun startup(): SuccessOrFail
+abstract class ManualProceeding(
+  override val startButtonLabel: String,
+  protected val exceptionHandler: ExceptionHandler = defaultExceptionHandler
+): ProceedingImpl() {
 
-  @Synchronized override fun startIfNotRunning() {
+  protected abstract fun startup()
+
+  @Synchronized final override fun sendStartSignal() {
 	require(canStart.value)
-	val result = if (!runningProp.value) startup() else SUCCESS
-	runningProp v when (result) {
-	  SUCCESS -> true
-	  FAIL    -> false
+	startSwitch()
+  }
+
+  private fun startSwitch(): Thread? {
+	return when (status.value) {
+	  OFF                         -> {
+		statusProp v STARTING
+		myMessage = ""
+		val t = thread {
+		  val result = exceptionHandler.with { startup() }
+		  statusProp v when (result) {
+			Success -> RUNNING
+			is Fail -> {
+			  myMessage = result.message
+			  OFF
+			}
+		  }
+		}
+		t
+	  }
+
+	  STARTING, STOPPING, RUNNING -> null
 	}
+  }
+
+  @Synchronized final override fun startAndJoin() {
+	require(canStart.value)
+	startSwitch()?.join()
   }
 
   override val canStart: ObsB = VarProp(true)
 
+
+  protected var myMessage: String
+	get() = message.value
+	set(value) {
+	  messageProp.value = value
+	}
+
 }
 
-abstract class StoppableManualProceeding: ManualProceeding(), StoppableProceeding {
+abstract class ThreadProceeding(
+  startButtonLabel: String,
+  exceptionHandler: ExceptionHandler = defaultExceptionHandler
+): ManualProceeding(startButtonLabel, exceptionHandler) {
+  abstract fun run()
+  final override fun startup() {
+	thread {
+	  val result = exceptionHandler.with {
+		run()
+	  }
+	  require(status.value == RUNNING)
+	  val something = when (result) {
+		Success -> OFF
+		is Fail -> {
+		  myMessage = result.message
+		  OFF
+		}
+	  }
+	  statusProp.value = something
+	}
+  }
+}
+
+abstract class StoppableManualProceeding(
+  noun: String,
+  exceptionHandler: ExceptionHandler = defaultExceptionHandler
+): ManualProceeding(
+  startButtonLabel = "Start $noun",
+  exceptionHandler = exceptionHandler
+), StoppableProceeding {
+
+  override val name = noun
+
+  override val stopButtonLabel = "Stop $noun"
+
   abstract fun stop()
-  override fun stopAndJoin() {
-	stop()
-	runningProp v false
+
+
+  @Synchronized final override fun sendStopSignal() {
+	require(canStop.value)
+	stopSwitch()
+  }
+
+  private fun stopSwitch(): Thread? {
+	return when (status.value) {
+	  RUNNING                 -> {
+		statusProp v STOPPING
+		myMessage = ""
+		thread {
+		  val result = exceptionHandler.with { stop() }
+		  statusProp v when (result) {
+			Success -> OFF
+			is Fail -> {
+			  myMessage = result.message
+			  RUNNING
+			}
+		  }
+		}
+	  }
+
+	  STARTING, STOPPING, OFF -> null
+	}
+  }
+
+  @Synchronized final override fun stopAndJoin() {
+	require(canStop.value)
+	stopSwitch()?.join()
   }
 
   override val canStop: ObsB = VarProp(true)
 }
 
-class BasicThreadedProceeding(
-  private val op: ()->Unit, private val exceptionHandler: ExceptionHandler = defaultExceptionHandler
-): ManualProceeding() {
-  @Synchronized override fun startup(): SuccessOrFail {
-	val t = thread(start = false) {
-	  op()
-	  runningProp v false
-	}
-	t.uncaughtExceptionHandler = object: StructuredExceptionHandler() {
-	  override fun handleException(t: Thread, e: Throwable, report: Report): ExceptionResponse {
-		val r = exceptionHandler(e, report)
-		runningProp v false
-		return r
-	  }
-	}
-	t.start()
-	return SUCCESS
-  }
-}
-
-fun daemonLoopSpawnerProceeding(
-  canStop: ObsB = VarProp(true),
-  sleepInterval: Duration,
-  op: ()->Unit,
-  finalize: ()->Unit = {},
-  exceptionHandler: ExceptionHandler = defaultExceptionHandler
-) = DaemonLoopSpawnerProceeding(
-  canStop = canStop,
-  sleepInterval = sleepInterval,
-  op = {
-	op()
-	CONTINUE
-  },
-  finalize = finalize,
-  exceptionHandler = exceptionHandler
-)
 
 class DaemonLoopSpawnerProceeding(
+  noun: String,
+  override val canStart: ObsB = VarProp(true),
   override val canStop: ObsB = VarProp(true),
   sleepInterval: Duration,
   private val op: ()->ControlFlow,
   private val finalize: ()->Unit = {},
-  private val exceptionHandler: ExceptionHandler = defaultExceptionHandler
-): ManualProceeding(), AsyncStoppableProceeding {
+  exceptionHandler: ExceptionHandler = defaultExceptionHandler
+): StoppableManualProceeding(noun, exceptionHandler = exceptionHandler) {
 
 
   var spawnDaemons = true
@@ -113,50 +184,40 @@ class DaemonLoopSpawnerProceeding(
 
   private var hadException: Boolean = false
 
-  @Synchronized override fun startup(): SuccessOrFail {
+  @Synchronized override fun startup() {
 	require(!hadException)
-	loop?.go {
-	  require(!it.wasSignaledToStop) {
-		"tried to start MutableRefreshTimeDaemonLoop while it was stopping. How to handle this? Doesn't make sense to start another before the previous stops. Also doesn't make sense to do nothing. Main possibilities are blocking until last stop completed or explicitly skipping if last stop didn't finish or a combination of the two with a timeout."
-	  }
-	}
 	require(loop == null)
-	if (loop == null) {
-	  loop = MutableRefreshTimeDaemonLoop(sleepInterval, op = {
-		op()
-	  }, finalize = {
+	loop = MutableRefreshTimeDaemonLoop(
+	  sleepInterval = sleepInterval,
+	  op = { op() },
+	  finalize = {
 		finalize()
 		synchronized(this@DaemonLoopSpawnerProceeding) {
+		  println("nulling loop 1?")
 		  loop = null
-		  runningProp v false
+		  statusProp v OFF
 		}
-	  }, uncaughtExceptionHandler = object: StructuredExceptionHandler() {
+	  },
+	  uncaughtExceptionHandler = object: StructuredExceptionHandler() {
 		override fun handleException(t: Thread, e: Throwable, report: Report): ExceptionResponse {
 		  hadException = true
 		  val r = exceptionHandler(e, report)
-		  runningProp v false
-		  loop = null
+		  synchronized(this@DaemonLoopSpawnerProceeding) {
+			println("nulling loop 2?")
+			loop = null
+			statusProp v OFF
+		  }
 		  return r
 		}
-	  }).also {
-		it.isDaemon = spawnDaemons
-		it.start()
 	  }
-	}
-	return SUCCESS
-  }
-
-  @Synchronized override fun stopAndJoin() {
-	loop?.scope {
-	  signalToStop()
-	  join()
+	).also {
+	  it.isDaemon = spawnDaemons
+	  it.start()
 	}
   }
 
-  @Synchronized override fun sendStopSignal() {
-	loop?.scope {
-	  signalToStop()
-	}
+  override fun stop() {
+	loop!!.stopAndJoin()
   }
 
 }

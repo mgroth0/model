@@ -68,6 +68,19 @@ interface Converter<A, B> {
 	invertedConverters[this] = inv
 	return inv
   }
+
+  fun nullable(): Converter<A?, B?> = object: Converter<A?, B?> {
+	override fun convertToB(a: A?): B? {
+	  if (a == null) return null
+	  return this@Converter.convertToB(a)
+	}
+
+	override fun convertToA(b: B?): A? {
+	  if (b == null) return null
+	  return this@Converter.convertToA(b)
+	}
+
+  }
 }
 
 interface StringConverter<T>: Converter<String, T> {
@@ -122,8 +135,6 @@ val BYTE_SIZE_FORMATTER = object: StringConverter<Number> {
 
   override fun fromString(s: String) = TODO()
 }
-
-
 
 
 val RATIO_TO_PERCENT_FORMATTER_NO_DECIMAL = object: StringConverter<Number> {

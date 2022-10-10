@@ -1,32 +1,43 @@
 package matt.model.obsmod.run
 
 import matt.model.idea.ProceedingIdea
+import matt.model.obsmod.run.Proceeding.Status.OFF
+import matt.model.obsmod.run.Proceeding.Status.RUNNING
+import matt.model.startstop.Startable
+import matt.model.startstop.Stoppable
 import matt.obs.bindings.bool.ObsB
+import matt.obs.prop.ObsVal
 
-interface Proceeding: ProceedingIdea {
-  val running: ObsB
-  fun startIfNotRunning()
+
+interface Proceeding: ProceedingIdea, Startable {
+  val name: String
+  val startButtonLabel: String
   val canStart: ObsB
-}
+  val status: ObsVal<Status>
+  val message: ObsVal<String>
 
-fun Proceeding.onStart(op: ()->Unit) {
-  running.onChange {
-	if (it) op()
+  enum class Status {
+	OFF,
+	STARTING,
+	RUNNING,
+	STOPPING
   }
 }
 
-fun Proceeding.onStop(op: ()->Unit) {
-  running.onChange {
-	if (!it) op()
+fun Proceeding.afterStarted(op: ()->Unit) {
+  status.onChange {
+	if (it == RUNNING) op()
   }
 }
 
-interface StoppableProceeding: Proceeding {
-  fun stopAndJoin()
+fun Proceeding.afterStopped(op: ()->Unit) {
+  status.onChange {
+	if (it == OFF) op()
+  }
+}
+
+
+interface StoppableProceeding: Proceeding, Stoppable {
+  val stopButtonLabel: String
   val canStop: ObsB
 }
-
-interface AsyncStoppableProceeding: StoppableProceeding {
-  fun sendStopSignal()
-}
-

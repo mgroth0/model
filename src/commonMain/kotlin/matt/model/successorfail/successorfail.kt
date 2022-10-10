@@ -1,5 +1,6 @@
 package matt.model.successorfail
 
-enum class SuccessOrFail {
-  SUCCESS, FAIL
-}
+sealed interface SuccessOrFail
+
+object Success: SuccessOrFail
+class Fail(val message: String): SuccessOrFail
