@@ -1,6 +1,11 @@
 package matt.model.mod
 
-/*implemented by generated KSubProject*/
-interface ModType {
+import matt.model.idea.ModIdea
 
-}
+/*implemented by generated KSubProject*/
+interface ModType: ModIdea
+
+
+interface RelativeToKMod: ModType
+
+interface AbsoluteMod: RelativeToKMod
