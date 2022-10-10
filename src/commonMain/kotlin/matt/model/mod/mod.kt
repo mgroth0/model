@@ -2,10 +2,19 @@ package matt.model.mod
 
 import matt.model.idea.ModIdea
 
-/*implemented by generated KSubProject*/
+
 interface ModType: ModIdea
 
+interface RelativeMod: ModType
 
-interface RelativeToKMod: ModType
+interface KMod: ModType
 
-interface AbsoluteMod: RelativeToKMod
+/*implemented by generated KSubProject*/
+interface RelativeToKMod: RelativeMod, KMod {
+  val relToKNames: List<String>
+}
+
+val RelativeToKMod.gradlePath get() = ":k:${relToKNames.joinToString(":")}"
+
+interface AbsoluteMod: RelativeMod
+interface AbsoluteKMod: AbsoluteMod, RelativeToKMod
