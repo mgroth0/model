@@ -46,25 +46,38 @@ open class LoadedValueSlot<T>(): Async<T>() {
   }
 }
 
-open class LoadedThenCachedValueSlot<T>(): LoadedValueSlot<T>() {
+class DelegatedSlot<T>(): AsyncBase<T>() {
+
+
+  private var getter: (()->T)? = null
+
   @Synchronized
   override fun await(): T {
-	return getFromCache?.invoke() ?: super.await()!!
+	latch?.await()
+	return getter!!.invoke()
   }
 
-  private var getFromCache: (()->T)? = null
-
-  override var value: T? = null
-
   @Synchronized
-  fun disposeValueAndSetCacheGetter(op: ()->T) {
-	getFromCache = op
-	value = null
+  fun putGetter(op: ()->T) {
+	getter = op
+	openAndDisposeLatch()
+  }
+}
+
+abstract class Async<T>: AsyncBase<T>() {
+
+  protected open var value: T? = null
+
+
+  override fun await(): T {
+	latch?.await()
+	@Suppress("UNCHECKED_CAST")
+	return value as T
   }
 }
 
 /*is this just a future? or a modified lazy?*/
-abstract class Async<T>: Awaitable<T> {
+abstract class AsyncBase<T>: Awaitable<T> {
   protected fun openAndDisposeLatch() {
 	latch?.open()
 	latch = null
@@ -73,11 +86,4 @@ abstract class Async<T>: Awaitable<T> {
   protected var latch: SimpleLatch? = SimpleLatch()
 	private set
 
-  protected open var value: T? = null
-
-  override fun await(): T {
-	latch?.await()
-	@Suppress("UNCHECKED_CAST")
-	return value as T
-  }
 }
