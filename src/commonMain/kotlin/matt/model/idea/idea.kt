@@ -6,3 +6,4 @@ interface ProceedingIdea
 interface ServiceIdea
 interface ModIdea
 interface ProjectIdea
+interface SerIdea
