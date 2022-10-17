@@ -16,5 +16,10 @@ interface RelativeToKMod: RelativeMod, KMod {
 
 val RelativeToKMod.gradlePath get() = ":k:${relToKNames.joinToString(":")}"
 
-interface AbsoluteMod: RelativeMod
-interface AbsoluteKMod: AbsoluteMod, RelativeToKMod
+interface AbsoluteMod: RelativeMod {
+  val name: String
+}
+
+interface AbsoluteKMod: AbsoluteMod, RelativeToKMod {
+  override val name get() = relToKNames.last()
+}
