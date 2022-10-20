@@ -37,7 +37,7 @@ open class SyncLoadedValueOp<T>(private val op: ()->T): Async<T>() {
   }
 }
 
-open class LoadedValueSlot<T>(): Async<T>() {
+open class LoadedValueSlot<T>: Async<T>() {
   @Synchronized
   fun putLoadedValue(t: T) {
 	require(latch!!.isClosed)
@@ -46,7 +46,7 @@ open class LoadedValueSlot<T>(): Async<T>() {
   }
 }
 
-class DelegatedSlot<T>(): AsyncBase<T>() {
+class DelegatedSlot<T>: AsyncBase<T>() {
 
 
   private var getter: (()->T)? = null

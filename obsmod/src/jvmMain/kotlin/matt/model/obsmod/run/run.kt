@@ -1,5 +1,3 @@
-//@file: JvmName("RunJvmKt")
-
 package matt.model.obsmod.run
 
 import matt.log.profile.err.ExceptionHandler
@@ -30,7 +28,7 @@ abstract class ProceedingImpl: Proceeding {
   override val status: ObsVal<Status> = statusProp
   protected val messageProp = VarProp("")
   override val message: ObsVal<String> = messageProp
-  val isOff by lazy { status.eq(OFF) }
+  override val isOff by lazy { status.eq(OFF) }
   val isRunning by lazy { status.eq(RUNNING) }
 }
 
@@ -40,7 +38,8 @@ abstract class ManualProceeding(
   protected val exceptionHandler: ExceptionHandler = defaultExceptionHandler
 ): ProceedingImpl() {
 
-  protected abstract fun startup()
+  protected abstract fun Startup.startup()
+
 
   @Synchronized final override fun sendStartSignal() {
 	require(canStart.value)
@@ -53,11 +52,13 @@ abstract class ManualProceeding(
 		statusProp v STARTING
 		myMessage = ""
 		val t = thread {
-		  val result = exceptionHandler.with { startup() }
-		  statusProp v when (result) {
+		  val startup = Startup()
+		  val result = exceptionHandler.with { startup.startup() }
+		  val realResult = startup.failure.takeIf { it is Fail } ?: result
+		  statusProp v when (realResult) {
 			Success -> RUNNING
 			is Fail -> {
-			  myMessage = result.message
+			  myMessage = realResult.message
 			  OFF
 			}
 		  }
@@ -83,6 +84,13 @@ abstract class ManualProceeding(
 	  messageProp.value = value
 	}
 
+  inner class Startup internal constructor() {
+	internal var failure: Fail? = null
+	fun failed(message: String) {
+	  failure = Fail(message)
+	}
+  }
+
 }
 
 abstract class ThreadProceeding(
@@ -90,7 +98,7 @@ abstract class ThreadProceeding(
   exceptionHandler: ExceptionHandler = defaultExceptionHandler
 ): ManualProceeding(startButtonLabel, exceptionHandler) {
   abstract fun run()
-  final override fun startup() {
+  final override fun Startup.startup() {
 	thread {
 	  val result = exceptionHandler.with {
 		run()
@@ -108,6 +116,7 @@ abstract class ThreadProceeding(
   }
 }
 
+@Suppress("unused")
 abstract class StoppableManualProceeding(
   noun: String,
   exceptionHandler: ExceptionHandler = defaultExceptionHandler
@@ -184,7 +193,7 @@ class DaemonLoopSpawnerProceeding(
 
   private var hadException: Boolean = false
 
-  @Synchronized override fun startup() {
+  @Synchronized override fun Startup.startup() {
 	require(!hadException)
 	require(loop == null)
 	loop = MutableRefreshTimeDaemonLoop(
@@ -193,7 +202,6 @@ class DaemonLoopSpawnerProceeding(
 	  finalize = {
 		finalize()
 		synchronized(this@DaemonLoopSpawnerProceeding) {
-		  println("nulling loop 1?")
 		  loop = null
 		  statusProp v OFF
 		}
@@ -203,7 +211,6 @@ class DaemonLoopSpawnerProceeding(
 		  hadException = true
 		  val r = exceptionHandler(e, report)
 		  synchronized(this@DaemonLoopSpawnerProceeding) {
-			println("nulling loop 2?")
 			loop = null
 			statusProp v OFF
 		  }
@@ -216,8 +223,6 @@ class DaemonLoopSpawnerProceeding(
 	}
   }
 
-  override fun stop() {
-	loop!!.stopAndJoin()
-  }
+  override fun stop() = loop!!.stopAndJoin()
 
 }

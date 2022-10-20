@@ -15,6 +15,7 @@ interface Proceeding: ProceedingIdea, Startable {
   val canStart: ObsB
   val status: ObsVal<Status>
   val message: ObsVal<String>
+  val isOff: ObsB
 
   enum class Status {
 	OFF,
