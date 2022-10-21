@@ -1,6 +1,11 @@
 package matt.model.successorfail
 
-sealed interface SuccessOrFail
+sealed interface SuccessOrFail {
+  val message: String
+}
 
-object Success: SuccessOrFail
-class Fail(val message: String): SuccessOrFail
+object Success: SuccessOrFail {
+  override val message = ""
+}
+
+class Fail(override val message: String): SuccessOrFail

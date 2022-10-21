@@ -8,7 +8,7 @@ class Skipper(
   }
 
   private var skipIndex = -1
-  fun <E> skipThrough(list: List<E>): List<E> = list.filter {
+  fun <E> skipThrough(list: Iterable<E>): List<E> = list.filter {
 	skipIndex++
 	if (skipIndex > numElementsToSkip) skipIndex = 0
 	skipIndex == numElementsToSkip

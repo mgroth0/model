@@ -50,17 +50,15 @@ abstract class ManualProceeding(
 	return when (status.value) {
 	  OFF                         -> {
 		statusProp v STARTING
-		myMessage = ""
+		messageProp v ""
 		val t = thread {
 		  val startup = Startup()
 		  val result = exceptionHandler.with { startup.startup() }
 		  val realResult = startup.failure.takeIf { it is Fail } ?: result
+		  messageProp v realResult.message
 		  statusProp v when (realResult) {
 			Success -> RUNNING
-			is Fail -> {
-			  myMessage = realResult.message
-			  OFF
-			}
+			is Fail -> OFF
 		  }
 		}
 		t
@@ -78,12 +76,6 @@ abstract class ManualProceeding(
   override val canStart: ObsB = VarProp(true)
 
 
-  protected var myMessage: String
-	get() = message.value
-	set(value) {
-	  messageProp.value = value
-	}
-
   inner class Startup internal constructor() {
 	internal var failure: Fail? = null
 	fun failed(message: String) {
@@ -98,25 +90,29 @@ abstract class ThreadProceeding(
   exceptionHandler: ExceptionHandler = defaultExceptionHandler
 ): ManualProceeding(startButtonLabel, exceptionHandler) {
   abstract fun run()
+  private var thr: Thread? = null
   final override fun Startup.startup() {
-	thread {
-	  val result = exceptionHandler.with {
-		run()
-	  }
-	  require(status.value == RUNNING)
-	  val something = when (result) {
-		Success -> OFF
-		is Fail -> {
-		  myMessage = result.message
-		  OFF
+	thr = thread {
+		val result = exceptionHandler.with(InterruptedException::class) {
+		  run()
 		}
-	  }
-	  statusProp.value = something
+		require(status.value == RUNNING)
+		messageProp v result.message
+		statusProp.value = OFF
+		thr = null
 	}
   }
+
+  @Synchronized
+  fun forceStop() {
+	thr?.apply {
+	  interrupt()
+	  join()
+	}
+  }
+
 }
 
-@Suppress("unused")
 abstract class StoppableManualProceeding(
   noun: String,
   exceptionHandler: ExceptionHandler = defaultExceptionHandler
@@ -141,15 +137,13 @@ abstract class StoppableManualProceeding(
 	return when (status.value) {
 	  RUNNING                 -> {
 		statusProp v STOPPING
-		myMessage = ""
+		messageProp v ""
 		thread {
 		  val result = exceptionHandler.with { stop() }
+		  messageProp v result.message
 		  statusProp v when (result) {
 			Success -> OFF
-			is Fail -> {
-			  myMessage = result.message
-			  RUNNING
-			}
+			is Fail -> RUNNING
 		  }
 		}
 	  }
@@ -182,6 +176,7 @@ class DaemonLoopSpawnerProceeding(
 
   private var loop: MutableRefreshTimeDaemonLoop? = null
 
+  @Suppress("MemberVisibilityCanBePrivate")
   val sleepIntervalProp = VarProp(sleepInterval).apply {
 	onChange {
 	  synchronized(this@DaemonLoopSpawnerProceeding) {
@@ -189,6 +184,8 @@ class DaemonLoopSpawnerProceeding(
 	  }
 	}
   }
+
+  @Suppress("MemberVisibilityCanBePrivate")
   var sleepInterval by sleepIntervalProp
 
   private var hadException: Boolean = false
