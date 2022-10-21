@@ -1,9 +1,13 @@
 package matt.model.syncop
 
+import matt.lang.YesIUseLang
 import matt.lang.sync.inSync
 import kotlin.jvm.Synchronized
 
 class AntiDeadlockSynchronizer {
+  companion object {
+	val yesIUseLang = YesIUseLang
+  }
 
   private var currentWorkerCount = 0
 
