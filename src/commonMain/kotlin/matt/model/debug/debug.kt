@@ -6,10 +6,10 @@ import matt.model.prints.Prints
 
 class DebugLogger(val name: String): DebuggerIdea, ReporterIdea, Prints {
   override fun println(a: Any) {
-	System.out.println("$name:\t$a")
+	kotlin.io.println("$name:\t$a")
   }
 
   override fun print(a: Any) {
-	System.out.print("$name:\t$a")
+	kotlin.io.print("$name:\t$a")
   }
 }
