@@ -1,12 +1,29 @@
 package matt.model.debugger
 
+import matt.model.idea.DebuggerIdea
 import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 import kotlin.time.Duration
 
-class Debugger(private val enable: Boolean = true) {
+class StackTraceDebugger() {
+  fun printStackTraces() {
+	Thread.getAllStackTraces().filterKeys { it.isAlive }.forEach {
+	  println(
+		"""
+		==================================================
+		Thread: ${it.key}
+		
+		${it.value.joinToString("\n") { it.toString() }}
+		==================================================
+	  """.trimMargin()
+	  )
+	}
+  }
+}
+
+class ReportNothingDoneDebugger(private val enable: Boolean = true): DebuggerIdea {
   private var lastThingDoneTime = System.currentTimeMillis()
-  var lastThingDone = "${Debugger::class.simpleName} created"
+  var lastThingDone = "${ReportNothingDoneDebugger::class.simpleName} created"
 	set(value) {
 	  lastThingDoneTime = System.currentTimeMillis()
 	  field = value
