@@ -14,6 +14,7 @@ object ValJson {
 	"ide" to 65009,
 	"graphviz" to 65010,
 	"ktor" to 65011,
-	"spotify" to 65012
+	"spotify" to 65012,
+	"deephys:web" to 65013
   )
 }
