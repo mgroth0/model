@@ -23,3 +23,4 @@ interface AbsoluteMod: RelativeMod {
 interface AbsoluteKMod: AbsoluteMod, RelativeToKMod {
   override val modName get() = relToKNames.last()
 }
+
