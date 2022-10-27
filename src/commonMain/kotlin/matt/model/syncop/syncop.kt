@@ -1,8 +1,11 @@
 package matt.model.syncop
 
+import matt.lang.NullToReduceObjects
+import matt.lang.Op
 import matt.lang.YesIUseLang
 import matt.lang.sync.inSync
 import kotlin.jvm.Synchronized
+
 
 class AntiDeadlockSynchronizer {
   companion object {
@@ -12,9 +15,10 @@ class AntiDeadlockSynchronizer {
   private var currentWorkerCount = 0
 
 
-  private val opQueue by lazy { mutableListOf<()->Unit>() }
+  @NullToReduceObjects
+  private var opQueue: MutableList<Op>? = null
 
-  fun useInternalData(op: ()->Unit) {
+  fun useInternalData(op: Op) {
 	inSync(this) {
 	  currentWorkerCount += 1
 	}
@@ -22,15 +26,18 @@ class AntiDeadlockSynchronizer {
 	inSync(this) {
 	  currentWorkerCount -= 1
 	  if (currentWorkerCount == 0) {
-		opQueue.forEach { it() }
-		opQueue.clear()
+		opQueue?.forEach { it() }
+		opQueue = null
 	  }
 	}
   }
 
-  @Synchronized fun operateOnInternalDataNowOrLater(op: ()->Unit) {
-	if (currentWorkerCount > 0) opQueue += op
-	else op()
+  @Synchronized fun operateOnInternalDataNowOrLater(op: Op) {
+	if (currentWorkerCount > 0) {
+	  (opQueue ?: mutableListOf<Op>().also {
+		opQueue = it
+	  }) += op
+	} else op()
   }
 
 }
