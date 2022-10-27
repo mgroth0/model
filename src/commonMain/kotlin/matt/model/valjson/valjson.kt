@@ -1,22 +1,35 @@
 package matt.model.valjson
 
+import matt.lang.delegation.provider
+import matt.lang.delegation.valProp
+
 object ValJson {
   const val WAIT_FOR_MS = 1000
 
-  object Port {
+  private val ports = mutableMapOf<String, Int>()
+
+  object Port: Map<String, Int> by ports {
 	private var num = 65000
-	val task = num++
-	val top = num++
-	val notify = num++
-	val launch = num++
-	val slidespace = num++
-	val brainstorm = num++
-	val kjg = num++
-	val pdf = num++
-	val ide = num++
-	val graphviz = num++
-	val ktor = num++
-	val spotify = num++
-	val deephysWeb = num++
+	private val aPort
+	  get() = provider {
+		val i = num++
+		ports[it] = i
+		valProp {
+		  i
+		}
+	  }
+	val task by aPort
+	val top by aPort
+	val notify by aPort
+	val launch by aPort
+	val slidespace by aPort
+	val brainstorm by aPort
+	val kjg by aPort
+	val pdf by aPort
+	val ide by aPort
+	val graphviz by aPort
+	val ktor by aPort
+	val spotify by aPort
+	val deephysWeb by aPort
   }
 }
