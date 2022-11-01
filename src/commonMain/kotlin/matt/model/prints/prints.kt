@@ -1,8 +1,9 @@
 package matt.model.prints
 
-import matt.model.idea.ReporterIdea
+import matt.model.report.Reporter
 
-interface Prints: ReporterIdea {
+interface Prints: Reporter {
+  override fun local(prefix: String): Prints
   fun println(a: Any)
   fun print(a: Any)
 }
