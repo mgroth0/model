@@ -1,5 +1,6 @@
 package matt.model.obsmod.run
 
+import matt.lang.go
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.ExceptionResponse
 import matt.log.profile.err.StructuredExceptionHandler
@@ -46,16 +47,19 @@ abstract class ManualProceeding(
 	startSwitch()
   }
 
+
   private fun startSwitch(): Thread? {
 	return when (status.value) {
 	  OFF                         -> {
 		statusProp v STARTING
-		messageProp v ""
+		/*messageProp v ""*/
 		val t = thread {
 		  val startup = Startup()
 		  val result = exceptionHandler.with { startup.startup() }
 		  val realResult = startup.failure.takeIf { it is Fail } ?: result
-		  messageProp v realResult.message
+		  realResult.message.takeIf { it.isNotBlank() }?.go {
+			messageProp v it
+		  }
 		  statusProp v when (realResult) {
 			Success -> RUNNING
 			is Fail -> OFF
@@ -93,13 +97,15 @@ abstract class ThreadProceeding(
   private var thr: Thread? = null
   final override fun Startup.startup() {
 	thr = thread {
-		val result = exceptionHandler.with(InterruptedException::class) {
-		  run()
-		}
-		require(status.value == RUNNING)
-		messageProp v result.message
-		statusProp.value = OFF
-		thr = null
+	  val result = exceptionHandler.with(InterruptedException::class) {
+		run()
+	  }
+	  require(status.value == RUNNING)
+	  result.message.takeIf { it.isNotBlank() }?.go {
+		messageProp v it
+	  }
+	  statusProp.value = OFF
+	  thr = null
 	}
   }
 
