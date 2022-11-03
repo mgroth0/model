@@ -11,7 +11,8 @@ abstract class Report {
 
 /*can later collect machine and context info, etc*/
 class ThrowReport(private val t: Thread?, private val e: Throwable?): Report() {
-  constructor(e: Throwable): this(Thread.currentThread(),e)
+  constructor(e: Throwable): this(Thread.currentThread(), e)
+
   override val text by lazy {
 	"""
     ERROR REPORT
@@ -31,7 +32,13 @@ fun Throwable.infoString(): String = """
   Message=${message}
   
   STACK TRACE:
-  ${stackTraceToString()}
+  ${
+  stackTraceToString().let {
+	if (it.length > 10_000) it.take(
+	  10_000
+	) + "... THROTTLED STACK TRACE STRING TO EASE STACK OVERFLOW ERROR DETECTION"
+  }
+}
   
   CAUSE: ${cause?.infoString()}
   
