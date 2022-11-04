@@ -1,5 +1,7 @@
 package matt.model.await
 
-interface Awaitable<T> {
+import matt.lang.model.value.ValueWrapperIdea
+
+interface Awaitable<T>: ValueWrapperIdea {
   fun await(): T
 }

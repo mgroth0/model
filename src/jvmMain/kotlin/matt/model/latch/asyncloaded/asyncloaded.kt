@@ -1,5 +1,6 @@
 package matt.model.latch.asyncloaded
 
+import matt.lang.model.value.ValueWrapperIdea
 import matt.model.await.Awaitable
 import matt.model.latch.SimpleLatch
 import java.lang.Thread.State
@@ -64,7 +65,7 @@ class DelegatedSlot<T>: AsyncBase<T>() {
   }
 }
 
-abstract class Async<T>: AsyncBase<T>() {
+abstract class Async<T>: AsyncBase<T>(), ValueWrapperIdea {
 
   protected open var value: T? = null
 
