@@ -18,18 +18,21 @@ object ValJson {
 		  i
 		}
 	  }
+	/*put them higher if I want them to change less often*/
+	val ide by aPort
+
 	val task by aPort
 	val top by aPort
 	val notify by aPort
 	val launch by aPort
-	val slidespace by aPort
+	/*val slidespace by aPort*/
 	val brainstorm by aPort
 	val kjg by aPort
 	val pdf by aPort
-	val ide by aPort
+
 	val graphviz by aPort
-	val ktor by aPort
+	/*val ktor by aPort*/
 	val spotify by aPort
-	val deephysWeb by aPort
+	val localKtorTest by aPort
   }
 }
