@@ -1,7 +1,7 @@
 package matt.model.syncop
 
-import matt.lang.NullToReduceObjects
 import matt.lang.YesIUseLang
+import matt.lang.anno.NullToReduceObjects
 import matt.lang.function.Op
 import matt.lang.sync.inSync
 import kotlin.jvm.Synchronized
