@@ -34,5 +34,6 @@ object ValJson {
 	/*val ktor by aPort*/
 	val spotify by aPort
 	val localKtorTest by aPort
+	val profileAgent by aPort
   }
 }

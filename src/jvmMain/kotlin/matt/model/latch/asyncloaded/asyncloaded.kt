@@ -1,27 +1,36 @@
 package matt.model.latch.asyncloaded
 
 import matt.lang.model.value.ValueWrapperIdea
+import matt.lang.weak.lazyWeak
 import matt.model.await.Awaitable
 import matt.model.latch.SimpleLatch
 import java.lang.Thread.State
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.thread
 
 class DaemonLoadedValueOp<T>(name: String? = null, private val op: ()->T): Async<T>() {
 
-  private val thread by lazy {
-	Thread {
+  companion object {
+	val threadIndex = AtomicInteger(0)
+  }
+
+  private val myThread by lazy {
+	thread(
+	  name = "DaemonLoadedValue Thread ${threadIndex.getAndIncrement()}",
+	  start = false,
+	  isDaemon = true
+	) {
 	  value = op()
 	  openAndDisposeLatch()
 	  if (name != null) println("finished loading $name")
-	}.apply {
-	  isDaemon = true
 	}
   }
 
   @Synchronized
   fun startLoading() {
 	require(latch!!.isClosed)
-	require(thread.state == State.NEW)
-	thread.start()
+	require(myThread.state == State.NEW)
+	myThread.start()
 
   }
 }
@@ -47,7 +56,7 @@ open class LoadedValueSlot<T>: Async<T>() {
   }
 }
 
-class DelegatedSlot<T>: AsyncBase<T>() {
+class DelegatedSlot<T: Any>: AsyncBase<T>() {
 
 
   private var getter: (()->T)? = null
@@ -61,6 +70,15 @@ class DelegatedSlot<T>: AsyncBase<T>() {
   @Synchronized
   fun putGetter(op: ()->T) {
 	getter = op
+	openAndDisposeLatch()
+  }
+
+  @Synchronized
+  fun putLazyWeakGetter(op: ()->T) {
+	val lw by lazyWeak {
+	  op()
+	}
+	getter = { lw }
 	openAndDisposeLatch()
   }
 }

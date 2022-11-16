@@ -1,8 +1,14 @@
 package matt.model.rect
 
-data class Rect(
-  val x: Int,
-  val y: Int,
-  val width: Int,
-  val height: Int
+data class RectSize(
+  val width: Double,
+  val height: Double
+)
+
+
+data class Rect<U>(
+  val x: U,
+  val y: U,
+  val width: U,
+  val height: U
 )
