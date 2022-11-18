@@ -9,7 +9,7 @@ object ValJson {
   private val ports = mutableMapOf<String, Int>()
 
   object Port: Map<String, Int> by ports {
-	private var num = 65000
+	private var num = 65000 /*max port possible is 65_535*/
 	private val aPort
 	  get() = provider {
 		val i = num++
@@ -18,6 +18,7 @@ object ValJson {
 		  i
 		}
 	  }
+
 	/*put them higher if I want them to change less often*/
 	val ide by aPort
 
@@ -25,15 +26,20 @@ object ValJson {
 	val top by aPort
 	val notify by aPort
 	val launch by aPort
+
 	/*val slidespace by aPort*/
 	val brainstorm by aPort
 	val kjg by aPort
 	val pdf by aPort
 
 	val graphviz by aPort
+
 	/*val ktor by aPort*/
 	val spotify by aPort
 	val localKtorTest by aPort
 	val profileAgent by aPort
+	//	val localKtorTest by aPort
+
+	val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
   }
 }

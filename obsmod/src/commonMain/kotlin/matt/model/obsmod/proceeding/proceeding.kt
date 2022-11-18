@@ -1,10 +1,9 @@
-package matt.model.obsmod.run
+package matt.model.obsmod.proceeding
 
 import matt.model.idea.ProceedingIdea
-import matt.model.obsmod.run.Proceeding.Status.OFF
-import matt.model.obsmod.run.Proceeding.Status.RUNNING
+import matt.model.obsmod.proceeding.Proceeding.Status.OFF
+import matt.model.obsmod.proceeding.Proceeding.Status.RUNNING
 import matt.model.startstop.Startable
-import matt.model.startstop.Stoppable
 import matt.obs.bindings.bool.ObsB
 import matt.obs.prop.ObsVal
 
@@ -38,7 +37,3 @@ fun Proceeding.afterStopped(op: ()->Unit) {
 }
 
 
-interface StoppableProceeding: Proceeding, Stoppable {
-  val stopButtonLabel: String
-  val canStop: ObsB
-}

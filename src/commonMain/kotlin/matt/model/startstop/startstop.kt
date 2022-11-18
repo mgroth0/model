@@ -7,7 +7,6 @@ interface Startable: ProceedingIdea {
   fun startAndJoin()
 }
 
-
 interface Stoppable: ProceedingIdea {
   fun sendStopSignal()
   fun stopAndJoin()
