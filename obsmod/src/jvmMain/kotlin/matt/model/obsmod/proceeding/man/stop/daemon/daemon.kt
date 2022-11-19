@@ -4,7 +4,7 @@ import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.ExceptionResponse
 import matt.log.profile.err.StructuredExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
-import matt.model.errreport.Report
+import matt.model.code.errreport.Report
 import matt.model.flowlogic.controlflowstatement.ControlFlow
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.man.stop.StoppableManualProceeding

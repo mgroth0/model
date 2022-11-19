@@ -1,7 +1,7 @@
 package matt.model.obsmod.proceeding.stop
 
 import matt.model.obsmod.proceeding.Proceeding
-import matt.model.startstop.Stoppable
+import matt.model.flowlogic.startstop.Stoppable
 import matt.obs.bindings.bool.ObsB
 
 interface StoppableProceeding: Proceeding, Stoppable {

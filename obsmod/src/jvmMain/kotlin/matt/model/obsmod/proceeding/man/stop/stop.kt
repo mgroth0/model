@@ -9,8 +9,8 @@ import matt.model.obsmod.proceeding.Proceeding.Status.STARTING
 import matt.model.obsmod.proceeding.Proceeding.Status.STOPPING
 import matt.model.obsmod.proceeding.man.ManualProceeding
 import matt.model.obsmod.proceeding.stop.StoppableProceeding
-import matt.model.successorfail.Fail
-import matt.model.successorfail.Success
+import matt.model.code.successorfail.Fail
+import matt.model.code.successorfail.Success
 import matt.obs.bindings.bool.ObsB
 import matt.obs.prop.VarProp
 import kotlin.concurrent.thread

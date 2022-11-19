@@ -39,3 +39,8 @@ abstract class SimpleData(private val identity: Any) {
 	return identity.hashCode()
   }
 }
+
+
+interface Searchable {
+  val searchSeq: Sequence<String>
+}

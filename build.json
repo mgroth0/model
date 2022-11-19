@@ -1,6 +1,6 @@
 {
   "type" :         "matt.mstruct.bj.MultiPlatformModule",
-  "jvm": {},
+  "jvm" :          {},
   "js" :           "LIB",
   "dependencies" : [
 	{
@@ -17,6 +17,11 @@
 	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
 	  "cfg" :  "commonMainApi",
 	  "key" :  "kotlinx-serialization-json"
+	},
+	{
+	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "cfg" :  "commonMainApi",
+	  "key" :  "kotlinx-coroutines"
 	},
 	{
 	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
