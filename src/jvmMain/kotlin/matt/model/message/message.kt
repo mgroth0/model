@@ -1,6 +1,7 @@
 package matt.model.message
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 
 class ActionResult(
@@ -118,6 +119,9 @@ data class PDFPageMessage(val pageNum: Int): InterAppMessage
 
 @Serializable
 class ObjMessage<T>(val obj: T): InterAppMessage
+
+@Serializable
+class JsonMessage(val json: JsonElement): InterAppMessage
 
 @Serializable
 class Freecomp(val path: String): InterAppMessage
