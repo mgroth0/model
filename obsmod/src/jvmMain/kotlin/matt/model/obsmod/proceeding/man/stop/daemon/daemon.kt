@@ -47,6 +47,7 @@ class DaemonLoopSpawnerProceeding(
 	require(loop == null)
 	loop = MutableRefreshTimeDaemonLoop(
 	  sleepInterval = sleepInterval,
+	  isDaemon = spawnDaemons,
 	  op = { op() },
 	  finalize = {
 		finalize()
@@ -67,8 +68,7 @@ class DaemonLoopSpawnerProceeding(
 		}
 	  }
 	).also {
-	  it.isDaemon = spawnDaemons
-	  it.start()
+	  it.sendStartSignal()
 	}
   }
 

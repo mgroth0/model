@@ -3,14 +3,14 @@ package matt.model.obsmod.proceeding.man.stop
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
 import matt.log.profile.err.with
+import matt.model.code.successorfail.Fail
+import matt.model.code.successorfail.Success
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.Proceeding.Status.RUNNING
 import matt.model.obsmod.proceeding.Proceeding.Status.STARTING
 import matt.model.obsmod.proceeding.Proceeding.Status.STOPPING
 import matt.model.obsmod.proceeding.man.ManualProceeding
 import matt.model.obsmod.proceeding.stop.StoppableProceeding
-import matt.model.code.successorfail.Fail
-import matt.model.code.successorfail.Success
 import matt.obs.bindings.bool.ObsB
 import matt.obs.prop.VarProp
 import kotlin.concurrent.thread
@@ -40,7 +40,7 @@ abstract class StoppableManualProceeding(
 	  RUNNING                 -> {
 		statusProp v STOPPING
 		messageProp v ""
-		thread {
+		thread(name = "Stop $name") {
 		  val result = exceptionHandler.with { stop() }
 		  messageProp v result.message
 		  statusProp v when (result) {
@@ -54,9 +54,12 @@ abstract class StoppableManualProceeding(
 	}
   }
 
-  @Synchronized final override fun stopAndJoin() {
-	require(canStop.value)
-	stopSwitch()?.join()
+  final override fun stopAndJoin() {
+	val stopThread = synchronized(this) {
+	  require(canStop.value)
+	  stopSwitch()
+	}
+	stopThread?.join()
   }
 
   override val canStop: ObsB = VarProp(true)
