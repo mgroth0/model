@@ -11,8 +11,7 @@ import kotlinx.serialization.Serializable
   Square, Sin
 }
 
-@Serializable
-class WaveConfig(val form: WaveForm, val phase: Phase)
+
 
 @Serializable
 class Phase(val degrees: Degrees)
