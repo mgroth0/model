@@ -1,4 +1,5 @@
 package matt.model.data.message
+
 import kotlinx.serialization.Serializable
 
 @Serializable
