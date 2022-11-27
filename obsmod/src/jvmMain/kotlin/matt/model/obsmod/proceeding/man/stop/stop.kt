@@ -31,7 +31,9 @@ abstract class StoppableManualProceeding(
 
 
   @Synchronized final override fun sendStopSignal() {
-	require(canStop.value)
+	require(canStop.value) {
+	  "sent stop signal when canStop of $name is false"
+	}
 	stopSwitch()
   }
 

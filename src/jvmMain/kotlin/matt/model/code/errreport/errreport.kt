@@ -37,6 +37,7 @@ fun Throwable.infoString(): String = """
 	if (it.length > 10_000) it.take(
 	  10_000
 	) + "... THROTTLED STACK TRACE STRING TO EASE STACK OVERFLOW ERROR DETECTION"
+	else it
   }
 }
   
