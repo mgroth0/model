@@ -1,5 +1,3 @@
-@file:JvmName("PromiseJvmKt")
-
 package matt.model.flowlogic.promise
 
 import matt.model.flowlogic.latch.SimpleLatch
