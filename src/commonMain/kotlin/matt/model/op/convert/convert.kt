@@ -81,6 +81,27 @@ interface Converter<A, B> {
 	}
 
   }
+
+
+
+}
+
+fun <A,B: Any> Converter<A,B>.asFailable() = object: FailableConverter<A,B> {
+  override fun convertToB(a: A): B? {
+	return this@asFailable.convertToB(a)
+  }
+
+  override fun convertToA(b: B): A {
+	return this@asFailable.convertToA(b)
+  }
+
+}
+
+interface FailableConverter<A,B: Any> {
+  fun convertToB(a: A): B?
+  fun A.toB() = convertToB(this)
+  fun convertToA(b: B): A
+  fun B.toA() = convertToA(this)
 }
 
 interface StringConverter<T>: Converter<String, T> {
@@ -88,6 +109,11 @@ interface StringConverter<T>: Converter<String, T> {
   fun fromString(s: String): T
   override fun convertToA(b: T): String = toString(b)
   override fun convertToB(a: String) = fromString(a)
+}
+
+object StringStringConverter: StringConverter<String> {
+  override fun toString(t: String) = t
+  override fun fromString(s: String) = s
 }
 
 object IntStringConverter: StringConverter<Int> {
