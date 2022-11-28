@@ -1,5 +1,7 @@
 package matt.model.data.mathable
 
+import matt.model.data.interp.BasicInterpolatable
+
 
 interface Mathable<M: Mathable<M>> {
   operator fun div(n: Number): M
@@ -11,7 +13,16 @@ interface Mathable<M: Mathable<M>> {
 
 interface MathAndComparable<M: MathAndComparable<M>>: Mathable<M>, Comparable<M>
 
-interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M> {
+interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpolatable<M> {
+
+  override fun interpolate(endValue: BasicInterpolatable<*>, t: Double): M {
+
+	@Suppress("UNCHECKED_CAST") if (t <= 0.0) return this as M
+	@Suppress("UNCHECKED_CAST") return if (t >= 1.0) (endValue as M) else fromDouble(
+	  asDouble + ((endValue as DoubleWrapper<M>).asDouble - asDouble)*t,
+	)
+  }
+
   override fun compareTo(other: M): Int {
 	return asDouble.compareTo(other.asDouble)
   }
