@@ -13,4 +13,7 @@ class SimpleLatch: Awaitable<Unit> {
   fun open() = latch.countDown()
   val isOpen get() = latch.count == 0L
   val isClosed get() = !isOpen
+  fun openned() = apply {
+    open()
+  }
 }

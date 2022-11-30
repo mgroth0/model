@@ -83,11 +83,10 @@ interface Converter<A, B> {
   }
 
 
-
 }
 
-fun <A,B: Any> Converter<A,B>.asFailable() = object: FailableConverter<A,B> {
-  override fun convertToB(a: A): B? {
+fun <A, B: Any> Converter<A, B>.asFailable() = object: FailableConverter<A, B> {
+  override fun convertToB(a: A): B {
 	return this@asFailable.convertToB(a)
   }
 
@@ -97,7 +96,7 @@ fun <A,B: Any> Converter<A,B>.asFailable() = object: FailableConverter<A,B> {
 
 }
 
-interface FailableConverter<A,B: Any> {
+interface FailableConverter<A, B: Any> {
   fun convertToB(a: A): B?
   fun A.toB() = convertToB(this)
   fun convertToA(b: B): A
@@ -111,14 +110,21 @@ interface StringConverter<T>: Converter<String, T> {
   override fun convertToB(a: String) = fromString(a)
 }
 
+interface FailableStringConverter<T: Any>: FailableConverter<String, T> {
+  fun toString(t: T): String
+  fun fromString(s: String): T?
+  override fun convertToA(b: T): String = toString(b)
+  override fun convertToB(a: String) = fromString(a)
+}
+
 object StringStringConverter: StringConverter<String> {
   override fun toString(t: String) = t
   override fun fromString(s: String) = s
 }
 
-object IntStringConverter: StringConverter<Int> {
+object IntStringConverter: FailableStringConverter<Int> {
   override fun toString(t: Int) = t.toString()
-  override fun fromString(s: String) = s.toInt()
+  override fun fromString(s: String) = s.toIntOrNull()
 }
 
 object MyNumberStringConverter: StringConverter<Number> {
