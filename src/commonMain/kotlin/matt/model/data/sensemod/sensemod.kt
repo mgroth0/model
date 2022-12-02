@@ -13,14 +13,21 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-class Phase(val degrees: Degrees) {
+data class Phase(val degrees: Degrees) {
+  companion object {
+	val ZERO = Phase(Degrees.ZERO)
+	val HALF_CYCLE = Phase(Degrees(180))
+  }
+
   override fun toString() = degrees.toString()
 }
 
 @Serializable
-class Degrees(val value: Int) {
+data class Degrees(val value: Int) {
   companion object {
 	const val SYMBOL = "°"
+	val ZERO = Degrees(0)
   }
+
   override fun toString() = "$value$SYMBOL"
 }
