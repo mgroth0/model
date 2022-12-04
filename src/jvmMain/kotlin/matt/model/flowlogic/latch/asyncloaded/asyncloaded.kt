@@ -31,7 +31,6 @@ class DaemonLoadedValueOp<T>(name: String? = null, private val op: ()->T): Async
 	require(latch!!.isClosed)
 	require(myThread.state == State.NEW)
 	myThread.start()
-
   }
 }
 
