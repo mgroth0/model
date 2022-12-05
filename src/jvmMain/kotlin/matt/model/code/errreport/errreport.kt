@@ -9,6 +9,8 @@ abstract class Report {
   }
 }
 
+fun Throwable.printReport() = ThrowReport(this).print()
+
 /*can later collect machine and context info, etc*/
 class ThrowReport(private val t: Thread?, private val e: Throwable?): Report() {
   constructor(e: Throwable): this(Thread.currentThread(), e)
