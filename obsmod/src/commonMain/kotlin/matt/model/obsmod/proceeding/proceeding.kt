@@ -23,6 +23,7 @@ interface Proceeding: ProceedingIdea, Startable {
 	STOPPING
   }
 }
+val Proceeding.isRunning get() = status.value == RUNNING
 
 fun Proceeding.afterStarted(op: ()->Unit) {
   status.onChange {
