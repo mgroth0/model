@@ -11,6 +11,8 @@ interface Mathable<M: Mathable<M>> {
   operator fun minus(m: M): M
 }
 
+
+
 interface MathAndComparable<M: MathAndComparable<M>>: Mathable<M>, Comparable<M>
 
 interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpolatable<M> {

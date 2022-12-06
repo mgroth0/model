@@ -23,3 +23,19 @@ class CanOnlySetOnce<V>: ReadWriteProperty<Any?, V?> {
 	myValue = value
   }
 }
+
+class RequireAlwaysEverySetEqual<V>: ReadWriteProperty<Any?, V?> {
+  private var didSet = false
+  private var myValue: V? = null
+
+  override fun getValue(thisRef: Any?, property: KProperty<*>) = myValue
+
+  @Synchronized
+  override fun setValue(thisRef: Any?, property: KProperty<*>, value: V?) {
+	if (didSet) require(value == myValue)
+	else {
+	  myValue = value
+	  didSet = true
+	}
+  }
+}

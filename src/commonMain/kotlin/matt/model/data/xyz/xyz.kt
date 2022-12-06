@@ -29,3 +29,7 @@ data class XYZ(val x: Double, val y: Double, val z: Double): Mathable<XYZ> {
 
 
 }
+
+
+enum class Dim2D { X, Y }
+enum class Dim3D { X, Y, Z }
