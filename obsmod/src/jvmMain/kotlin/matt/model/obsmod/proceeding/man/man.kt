@@ -55,7 +55,9 @@ abstract class ManualProceeding(
 
   final override fun startAndJoin() {
 	val startThread = synchronized(this) {
-	  require(canStart.value)
+	  require(canStart.value) {
+		"$this cannot start"
+	  }
 	  startSwitch()
 	}
 	startThread?.join()
