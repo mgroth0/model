@@ -14,3 +14,9 @@ interface WritableText: HasText {
 interface WritableBytes: HasBytes {
   override var bytes: ByteArray
 }
+
+interface MightExist {
+  fun exists(): Boolean
+}
+
+interface MightExistAndWritableText: MightExist, WritableText
