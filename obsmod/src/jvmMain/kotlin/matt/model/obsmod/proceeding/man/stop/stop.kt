@@ -16,7 +16,7 @@ import matt.obs.prop.VarProp
 import kotlin.concurrent.thread
 
 abstract class StoppableManualProceeding(
-  noun: String,
+  override val noun: String,
   exceptionHandler: ExceptionHandler = defaultExceptionHandler
 ): ManualProceeding(
   startButtonLabel = "Start $noun",

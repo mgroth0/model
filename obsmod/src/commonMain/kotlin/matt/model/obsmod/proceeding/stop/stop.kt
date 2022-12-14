@@ -7,4 +7,5 @@ import matt.obs.bindings.bool.ObsB
 interface StoppableProceeding: Proceeding, Stoppable {
   val stopButtonLabel: String
   val canStop: ObsB
+  val noun: String
 }
