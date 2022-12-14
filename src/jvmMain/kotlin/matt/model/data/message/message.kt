@@ -50,8 +50,8 @@ object YES: InterAppMessage
 class FileMessage(val file: SFile): InterAppMessage
 
 @Serializable
-class FilesMessage(vararg val files: SFile): InterAppMessage {
-  constructor(files: List<SFile>): this(*files.toTypedArray())
+class FilesMessage(val files: List<SFile>): InterAppMessage {
+  //  constructor(files: List<SFile>): this(*files.toTypedArray())
 }
 
 @Serializable

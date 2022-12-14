@@ -1,9 +1,11 @@
 package matt.model.data.message
 
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
+@JvmInline
 @Serializable
-class SFile(val path: String) {
+value class SFile(val path: String) {
   override fun toString() = path
 }
 
