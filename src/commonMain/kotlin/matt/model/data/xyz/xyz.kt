@@ -2,6 +2,7 @@ package matt.model.data.xyz
 
 import matt.lang.NOT_IMPLEMENTED
 import matt.model.data.mathable.Mathable
+import kotlin.math.absoluteValue
 
 fun xyz(x: Number = 0, y: Number = 0, z: Number = 0) = XYZ(x = x.toDouble(), y = y.toDouble(), z = z.toDouble())
 data class XYZ(val x: Double, val y: Double, val z: Double): Mathable<XYZ> {
@@ -12,6 +13,7 @@ data class XYZ(val x: Double, val y: Double, val z: Double): Mathable<XYZ> {
   override fun times(n: Number): XYZ {
 	return XYZ(x*n.toDouble(), y*n.toDouble(), z*n.toDouble())
   }
+
 
   override fun div(m: XYZ) = NOT_IMPLEMENTED
 
@@ -27,6 +29,9 @@ data class XYZ(val x: Double, val y: Double, val z: Double): Mathable<XYZ> {
 	return XYZ(x - m.x, y - m.y, z - m.z)
   }
 
+
+  override val abs: XYZ
+	get() = XYZ(x = x.absoluteValue, y = y.absoluteValue, z = z.absoluteValue)
 
 }
 

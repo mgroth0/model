@@ -1,6 +1,7 @@
 package matt.model.data.mathable
 
 import matt.model.data.interp.BasicInterpolatable
+import kotlin.math.abs
 
 
 interface Mathable<M: Mathable<M>> {
@@ -9,18 +10,26 @@ interface Mathable<M: Mathable<M>> {
   operator fun times(n: Number): M
   operator fun plus(m: M): M
   operator fun minus(m: M): M
-  val isZero: Boolean
-  val isNaN: Boolean
-  val isInfinity: Boolean
+
   val abs: M
-  fun of(n: Int): M
+
 }
+
 
 
 
 interface MathAndComparable<M: MathAndComparable<M>>: Mathable<M>, Comparable<M>
 
-interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpolatable<M> {
+
+interface NumberWrapper<N: NumberWrapper<N>> {
+  val asNumber: Number
+  val isZero: Boolean
+  val isNaN: Boolean
+  val isInfinite: Boolean
+  fun of(n: Int): N
+}
+
+interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpolatable<M>, NumberWrapper<M> {
 
   override fun interpolate(endValue: BasicInterpolatable<*>, t: Double): M {
 
@@ -36,6 +45,8 @@ interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpo
 
   fun fromDouble(d: Double): M
   val asDouble: Double
+  override val asNumber: Number
+	get() = asDouble
   override fun plus(m: M): M {
 	return fromDouble(asDouble + m.asDouble)
   }
@@ -56,16 +67,33 @@ interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpo
 	return asDouble/m.asDouble
   }
 
+  override val isInfinite: Boolean
+	get() = asDouble.isInfinite()
+
+  override val isNaN: Boolean
+	get() = asDouble.isNaN()
+
+  override val isZero: Boolean
+	get() = asDouble == 0.0
+
+  override val abs: M
+	get() = fromDouble(abs(asDouble))
+
+  override fun of(n: Int): M {
+	return fromDouble(n.toDouble())
+  }
 }
 
 
-interface FloatWrapper<M: FloatWrapper<M>>: MathAndComparable<M> {
+interface FloatWrapper<M: FloatWrapper<M>>: MathAndComparable<M>, NumberWrapper<M> {
   override fun compareTo(other: M): Int {
 	return asFloat.compareTo(other.asFloat)
   }
 
   fun fromFloat(d: Float): M
   val asFloat: Float
+  override val asNumber: Number
+	get() = asFloat
   override fun plus(m: M): M {
 	return fromFloat(asFloat + m.asFloat)
   }
@@ -84,6 +112,22 @@ interface FloatWrapper<M: FloatWrapper<M>>: MathAndComparable<M> {
 
   override fun times(n: Number): M {
 	return fromFloat(asFloat*n.toFloat())
+  }
+
+  override val isNaN: Boolean
+	get() = asFloat.isNaN()
+
+  override val isZero: Boolean
+	get() = asFloat == 0.0f
+
+  override val abs: M
+	get() = fromFloat(abs(asFloat))
+
+  override val isInfinite: Boolean
+	get() = asFloat.isInfinite()
+
+  override fun of(n: Int): M {
+	return fromFloat(n.toFloat())
   }
 
 }

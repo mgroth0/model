@@ -7,6 +7,7 @@ import matt.model.data.byte.ByteSize.ByteUnit.KB
 import matt.model.data.byte.ByteSize.ByteUnit.MB
 import matt.model.data.byte.ByteSize.ByteUnit.TB
 import matt.model.data.mathable.MathAndComparable
+import matt.model.data.mathable.NumberWrapper
 import matt.model.op.convert.Converter
 import kotlin.jvm.JvmName
 import kotlin.math.abs
@@ -24,7 +25,7 @@ val Long.megabytes get() = ByteSize(this*MB.size)
 val Long.gigabytes get() = ByteSize(this*GB.size)
 val Long.terabytes get() = ByteSize(this*TB.size)
 
-data class ByteSize(val bytes: Long): MathAndComparable<ByteSize> {
+data class ByteSize(val bytes: Long): MathAndComparable<ByteSize>, NumberWrapper<ByteSize> {
   constructor(bytes: Number): this(bytes.toLong())
 
 
@@ -59,13 +60,17 @@ data class ByteSize(val bytes: Long): MathAndComparable<ByteSize> {
 	get() = bytes == 0L
   override val isNaN: Boolean
 	get() = false
-  override val isInfinity: Boolean
+  override val isInfinite: Boolean
 	get() = false
   override val abs: ByteSize
 	get() = ByteSize(abs(bytes))
 
+
+  override val asNumber: Number
+	get() = bytes
+
   override fun of(n: Int): ByteSize {
-	TODO("Not yet implemented")
+	return ByteSize(n)
   }
 
   override fun div(m: ByteSize) = bytes/m.bytes
