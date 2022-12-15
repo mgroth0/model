@@ -6,9 +6,10 @@ import matt.model.data.byte.ByteSize.ByteUnit.GB
 import matt.model.data.byte.ByteSize.ByteUnit.KB
 import matt.model.data.byte.ByteSize.ByteUnit.MB
 import matt.model.data.byte.ByteSize.ByteUnit.TB
-import matt.model.op.convert.Converter
 import matt.model.data.mathable.MathAndComparable
+import matt.model.op.convert.Converter
 import kotlin.jvm.JvmName
+import kotlin.math.abs
 
 
 val Int.bytes get() = ByteSize(this)
@@ -54,6 +55,19 @@ data class ByteSize(val bytes: Long): MathAndComparable<ByteSize> {
   override fun compareTo(other: ByteSize) = this.bytes.compareTo(other.bytes)
   override fun div(n: Number): ByteSize = ByteSize(bytes/n.toLong())
   override fun times(n: Number) = ByteSize(bytes*n.toLong())
+  override val isZero: Boolean
+	get() = bytes == 0L
+  override val isNaN: Boolean
+	get() = false
+  override val isInfinity: Boolean
+	get() = false
+  override val abs: ByteSize
+	get() = ByteSize(abs(bytes))
+
+  override fun of(n: Int): ByteSize {
+	TODO("Not yet implemented")
+  }
+
   override fun div(m: ByteSize) = bytes/m.bytes
   override operator fun plus(m: ByteSize) = ByteSize(bytes + m.bytes)
   override operator fun minus(m: ByteSize) = ByteSize(bytes - m.bytes)
