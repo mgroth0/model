@@ -2,6 +2,7 @@ package matt.model.data.mathable
 
 import matt.model.data.interp.BasicInterpolatable
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 
 interface Mathable<M: Mathable<M>> {
@@ -138,7 +139,7 @@ data class Fraction<N: Mathable<N>, D: Mathable<D>>(val n: N, val d: D)
 operator fun <M: Mathable<M>, D: Mathable<D>> M.div(d: D) = Fraction(n = this, d = d)
 
 
-interface IntWrapper<M: IntWrapper<M>>: MathAndComparable<M> {
+interface IntWrapper<M: IntWrapper<M>>: NumberWrapper<M> {
   override fun compareTo(other: M): Int {
 	return asInt.compareTo(other.asInt)
   }
@@ -163,6 +164,25 @@ interface IntWrapper<M: IntWrapper<M>>: MathAndComparable<M> {
 
   override fun div(m: M): Number {
 	return asInt/m.asInt
+  }
+
+  override val abs: M
+	get() = fromInt(asInt.absoluteValue)
+
+  override val asNumber: Number
+	get() = asInt
+
+  override val isInfinite: Boolean
+	get() = false
+
+  override val isNaN: Boolean
+	get() = false
+
+  override val isZero: Boolean
+	get() = asInt == 0
+
+  override fun of(n: Int): M {
+	return fromInt(n)
   }
 
 }
