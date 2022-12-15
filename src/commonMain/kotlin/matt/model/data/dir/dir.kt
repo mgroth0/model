@@ -9,8 +9,8 @@ enum class Direction() {
 }
 
 
-enum class LeftOrRight(val textSymbol: String) {
-  LEFT("←"), RIGHT("→")
+enum class LeftOrRight(val textSymbol: String, val moreSymbol: String) {
+  LEFT("←","<<"), RIGHT("→",">>")
 }
 
 @Serializable

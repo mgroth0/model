@@ -9,6 +9,11 @@ interface Mathable<M: Mathable<M>> {
   operator fun times(n: Number): M
   operator fun plus(m: M): M
   operator fun minus(m: M): M
+  val isZero: Boolean
+  val isNaN: Boolean
+  val isInfinity: Boolean
+  val abs: M
+  fun of(n: Int): M
 }
 
 
