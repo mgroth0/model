@@ -21,7 +21,7 @@ interface Mathable<M: Mathable<M>> {
 interface MathAndComparable<M: MathAndComparable<M>>: Mathable<M>, Comparable<M>
 
 
-interface NumberWrapper<N: NumberWrapper<N>> {
+interface NumberWrapper<N: NumberWrapper<N>>: MathAndComparable<N> {
   val asNumber: Number
   val isZero: Boolean
   val isNaN: Boolean
