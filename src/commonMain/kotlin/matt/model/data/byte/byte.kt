@@ -14,13 +14,13 @@ import kotlin.math.abs
 
 
 val Int.bytes get() = ByteSize(this)
-val Int.killobytes get() = ByteSize(this*KB.size)
+val Int.kilobytes get() = ByteSize(this*KB.size)
 val Int.megabytes get() = ByteSize(this*MB.size)
 val Int.gigabytes get() = ByteSize(this*GB.size)
 val Int.terabytes get() = ByteSize(this*TB.size)
 
 val Long.bytes get() = ByteSize(this)
-val Long.killobytes get() = ByteSize(this*KB.size)
+val Long.kilobytes get() = ByteSize(this*KB.size)
 val Long.megabytes get() = ByteSize(this*MB.size)
 val Long.gigabytes get() = ByteSize(this*GB.size)
 val Long.terabytes get() = ByteSize(this*TB.size)
