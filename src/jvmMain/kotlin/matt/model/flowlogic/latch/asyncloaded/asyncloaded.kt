@@ -32,6 +32,12 @@ class DaemonLoadedValueOp<T>(name: String? = null, private val op: ()->T): Async
 	require(myThread.state == State.NEW)
 	myThread.start()
   }
+
+  @Synchronized
+  fun startLoadingIfNotStarted() {
+	if (myThread.state == State.NEW) myThread.start()
+  }
+
 }
 
 open class SyncLoadedValueOp<T>(private val op: ()->T): Async<T>() {
