@@ -1,5 +1,6 @@
 package matt.model.flowlogic.runner
 
+import matt.lang.function.Convert
 import matt.lang.function.On
 import matt.lang.function.Produce
 
@@ -10,9 +11,8 @@ interface Runner {
 
 interface Run<R> {
   fun whenFinished(op: On<R>)
-  fun join(op: On<R>)
+  fun <RR> join(op: Convert<R,RR>): RR
 }
-
 
 
 object InPlaceRunner: Runner {
@@ -27,7 +27,7 @@ class AlreadyFinishedRun<R> internal constructor(private val r: R): Run<R> {
 	op(r)
   }
 
-  override fun join(op: On<R>) {
-	op(r)
+  override fun <RR> join(op: Convert<R,RR>): RR {
+	return op(r)
   }
 }

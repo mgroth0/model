@@ -1,11 +1,10 @@
 package matt.model.flowlogic.runner
 
+import matt.lang.function.Convert
 import matt.lang.function.On
 import matt.lang.function.Produce
 import matt.lang.model.value.Value
 import matt.model.flowlogic.latch.asyncloaded.LoadedValueSlot
-import matt.model.flowlogic.runner.Run
-import matt.model.flowlogic.runner.Runner
 import kotlin.concurrent.thread
 
 object ThreadRunner: Runner {
@@ -29,9 +28,9 @@ class ThreadRun<R> internal constructor(): Run<R> {
 	}
   }
 
-  override fun join(op: On<R>) {
+  override fun <RR> join(op: Convert<R, RR>): RR {
 	thread!!.join()
-	op(result!!.value)
+	return op(result!!.value)
   }
 }
 
@@ -43,8 +42,8 @@ class ResultRun<R>(private val result: LoadedValueSlot<R>): Run<R> {
 	}
   }
 
-  override fun join(op: On<R>) {
-	op(result.await())
+  override fun <RR> join(op: Convert<R, RR>): RR {
+	return op(result.await())
   }
 }
 

@@ -10,10 +10,14 @@ enum class Direction() {
 
 
 enum class LeftOrRight(val textSymbol: String, val moreSymbol: String) {
-  LEFT("←","<<"), RIGHT("→",">>")
+  LEFT("←", "<<"), RIGHT("→", ">>")
 }
 
 @Serializable
 enum class OffOrOn {
   OFF, ON
+}
+
+enum class YesOrNo {
+  YES, NO
 }
