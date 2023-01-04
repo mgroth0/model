@@ -18,6 +18,7 @@ val RelativeToKMod.gradlePath get() = ":k:${relToKNames.joinToString(":")}"
 
 interface AbsoluteMod: RelativeMod {
   val modName: String
+  val groupName: String?
 }
 
 interface AbsoluteKMod: AbsoluteMod, RelativeToKMod {
