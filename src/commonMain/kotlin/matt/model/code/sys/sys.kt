@@ -92,6 +92,7 @@ class UnknownWindowsMachine(): WindowsMachine(
 
 sealed interface Linux: Unix {
   override val caseSensitive get() = true
+  val isAarch64: Boolean
 }
 
 sealed class LinuxMachine(
@@ -117,6 +118,9 @@ class OpenMind(
   init {
 	require(inSlurmJob == node is OpenMindSlurmNode)
   }
+
+  override val isAarch64: Boolean
+	get() = TODO("Not yet implemented")
 }
 
 sealed class OpenMindNode
@@ -139,11 +143,15 @@ class OpenMindSlurmNode(val n: Int): OpenMindNode()
 class VagrantLinuxMachine: LinuxMachine(
   getHomeDir = { TODO() },
   getRegisteredDir = { TODO() },
-)
+) {
+  override val isAarch64: Boolean
+	get() = TODO("Not yet implemented")
+}
 
-class UnknownLinuxMachine(val hostname: String, homeDir: String): LinuxMachine(
+class UnknownLinuxMachine(val hostname: String, homeDir: String, isAarch64: Lazy<Boolean>): LinuxMachine(
   getHomeDir = { homeDir },
   getRegisteredDir = { null },
 ) {
   override fun toString() = "[${UnknownLinuxMachine::class.simpleName} with hostname=$hostname]"
+  override val isAarch64 by isAarch64
 }
