@@ -5,8 +5,11 @@ import matt.model.data.mathable.IntWrapper
 import matt.model.op.convert.Converter
 import kotlin.math.absoluteValue
 
+fun <T> MyIndexedValue<T, Index>.toKotlinIndexedValue() = IndexedValue(index = index.i, value = element)
+
 infix fun <T> T.withIndex(i: Int) = MyIndexedValue(index = Index(i), element = this)
-infix fun <T, I: AbstractIndex> T.withIndex(i: I): MyIndexedValue<T, I> = MyIndexedValue<T, I>(index = i, element = this)
+infix fun <T, I: AbstractIndex> T.withIndex(i: I): MyIndexedValue<T, I> =
+  MyIndexedValue<T, I>(index = i, element = this)
 
 class MyIndexedValue<T, I: AbstractIndex>(val element: T, val index: I) {
   override fun toString(): String {
