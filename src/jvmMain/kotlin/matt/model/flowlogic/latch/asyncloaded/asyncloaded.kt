@@ -1,5 +1,6 @@
 package matt.model.flowlogic.latch.asyncloaded
 
+import matt.lang.go
 import matt.lang.model.value.ValueWrapperIdea
 import matt.lang.weak.lazyWeak
 import matt.model.flowlogic.await.Awaitable
@@ -59,6 +60,8 @@ open class LoadedValueSlot<T>: Async<T>() {
 	value = t
 	openAndDisposeLatch()
   }
+
+  fun isDone() = latch?.isOpen ?: true
 }
 
 class DelegatedSlot<T: Any>: AsyncBase<T>() {
@@ -90,7 +93,22 @@ class DelegatedSlot<T: Any>: AsyncBase<T>() {
 
 abstract class Async<T>: AsyncBase<T>(), ValueWrapperIdea {
 
-  protected open var value: T? = null
+  private var setListeners: Lazy<MutableList<(T)->Unit>>? = lazy { mutableListOf() }
+
+  @Suppress("UNCHECKED_CAST")
+  protected var value: T? = null
+	@Synchronized set(value) {
+	  field = value
+	  setListeners?.go {
+		if (it.isInitialized()) {
+		  it.value.forEach { operation ->
+			operation(value as T)
+		  }
+		}
+		setListeners = null
+	  }
+
+	}
 
 
   override fun await(): T {
@@ -98,6 +116,18 @@ abstract class Async<T>: AsyncBase<T>(), ValueWrapperIdea {
 	@Suppress("UNCHECKED_CAST")
 	return value as T
   }
+
+  @Synchronized
+  fun whenReady(op: (T)->Unit) {
+	val ready = latch?.isOpen ?: true
+	if (ready) op(await())
+	else {
+	  setListeners!!.value.add {
+		op(it)
+	  }
+	}
+  }
+
 }
 
 /*is this just a future? or a modified lazy?*/
