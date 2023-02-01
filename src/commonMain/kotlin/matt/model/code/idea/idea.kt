@@ -9,3 +9,4 @@ interface ProjectIdea
 interface SerIdea
 interface MChartIdea
 interface DebuggerIdea
+interface LinearGradientIdea

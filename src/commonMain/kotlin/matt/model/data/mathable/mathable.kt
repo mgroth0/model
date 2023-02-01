@@ -1,6 +1,7 @@
 package matt.model.data.mathable
 
 import matt.model.data.interp.BasicInterpolatable
+import kotlin.jvm.JvmInline
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
@@ -28,6 +29,8 @@ interface NumberWrapper<N: NumberWrapper<N>>: MathAndComparable<N> {
   val isNaN: Boolean
   val isInfinite: Boolean
   fun of(n: Int): N
+//  val minimumPossibleValue: NumberWrapper<N>
+//  val maximumPossibleValue: NumberWrapper<N>
 }
 
 interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpolatable<M>, NumberWrapper<M> {
@@ -83,6 +86,14 @@ interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpo
   override fun of(n: Int): M {
 	return fromDouble(n.toDouble())
   }
+
+}
+
+@JvmInline
+value class BasicDoubleWrapper(override val asDouble: Double): DoubleWrapper<BasicDoubleWrapper> {
+  override fun fromDouble(d: Double): BasicDoubleWrapper {
+	return BasicDoubleWrapper(d)
+  }
 }
 
 
@@ -131,6 +142,13 @@ interface FloatWrapper<M: FloatWrapper<M>>: MathAndComparable<M>, NumberWrapper<
 	return fromFloat(n.toFloat())
   }
 
+}
+
+@JvmInline
+value class BasicFloatWrapper(override val asFloat: Float): FloatWrapper<BasicFloatWrapper> {
+  override fun fromFloat(d: Float): BasicFloatWrapper {
+	return BasicFloatWrapper(d)
+  }
 }
 
 
