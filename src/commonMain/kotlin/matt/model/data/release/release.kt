@@ -42,8 +42,8 @@ data class Version(val first: Int, val second: Int, val third: Int): Comparable<
 
   fun increment(level: UpdateLevel): Version {
 	return when (level) {
-	  PUBLISH -> Version(first + 1, second, third)
-	  FEATURE -> Version(first, second + 1, third)
+	  PUBLISH -> Version(first + 1, 0, 0)
+	  FEATURE -> Version(first, second + 1, 0)
 	  PATCH   -> Version(first, second, third + 1)
 	}
   }
