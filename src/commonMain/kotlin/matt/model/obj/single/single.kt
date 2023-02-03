@@ -3,15 +3,15 @@ package matt.model.obj.single
 import kotlin.jvm.Synchronized
 import kotlin.reflect.KClass
 
-internal val singletons = mutableSetOf<KClass<*>>()
-
-@Synchronized
-fun Any.registerSingleton() {
-  require(this::class !in singletons) {
-	"tried to create 2 of registered singleton ${this::class.simpleName}"
-  }
-  singletons += this::class
-}
+//internal val singletons = mutableSetOf<KClass<*>>()
+//dd
+//@Synchronized
+//fun Any.registerSingleton() {
+//  require(this::class !in singletons) {
+//	"tried to create 2 of registered singleton ${this::class.simpleName}"
+//  }
+//  singletons += this::class
+//}
 
 open class Singleton {
 
