@@ -18,6 +18,8 @@ interface Mathable<M: Mathable<M>> {
 }
 
 
+
+
 interface MathAndComparable<M: MathAndComparable<M>>: Mathable<M>, Comparable<M>
 
 
@@ -27,15 +29,16 @@ interface NumberWrapper<N: NumberWrapper<N>>: MathAndComparable<N> {
   val isNaN: Boolean
   val isInfinite: Boolean
   fun of(n: Int): N
-  //  val minimumPossibleValue: NumberWrapper<N>
-  //  val maximumPossibleValue: NumberWrapper<N>
+//  val minimumPossibleValue: NumberWrapper<N>
+//  val maximumPossibleValue: NumberWrapper<N>
 }
 
 interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpolatable<M>, NumberWrapper<M> {
 
-  override fun interpolate(endValue: M, t: Double): M {
+  override fun interpolate(endValue: BasicInterpolatable<*>, t: Double): M {
+
 	@Suppress("UNCHECKED_CAST") if (t <= 0.0) return this as M
-	return if (t >= 1.0) endValue else fromDouble(
+	@Suppress("UNCHECKED_CAST") return if (t >= 1.0) (endValue as M) else fromDouble(
 	  asDouble + ((endValue as DoubleWrapper<M>).asDouble - asDouble)*t,
 	)
   }
@@ -48,7 +51,6 @@ interface DoubleWrapper<M: DoubleWrapper<M>>: MathAndComparable<M>, BasicInterpo
   val asDouble: Double
   override val asNumber: Number
 	get() = asDouble
-
   override fun plus(m: M): M {
 	return fromDouble(asDouble + m.asDouble)
   }
@@ -104,7 +106,6 @@ interface FloatWrapper<M: FloatWrapper<M>>: MathAndComparable<M>, NumberWrapper<
   val asFloat: Float
   override val asNumber: Number
 	get() = asFloat
-
   override fun plus(m: M): M {
 	return fromFloat(asFloat + m.asFloat)
   }

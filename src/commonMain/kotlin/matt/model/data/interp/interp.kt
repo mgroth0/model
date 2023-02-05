@@ -15,5 +15,5 @@ interface BasicInterpolatable<T: Any> {
    *            fraction between {@code 0.0} and {@code 1.0}
    * @return interpolated value
    */
-  fun interpolate(endValue: T, t: Double): T
+  fun interpolate(endValue: BasicInterpolatable<*>, t: Double): T
 }
