@@ -20,8 +20,10 @@ data class Release(
 
 @Serializable
 class Commit(
-  val sha: String,
-  val url: String
+  /*sha must be private because it is not correctly retrieved from authenticated github client*/
+  private val sha: String,
+  /*url must be private because I DONT KNOW if it is correctly retrieved from authenticated github client*/
+  private val url: String
 )
 
 @Serializable
