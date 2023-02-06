@@ -1,6 +1,7 @@
 package matt.model.code.mod
 
 import matt.model.code.idea.ModIdea
+import kotlin.jvm.JvmInline
 
 
 interface ModType: ModIdea
@@ -13,6 +14,9 @@ interface KMod: ModType
 interface RelativeToKMod: RelativeMod, KMod {
   val relToKNames: List<String>
 }
+
+@JvmInline
+value class GradlePath(val path: String)
 
 val RelativeToKMod.gradlePath get() = ":k:${relToKNames.joinToString(":")}"
 
