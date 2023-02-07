@@ -16,11 +16,6 @@
 	{
 	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
 	  "cfg" :  "commonMainApi",
-	  "key" :  "kotlinx-coroutines"
-	},
-	{
-	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
-	  "cfg" :  "commonMainApi",
 	  "key" :  "kotlinx-datetime"
 	},
 	{
