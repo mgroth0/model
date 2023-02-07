@@ -4,22 +4,22 @@
   "js" :           "LIB",
   "dependencies" : [
 	{
-	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "type" : "Lib",
 	  "cfg" :  "commonMainApi",
 	  "key" :  "kt-stdlib"
 	},
 	{
-	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "type" : "Lib",
 	  "cfg" :  "commonMainApi",
 	  "key" :  "kotlinx-serialization-json"
 	},
 	{
-	  "type" : "matt.mstruct.bj.BuildJsonLibDependency",
+	  "type" : "Lib",
 	  "cfg" :  "commonMainApi",
 	  "key" :  "kotlinx-datetime"
 	},
 	{
-	  "type" : "matt.mstruct.bj.BuildJsonProjectDependency",
+	  "type" : "Project",
 	  "cfg" :  "commonMainApi",
 	  "path" : ":k:lang"
 	}
