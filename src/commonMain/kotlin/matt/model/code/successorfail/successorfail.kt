@@ -1,7 +1,5 @@
 package matt.model.code.successorfail
 
-import matt.model.obj.tostringbuilder.toStringBuilder
-
 
 inline fun <R> mightFail(op: FailableDSL.()->R): FailableReturn<R> {
   return FailableDSL.runOrFail(op)
@@ -65,6 +63,6 @@ object Success: SuccessOrFail {
 
 class Fail(override val message: String): SuccessOrFail {
   override fun toString(): String {
-	return toStringBuilder("message" to message)
+	return "Fail[message=\"$message\"]"
   }
 }
