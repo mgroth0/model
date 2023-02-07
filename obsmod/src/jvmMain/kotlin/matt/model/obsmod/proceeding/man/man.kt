@@ -6,7 +6,6 @@ import matt.log.profile.err.defaultExceptionHandler
 import matt.log.profile.err.with
 import matt.model.code.successorfail.Fail
 import matt.model.code.successorfail.Success
-import matt.model.obj.tostringbuilder.toStringBuilder
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.Proceeding.Status.RUNNING
 import matt.model.obsmod.proceeding.Proceeding.Status.STARTING
@@ -14,6 +13,7 @@ import matt.model.obsmod.proceeding.Proceeding.Status.STOPPING
 import matt.model.obsmod.proceeding.ProceedingImpl
 import matt.obs.bindings.bool.ObsB
 import matt.obs.prop.VarProp
+import matt.reflect.tostring.toStringBuilder
 import kotlin.concurrent.thread
 
 abstract class ManualProceeding(
