@@ -2,13 +2,13 @@ package matt.model.obsmod.proceeding.man.stop
 
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
-import matt.log.profile.err.with
 import matt.model.code.successorfail.Fail
 import matt.model.code.successorfail.Success
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.Proceeding.Status.RUNNING
 import matt.model.obsmod.proceeding.Proceeding.Status.STARTING
 import matt.model.obsmod.proceeding.Proceeding.Status.STOPPING
+import matt.model.obsmod.proceeding.err.with
 import matt.model.obsmod.proceeding.man.ManualProceeding
 import matt.model.obsmod.proceeding.stop.StoppableProceeding
 import matt.obs.bindings.bool.ObsB
