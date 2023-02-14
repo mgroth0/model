@@ -1,10 +1,10 @@
 package matt.model.flowlogic.promise
 
+import matt.lang.anno.OnlySynchronizedOnJvm
 import matt.lang.function.Op
 import matt.lang.function.Produce
 import matt.model.code.idea.ProceedingIdea
 import matt.model.flowlogic.await.Awaitable
-import kotlin.jvm.Synchronized
 
 /*Loosely based on the general computer science construct Promise and its javascript implementation and inspired by its name. For me, the name has literal significance too. Used in a case when an abstract function is supposed to do something asynchronously. But since there is sometimes nothing to return, there is less enforcement that the subclass actually implements the asynchronous function. The Commitment is a way for the subclass to "commit" that it is doing the async operation that it is supposed to be doing*/
 
@@ -34,7 +34,7 @@ open class CommitmentMaker: Commitment {
   final override var isFulfilled = false
 	private set
 
-  @Synchronized
+  @OnlySynchronizedOnJvm
   fun fulfilled() {
 	require(!isFulfilled) {
 	  "fulfilled twice"
@@ -47,7 +47,7 @@ open class CommitmentMaker: Commitment {
 
   private val thens = mutableListOf<Op>()
 
-  @Synchronized
+  @OnlySynchronizedOnJvm
   override fun then(op: Op): Commitment {
 	val c = CommitmentMaker()
 	if (isFulfilled) {
@@ -63,7 +63,7 @@ open class CommitmentMaker: Commitment {
   }
 
 
-  @Synchronized
+  @OnlySynchronizedOnJvm
   override fun thenAsync(op: Produce<Commitment>): Commitment {
 	val c = CommitmentMaker()
 	if (isFulfilled) {

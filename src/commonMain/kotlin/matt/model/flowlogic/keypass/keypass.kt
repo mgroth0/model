@@ -1,16 +1,16 @@
 package matt.model.flowlogic.keypass
 
-import kotlin.jvm.Synchronized
+import matt.lang.anno.OnlySynchronizedOnJvm
 
 class KeyPass {
 
   var isHeld = false
-	@Synchronized private set
-	@Synchronized get
+	@OnlySynchronizedOnJvm private set
+	@OnlySynchronizedOnJvm get
 
   val isNotHeld get() = !isHeld
 
-  @Synchronized
+  @OnlySynchronizedOnJvm
   fun <R> with(op: ()->R): R {
 	isHeld = true
 	val r = op()
@@ -18,13 +18,13 @@ class KeyPass {
 	return r
   }
 
-  @Synchronized
+  @OnlySynchronizedOnJvm
   fun hold() {
 	require(!isHeld)
 	isHeld = true
   }
 
-  @Synchronized
+  @OnlySynchronizedOnJvm
   fun release() {
 	require(isHeld)
 	isHeld = false

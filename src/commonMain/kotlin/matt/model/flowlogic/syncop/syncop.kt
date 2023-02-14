@@ -2,9 +2,9 @@ package matt.model.flowlogic.syncop
 
 import matt.lang.YesIUseLang
 import matt.lang.anno.NullToReduceObjects
+import matt.lang.anno.OnlySynchronizedOnJvm
 import matt.lang.function.Op
 import matt.lang.sync.inSync
-import kotlin.jvm.Synchronized
 
 
 class AntiDeadlockSynchronizer {
@@ -32,7 +32,7 @@ class AntiDeadlockSynchronizer {
 	}
   }
 
-  @Synchronized fun operateOnInternalDataNowOrLater(op: Op) {
+  @OnlySynchronizedOnJvm fun operateOnInternalDataNowOrLater(op: Op) {
 	if (currentWorkerCount > 0) {
 	  (opQueue ?: mutableListOf<Op>().also {
 		opQueue = it

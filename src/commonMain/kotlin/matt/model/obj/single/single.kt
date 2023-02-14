@@ -1,5 +1,6 @@
 package matt.model.obj.single
 
+import matt.lang.anno.OnlySynchronizedOnJvm
 import kotlin.jvm.Synchronized
 import kotlin.reflect.KClass
 
@@ -28,15 +29,15 @@ open class Singleton {
 abstract class SingleCallBase {
 
   var called: Boolean = false
-	@Synchronized get
-	@Synchronized protected set
+	@OnlySynchronizedOnJvm get
+	@OnlySynchronizedOnJvm protected set
 
 
 }
 
 class SingleCall(protected val op: ()->Unit = {}): SingleCallBase() {
 
-  @Synchronized
+  @OnlySynchronizedOnJvm
   operator fun invoke() {
 	require(!called)
 	op()
@@ -47,7 +48,7 @@ class SingleCall(protected val op: ()->Unit = {}): SingleCallBase() {
 }
 
 class SingleCallWithArg<A>(val op: (A)->Unit = {}): SingleCallBase() {
-  @Synchronized
+  @OnlySynchronizedOnJvm
   operator fun invoke(arg: A) {
 	require(!called)
 	op(arg)

@@ -1,11 +1,11 @@
 package matt.model.flowlogic.singlerunlambda
 
-import kotlin.jvm.Synchronized
+import matt.lang.anno.OnlySynchronizedOnJvm
 
 class SingleRunLambda(private val op: ()->Unit) {
   private var ran = false
 
-  @Synchronized
+  @OnlySynchronizedOnJvm
   operator fun invoke() {
 	if (!ran) {
 	  ran = true
