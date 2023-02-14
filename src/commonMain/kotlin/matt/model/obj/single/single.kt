@@ -1,7 +1,6 @@
 package matt.model.obj.single
 
 import matt.lang.anno.OnlySynchronizedOnJvm
-import kotlin.jvm.Synchronized
 import kotlin.reflect.KClass
 
 //internal val singletons = mutableSetOf<KClass<*>>()
