@@ -1,5 +1,7 @@
 package matt.model.code.successorfail
 
+import matt.model.code.idea.FailableIdea
+
 
 inline fun <R> mightFail(op: FailableDSL.()->R): FailableReturn<R> {
   return FailableDSL.runOrFail(op)
@@ -32,7 +34,7 @@ object FailableDSL {
 
 }
 
-sealed interface FailableReturn<T>
+sealed interface FailableReturn<T>: FailableIdea
 
 fun <T> FailableReturn<T>.requireSuccess() = (this as SuccessfulReturn<T>).value
 
@@ -53,7 +55,7 @@ class FailedReturn<T>(val message: String): FailableReturn<T> {
 }
 
 
-sealed interface SuccessOrFail {
+sealed interface SuccessOrFail: FailableIdea {
   val message: String
 }
 

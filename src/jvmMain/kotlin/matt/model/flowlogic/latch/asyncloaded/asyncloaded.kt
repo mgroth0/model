@@ -64,6 +64,8 @@ open class LoadedValueSlot<T>: Async<T>() {
   fun isDone() = latch?.isOpen ?: true
 }
 
+
+
 class DelegatedSlot<T: Any>: AsyncBase<T>() {
 
 
