@@ -20,3 +20,4 @@ interface MightExist {
 }
 
 interface MightExistAndWritableText: MightExist, WritableText
+interface MightExistAndWritableBytes: MightExist, WritableBytes
