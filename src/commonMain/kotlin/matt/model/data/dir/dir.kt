@@ -1,6 +1,7 @@
 package matt.model.data.dir
 
 import kotlinx.serialization.Serializable
+import matt.lang.function.Op
 
 enum class Direction() {
   BI(),
@@ -19,5 +20,7 @@ enum class OffOrOn {
 }
 
 enum class YesOrNo {
-  YES, NO
+  YES, NO;
+
+  fun ifYes(op: Op) = if (this == YES) op() else Unit
 }
