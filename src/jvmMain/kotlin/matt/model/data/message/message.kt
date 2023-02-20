@@ -79,6 +79,9 @@ class Go(val id: String): InterAppAction
 class Open(val thing: String): InterAppAction
 
 @Serializable
+object CommitAction: InterAppAction
+
+@Serializable
 object CLOSE: InterAppAction
 
 @Serializable
