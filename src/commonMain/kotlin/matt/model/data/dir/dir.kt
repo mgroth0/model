@@ -24,3 +24,7 @@ enum class YesOrNo {
 
   fun ifYes(op: Op) = if (this == YES) op() else Unit
 }
+
+enum class EnableOrDisable {
+  ENABLE,DISABLE
+}
