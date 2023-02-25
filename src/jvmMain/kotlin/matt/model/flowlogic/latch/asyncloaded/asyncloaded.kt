@@ -1,6 +1,7 @@
 package matt.model.flowlogic.latch.asyncloaded
 
 import matt.lang.go
+import matt.lang.model.value.Value
 import matt.lang.model.value.ValueWrapperIdea
 import matt.lang.weak.lazyWeak
 import matt.model.flowlogic.await.Awaitable
@@ -112,6 +113,8 @@ abstract class Async<T>: AsyncBase<T>(), ValueWrapperIdea {
 
 	}
 
+
+  fun wrappedLoadedValueOrNull() = if (latch!!.isOpen) Value(value) else null
 
   override fun await(): T {
 	latch?.await()
