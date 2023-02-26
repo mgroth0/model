@@ -4,6 +4,7 @@ import matt.lang.go
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
 import matt.model.code.successorfail.Fail
+import matt.model.code.successorfail.Failure
 import matt.model.code.successorfail.Success
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.Proceeding.Status.RUNNING
@@ -43,8 +44,8 @@ abstract class ManualProceeding(
 			messageProp v it
 		  }
 		  statusProp v when (realResult) {
-			Success -> RUNNING
-			is Fail -> OFF
+			Success    -> RUNNING
+			is Failure -> OFF
 		  }
 		}
 		t

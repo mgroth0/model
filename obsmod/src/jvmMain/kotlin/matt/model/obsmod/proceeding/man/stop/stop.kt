@@ -2,7 +2,7 @@ package matt.model.obsmod.proceeding.man.stop
 
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
-import matt.model.code.successorfail.Fail
+import matt.model.code.successorfail.Failure
 import matt.model.code.successorfail.Success
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.Proceeding.Status.RUNNING
@@ -47,7 +47,7 @@ abstract class StoppableManualProceeding(
 		  messageProp v result.message
 		  statusProp v when (result) {
 			Success -> OFF
-			is Fail -> RUNNING
+			is Failure -> RUNNING
 		  }
 		}
 	  }
