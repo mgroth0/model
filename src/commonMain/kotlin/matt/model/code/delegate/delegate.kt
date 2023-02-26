@@ -5,10 +5,34 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+open class ThrowingVetoable<V>(
+  private var value: V,
+  private val check: (V) -> Boolean
+): ReadWriteProperty<Any?, V> {
+  init {
+	require(check(value))
+  }
+
+  override fun getValue(thisRef: Any?, property: KProperty<*>) = value
+
+  override fun setValue(thisRef: Any?, property: KProperty<*>, value: V) {
+	require(check(value))
+	this.value = value
+  }
+}
+
+class LimitedInt(
+  value: Int,
+  private val min: Int = Int.MIN_VALUE,
+  private val max: Int = Int.MAX_VALUE
+): ThrowingVetoable<Int>(
+  value,
+  { it in min..max}
+)
+
 class SimpleGetter<T, V>(private val o: V): ReadOnlyProperty<T, V> {
   override fun getValue(thisRef: T, property: KProperty<*>) = o
 }
-
 
 
 class CanOnlySetOnce<V>: ReadWriteProperty<Any?, V?> {

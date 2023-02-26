@@ -59,7 +59,9 @@ sealed interface SuccessOrFail: FailableIdea {
   val message: String
 }
 
-object Success: SuccessOrFail {
+sealed interface SucceedOrFailWithException: SuccessOrFail
+
+object Success: SucceedOrFailWithException {
   override val message = ""
 }
 
@@ -67,4 +69,8 @@ class Fail(override val message: String): SuccessOrFail {
   override fun toString(): String {
 	return "Fail[message=\"$message\"]"
   }
+}
+
+class FailWithException(val exception: Exception): SucceedOrFailWithException {
+  override val message = exception.message ?: "no exception message"
 }
