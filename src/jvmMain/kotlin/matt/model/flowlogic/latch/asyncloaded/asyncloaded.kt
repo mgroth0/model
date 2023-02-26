@@ -114,7 +114,7 @@ abstract class Async<T>: AsyncBase<T>(), ValueWrapperIdea {
 	}
 
 
-  fun wrappedLoadedValueOrNull() = if (latch!!.isOpen) Value(value) else null
+  fun wrappedLoadedValueOrNull() = if (latch?.isOpen != false) Value(value) else null
 
   override fun await(): T {
 	latch?.await()
