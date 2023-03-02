@@ -10,6 +10,10 @@ enum class Direction() {
 }
 
 
+enum class BeforeOrAfter {
+  BEFORE, AFTER
+}
+
 enum class LeftOrRight(val textSymbol: String, val moreSymbol: String) {
   LEFT("←", "<<"), RIGHT("→", ">>")
 }
@@ -26,5 +30,5 @@ enum class YesOrNo {
 }
 
 enum class EnableOrDisable {
-  ENABLE,DISABLE
+  ENABLE, DISABLE
 }

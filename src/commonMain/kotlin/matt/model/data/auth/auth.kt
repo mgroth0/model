@@ -1,5 +1,13 @@
 package matt.model.data.auth
 
+import kotlinx.serialization.Serializable
+
+@Serializable
+class Login(
+  val username: String,
+  val password: String
+)
+
 class Auth(
   val key: String,
   val secret: String
@@ -21,3 +29,5 @@ data class EverNoteKeys(
   val authToken: String,
   val changingTokenFilePath: String
 )
+
+
