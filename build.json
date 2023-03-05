@@ -6,11 +6,6 @@
 	{
 	  "type" : "Lib",
 	  "cfg" :  "commonMainApi",
-	  "key" :  "kt-stdlib"
-	},
-	{
-	  "type" : "Lib",
-	  "cfg" :  "commonMainApi",
 	  "key" :  "kotlinx-serialization-json"
 	},
 	{
