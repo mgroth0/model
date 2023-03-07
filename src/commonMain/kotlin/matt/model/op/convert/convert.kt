@@ -4,6 +4,16 @@ import matt.model.data.byte.ByteSize
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+class NotAConverter<T>: Converter<T, T> {
+  override fun convertToB(a: T): T {
+	return a
+  }
+
+  override fun convertToA(b: T): T {
+	return b
+  }
+}
+
 fun <T> toStringConverter(op: (T)->String) = object: StringConverter<T> {
   override fun toString(t: T): String {
 	return op(t)

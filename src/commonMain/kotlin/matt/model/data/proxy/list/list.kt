@@ -1,4 +1,4 @@
-package matt.model.data.proxy
+package matt.model.data.proxy.list
 
 import matt.model.op.convert.Converter
 
