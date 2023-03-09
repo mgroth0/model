@@ -11,3 +11,4 @@ interface MChartIdea
 interface DebuggerIdea
 interface LinearGradientIdea
 interface FailableIdea
+interface PythonThing
