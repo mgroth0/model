@@ -46,7 +46,7 @@ fun Throwable.infoString(): String = """
   CAUSE: ${cause?.infoString()}
   
   SUPPRESSED EXCEPTIONS:
-  ${suppressedExceptions.joinToString("\n\n") { infoString() }}
+  ${suppressedExceptions.joinToString("\n\n") { it.infoString() }}
 """.trimIndent()
 
 
