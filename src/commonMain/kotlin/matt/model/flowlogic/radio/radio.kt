@@ -1,6 +1,8 @@
 package matt.model.flowlogic.radio
 
+import matt.lang.anno.OnlySynchronizedOnJvm
 import matt.lang.function.Consume
+import matt.lang.sync.inSync
 
 
 class RadioTransmitter<T> {
@@ -16,3 +18,29 @@ class RadioTransmitter<T> {
   }
 }
 
+class Poster<T> {
+
+  private val listeners = mutableListOf<Consume<T>>()
+
+  private val board = mutableListOf<T>()
+
+  @OnlySynchronizedOnJvm
+  fun post(t: T) {
+	board += t
+	listeners.forEach {
+	  it(t)
+	}
+  }
+
+  inner class PostBoard {
+
+	fun onEach(op: (T)->Unit) {
+	  inSync(this@Poster) {
+		board.forEach(op)
+	  }
+	  listeners += op
+	}
+
+  }
+
+}
