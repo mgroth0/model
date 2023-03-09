@@ -132,6 +132,11 @@ object StringStringConverter: StringConverter<String> {
   override fun fromString(s: String) = s
 }
 
+object BooleanStringConverter: StringConverter<Boolean> {
+  override fun toString(t: Boolean) = t.toString()
+  override fun fromString(s: String) = s.toBoolean()
+}
+
 object IntStringConverter: FailableStringConverter<Int> {
   override fun toString(t: Int) = t.toString()
   override fun fromString(s: String) = s.toIntOrNull()
