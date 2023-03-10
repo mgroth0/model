@@ -4,6 +4,7 @@ import matt.model.data.byte.ByteSize
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+
 class NotAConverter<T>: Converter<T, T> {
   override fun convertToB(a: T): T {
 	return a
@@ -13,6 +14,7 @@ class NotAConverter<T>: Converter<T, T> {
 	return b
   }
 }
+typealias IdentityConverter<T> = NotAConverter<T>
 
 fun <T> toStringConverter(op: (T)->String) = object: StringConverter<T> {
   override fun toString(t: T): String {
@@ -126,6 +128,13 @@ interface FailableStringConverter<T: Any>: FailableConverter<String, T> {
   override fun convertToA(b: T): String = toString(b)
   override fun convertToB(a: String) = fromString(a)
 }
+
+
+object ByteArrayStringConverter: StringConverter<ByteArray> {
+  override fun toString(t: ByteArray) = t.decodeToString()
+  override fun fromString(s: String) = s.encodeToByteArray()
+}
+
 
 object StringStringConverter: StringConverter<String> {
   override fun toString(t: String) = t
