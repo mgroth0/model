@@ -122,6 +122,19 @@ interface StringConverter<T>: Converter<String, T> {
   override fun convertToB(a: String) = fromString(a)
 }
 
+fun <X, Y, Z> Converter<X, Y>.then(converter: Converter<Y, Z>) = object: Converter<X, Z> {
+  override fun convertToB(a: X): Z {
+	return converter.convertToB(this@then.convertToB(a))
+
+  }
+
+  override fun convertToA(b: Z): X {
+	return this@then.convertToA(converter.convertToA(b))
+  }
+
+}
+
+
 interface FailableStringConverter<T: Any>: FailableConverter<String, T> {
   fun toString(t: T): String
   fun fromString(s: String): T?

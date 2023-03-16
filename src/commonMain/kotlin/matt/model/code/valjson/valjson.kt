@@ -40,6 +40,8 @@ object ValJson {
 	val profileAgent by aPort
 	//	val localKtorTest by aPort
 
+	val pythonTest by aPort
+
 	val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
   }
 }
