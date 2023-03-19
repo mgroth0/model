@@ -1,5 +1,6 @@
 package matt.model.data.byte
 
+import kotlinx.serialization.Serializable
 import matt.model.data.byte.ByteSize.ByteUnit
 import matt.model.data.byte.ByteSize.ByteUnit.B
 import matt.model.data.byte.ByteSize.ByteUnit.GB
@@ -25,7 +26,9 @@ val Long.megabytes get() = ByteSize(this*MB.size)
 val Long.gigabytes get() = ByteSize(this*GB.size)
 val Long.terabytes get() = ByteSize(this*TB.size)
 
+@Serializable
 data class ByteSize(val bytes: Long): MathAndComparable<ByteSize>, NumberWrapper<ByteSize> {
+
   constructor(bytes: Number): this(bytes.toLong())
 
 
