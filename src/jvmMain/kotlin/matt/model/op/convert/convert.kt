@@ -17,12 +17,6 @@ val RATIO_TO_PERCENT_FORMATTER = object : StringConverter<Number> {
     override fun fromString(s: String) = TODO()
 }
 
-class MyRandomClass() {
-    fun myRandomFunction(): String {
-        return "hello world 4"
-    }
-}
-
 
 
 
