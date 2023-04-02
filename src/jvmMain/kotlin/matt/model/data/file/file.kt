@@ -2,8 +2,6 @@
 
 package matt.model.data.file
 
-import matt.model.data.file.FilePath
-import matt.model.data.file.FolderPath
 import matt.model.code.ok.JavaIoFileIsOk
 import java.io.File
 
