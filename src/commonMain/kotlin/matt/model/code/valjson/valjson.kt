@@ -44,6 +44,8 @@ object ValJson {
 
         val multiDesktop by aPort
 
+        val selenium by aPort
+
         val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
     }
 }
