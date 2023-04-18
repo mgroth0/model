@@ -18,11 +18,13 @@ class ThrowReport(private val t: Thread?, private val e: Throwable?) : Report() 
     constructor(e: Throwable) : this(Thread.currentThread(), e)
 
     override val text by lazy {
-        """
-    ERROR REPORT
-    Thread: $t
-    Throwable: ${e?.infoString()}
-  """.trimIndent()
+        string {
+            lineDelimited {
+                +"ERROR REPORT"
+                +"Thread: $t"
+                +"Throwable: ${e?.infoString()}"
+            }
+        }
     }
 
 
@@ -30,10 +32,11 @@ class ThrowReport(private val t: Thread?, private val e: Throwable?) : Report() 
 
 
 fun Throwable.infoString(): String = string {
+    val throwable = this@infoString
     lineDelimited {
-        +"Throwable=${this}"
-        +"Class=${this::class.qualifiedName}"
-        +"String=${toString()}"
+        +"Throwable=$throwable"
+        +"Class=${throwable::class.qualifiedName}"
+        +"String=$throwable"
         +"Message=${message}"
         +"STACK TRACE:"
         stackTraceToString().let {
