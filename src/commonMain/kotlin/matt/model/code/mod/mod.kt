@@ -38,6 +38,19 @@ fun RelativeToKMod.asGradleKSubProjectPath() = when (this) {
 @Serializable
 @JvmInline
 value class GradleKSubProjectPath(override val path: String) : GradleProjectPath, RelativeToKMod {
+    companion object {
+        fun fromUniqueCamelCaseName(camelCaseID: String): GradleKSubProjectPath {
+            val parts = mutableListOf("")
+            camelCaseID.forEach {
+                if (it.isUpperCase()) {
+                    parts += ""
+                }
+                parts[parts.size - 1] = parts.last() + it.lowercase()
+            }
+            return GradleKSubProjectPath(":k:${parts.joinToString(separator = ":")}")
+        }
+    }
+
     init {
         require(path.startsWith(":k:"))
     }
