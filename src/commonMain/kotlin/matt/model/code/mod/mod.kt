@@ -28,12 +28,23 @@ interface GradlePath {
     val path: String
 }
 
-interface GradleProjectPath : GradlePath
+
+interface GradleProjectPath : GradlePath, ModType
+
+val GradleProjectPath.isRoot get() = path == ":"
+
+@JvmInline
+value class GradleProjectPathImpl(override val path: String) : GradleProjectPath {
+    init {
+        require(path.startsWith(":"))
+    }
+}
 
 fun RelativeToKMod.asGradleKSubProjectPath() = when (this) {
     is GradleKSubProjectPath -> this
     else -> GradleKSubProjectPath(gradlePath)
 }
+
 
 @Serializable
 @JvmInline
