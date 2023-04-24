@@ -39,6 +39,9 @@ fun RelativeToKMod.asGradleKSubProjectPath() = when (this) {
 @JvmInline
 value class GradleKSubProjectPath(override val path: String) : GradleProjectPath, RelativeToKMod {
     companion object {
+
+        private const val REQUIRED_PREFIX = ":k:"
+
         fun fromUniqueCamelCaseName(camelCaseID: String): GradleKSubProjectPath {
             val parts = mutableListOf("")
             camelCaseID.forEach {
@@ -49,13 +52,21 @@ value class GradleKSubProjectPath(override val path: String) : GradleProjectPath
             }
             return GradleKSubProjectPath(":k:${parts.joinToString(separator = ":")}")
         }
+
+
     }
 
     init {
-        require(path.startsWith(":k:"))
+        require(path.startsWith(REQUIRED_PREFIX)) {
+            "$path does not start with $REQUIRED_PREFIX"
+        }
     }
 
     override val relToKNames get() = path.split(":").filter { it.isNotBlank() }.drop(1)
+
+    override fun toString(): String {
+        return path
+    }
 }
 
 val RelativeToKMod.gradlePath get() = ":k:${relToKNames.joinToString(":")}"
