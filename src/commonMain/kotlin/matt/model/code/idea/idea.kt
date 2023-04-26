@@ -1,14 +1,15 @@
 package matt.model.code.idea
 
-interface UserActionIdea
-interface UIIdea
-interface ProceedingIdea
-interface ServiceIdea
-interface ModIdea
-interface ProjectIdea
-interface SerIdea
-interface MChartIdea
-interface DebuggerIdea
-interface LinearGradientIdea
-interface FailableIdea
-interface PythonThing
+interface Idea
+interface UserActionIdea : Idea
+interface UIIdea : Idea
+interface ProceedingIdea : Idea
+interface ServiceIdea : Idea
+interface ModIdea : Idea
+interface ProjectIdea : Idea
+interface SerIdea : Idea
+interface MChartIdea : Idea
+interface DebuggerIdea : Idea
+interface LinearGradientIdea : Idea
+interface FailableIdea : Idea
+interface PythonThing : Idea
