@@ -6,41 +6,42 @@ import matt.lang.sync.inSync
 
 
 class RadioTransmitter<T> {
-  private val listeners = mutableListOf<Consume<T>>()
-  fun broadcast(t: T) {
-	listeners.forEach { it.invoke(t) }
-  }
+    private val listeners = mutableListOf<Consume<T>>()
+    fun broadcast(t: T) {
+        listeners.forEach { it.invoke(t) }
+    }
 
-  inner class Radio {
-	fun listen(listener: Consume<T>) {
-	  listeners += listener
-	}
-  }
+    inner class Radio {
+        fun listen(listener: Consume<T>) {
+            listeners += listener
+        }
+    }
 }
 
+/*consider renaming it LiveList?*/
 class Poster<T> {
 
-  private val listeners = mutableListOf<Consume<T>>()
+    private val listeners = mutableListOf<Consume<T>>()
 
-  private val board = mutableListOf<T>()
+    private val board = mutableListOf<T>()
 
-  @OnlySynchronizedOnJvm
-  fun post(t: T) {
-	board += t
-	listeners.forEach {
-	  it(t)
-	}
-  }
+    @OnlySynchronizedOnJvm
+    fun post(t: T) {
+        board += t
+        listeners.forEach {
+            it(t)
+        }
+    }
 
-  inner class PostBoard {
+    inner class PostBoard {
+        fun onEach(op: (T) -> Unit) {
+            inSync(this@Poster) {
+                board.forEach(op)
+            }
+            listeners += op
+        }
+    }
 
-	fun onEach(op: (T)->Unit) {
-	  inSync(this@Poster) {
-		board.forEach(op)
-	  }
-	  listeners += op
-	}
-
-  }
+    fun onEach(op: (T) -> Unit) = PostBoard().onEach(op)
 
 }
