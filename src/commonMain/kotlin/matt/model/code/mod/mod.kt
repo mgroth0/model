@@ -32,6 +32,7 @@ interface GradlePath {
 interface GradleProjectPath : GradlePath, ModType
 
 val GradleProjectPath.isRoot get() = path == ":"
+fun GradleProjectPath.asKSubPath() = GradleKSubProjectPath(path)
 
 @JvmInline
 value class GradleProjectPathImpl(override val path: String) : GradleProjectPath {
@@ -42,7 +43,7 @@ value class GradleProjectPathImpl(override val path: String) : GradleProjectPath
 
 fun RelativeToKMod.asGradleKSubProjectPath() = when (this) {
     is GradleKSubProjectPath -> this
-    else -> GradleKSubProjectPath(gradlePath)
+    else                     -> GradleKSubProjectPath(gradlePath)
 }
 
 
@@ -93,3 +94,18 @@ interface AbsoluteKMod : AbsoluteMod, RelativeToKMod {
     override val modName get() = relToKNames.last()
 }
 
+
+@Serializable
+@JvmInline
+value class GradleTaskPath(val path: String) {
+    init {
+        require(":" in path) {
+            "task path \"$path\" should have at least one colon, right? Or do root project tasks not have colons?"
+        }
+    }
+
+    val gradleProjectPath get() = GradleProjectPathImpl(path.substringBeforeLast(":"))
+    override fun toString(): String {
+        return path
+    }
+}
