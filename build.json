@@ -22,6 +22,11 @@
       "type": "Project",
       "cfg": "jvmMainApi",
       "path": ":k:prim"
+    },
+    {
+      "type": "Lib",
+      "cfg": "commonMainImplementation",
+      "key": "ktorUtil"
     }
   ]
 }

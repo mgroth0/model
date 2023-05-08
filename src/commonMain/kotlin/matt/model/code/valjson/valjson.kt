@@ -47,6 +47,9 @@ object ValJson {
         val seleniumDaemon by aPort
         val seleniumService by aPort
 
+//        val oexpJPyBridge by aPort
+//        val oexpJPyBridgeExit by aPort
+
         val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
     }
 }
