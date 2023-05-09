@@ -3,7 +3,7 @@ package matt.model.data.auth
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Login(
+data class Login(
     val username: String,
     val password: String
 )
