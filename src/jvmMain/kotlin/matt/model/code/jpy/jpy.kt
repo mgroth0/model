@@ -13,6 +13,7 @@ enum class OexpSocketHeaders {
     CHECK_EQUALITY,
     STR,
     CALL_FUN,
+    GET_JSON,
     GET_VAL,
     SET_VAR,
     GC
