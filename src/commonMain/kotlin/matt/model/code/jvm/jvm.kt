@@ -1,15 +1,20 @@
 package matt.model.code.jvm
 
 import kotlinx.serialization.Serializable
+import matt.lang.If
 import matt.lang.anno.SeeURL
 import matt.lang.ifTrue
 import matt.lang.opt
 import matt.model.data.byte.ByteSize
+import kotlin.jvm.JvmInline
 
 
 @Serializable
 data class JvmArgs(
+    @SeeURL("https://stackoverflow.com/questions/32855984/does-java-xmx1g-mean-109-or-230-bytes")
     val xmx: ByteSize?,
+    @SeeURL("https://stackoverflow.com/questions/32855984/does-java-xmx1g-mean-109-or-230-bytes")
+    val xms: ByteSize? = null,
     val stackTraceInFastThrow: Boolean = true,
     val diagnosticVMOptions: Boolean = false,
     @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
@@ -19,27 +24,44 @@ data class JvmArgs(
     /*nvm, I just programmatically print both the top and bottom of the stack now. Much better.*/
     val maxStackSize: String? = null,
 
+    val prism: Boolean = true,
+
+    val unlockDiagnosticVmOptions: Boolean = true,
+    val showHiddenFrames: Boolean = true,
+
+    val useParallelGC: Boolean = false,
+
     val otherArgs: List<JvmArg> = listOf(),
 
     ) {
+
+    init {
+        if (showHiddenFrames && !unlockDiagnosticVmOptions) {
+            println("WARNING: I think showHiddenFrames requires unlockDiagnosticVmOptions")
+        }
+    }
+
     val args by lazy {
         arrayOf(
             /*https://stackoverflow.com/questions/65565209/nullpointers-in-javafx-when-using-a-large-canvas*/
-            "-Dprism.maxvram=2G",
-            *opt(xmx) { "-Xmx${mb.toInt()}m" },
+            *If(prism).then("-Dprism.maxvram=2G"),
+
+            *opt(xmx) { "-Xms$formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit" },
+            *opt(xmx) { "-Xmx$formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit" },
             *ifTrue(enableAssertionsAndCoroutinesDebugMode) { "-enableassertions" },
 
             /*OmitStackTraceInFastThrow: makes sure that exceptions get a full stack trace always.*/
             /*https://stackoverflow.com/questions/2411487/nullpointerexception-in-java-with-no-stacktrace*/
             *ifTrue(stackTraceInFastThrow) { "-XX:-OmitStackTraceInFastThrow" },
             /*VM option 'ShowHiddenFrames' is diagnostic and must be enabled via -XX:+UnlockDiagnosticVMOptions.*/
-            "-XX:+UnlockDiagnosticVMOptions",
-            "-XX:+ShowHiddenFrames",
+            *If(unlockDiagnosticVmOptions).then("-XX:+UnlockDiagnosticVMOptions"),
+            *If(showHiddenFrames).then("-XX:+ShowHiddenFrames"),
             *ifTrue(diagnosticVMOptions) { "-XX:+UnlockDiagnosticVMOptions" },
 
+            *If(useParallelGC).then("-XX:+UseParallelGC"),
 
-            *opt(maxStackTraceDepth) { "-XX:MaxJavaStackTraceDepth=${this}" },
-            *opt(maxStackSize) { "-Xss${this}" },
+            *opt(maxStackTraceDepth) { "-XX:MaxJavaStackTraceDepth=$this" },
+            *opt(maxStackSize) { "-Xss$this" },
 
             /*
             "Overhead of this feature is negligible and it can be safely turned on by default to simplify logging and diagnostic." - kotlinx.coroutines
@@ -53,12 +75,23 @@ data class JvmArgs(
 
             *otherArgs.map { it.toRawArg() }.toTypedArray(),
 
-
             )
+    }
+    val argsList by lazy {
+        JvmArgsList(args)
     }
 }
 
 
 interface JvmArg {
     fun toRawArg(): String
+}
+
+@JvmInline
+value class JvmArgsList(val args: List<String>) : List<String> by args {
+    constructor(args: Array<String>) : this(args.toList())
+
+    init {
+        require(args.toSet().size == args.size)
+    }
 }
