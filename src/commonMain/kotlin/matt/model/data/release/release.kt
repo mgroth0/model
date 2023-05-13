@@ -26,6 +26,11 @@ class Commit(
   private val url: String
 )
 
+@Serializable data class VersionInfo(
+    val version: Version,
+    val downloadURL: String
+)
+
 @Serializable
 data class Version(val first: Int, val second: Int, val third: Int): Comparable<Version> {
   constructor(versionString: String): this(
