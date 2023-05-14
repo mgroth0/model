@@ -1,5 +1,7 @@
 package matt.model.code.sys
 
+import matt.lang.anno.SeeURL
+
 sealed interface OS {
   val caseSensitive: Boolean
   val pathSep: String
@@ -103,12 +105,13 @@ sealed class LinuxMachine(
   getRegisteredDir = getRegisteredDir
 ), Linux
 
+@SeeURL("https://github.mit.edu/MGHPCC/OpenMind/issues/4435")
 class OpenMind(
   val node: OpenMindNode,
   val sImgLoc: String?,
   slurmJobID: String?
 ): LinuxMachine(
-  getHomeDir = { "/om2/user/mjgroth" },
+  getHomeDir = { "/om2/vast/user/mjgroth" },
   getRegisteredDir = { "registered" },
 ) {
   val inSingularity = sImgLoc != null
