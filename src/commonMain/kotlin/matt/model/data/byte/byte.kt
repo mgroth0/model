@@ -1,12 +1,12 @@
 package matt.model.data.byte
 
 import kotlinx.serialization.Serializable
-import matt.model.data.byte.ByteSize.BinaryByteUnit
 import matt.model.data.byte.ByteSize.BinaryByteUnit.B
 import matt.model.data.byte.ByteSize.BinaryByteUnit.GiB
 import matt.model.data.byte.ByteSize.BinaryByteUnit.KiB
 import matt.model.data.byte.ByteSize.BinaryByteUnit.MiB
 import matt.model.data.byte.ByteSize.BinaryByteUnit.TiB
+import matt.model.data.byte.ByteSize.ByteUnit
 import matt.model.data.byte.ByteSize.DecimalByteUnit
 import matt.model.data.byte.ByteSize.DecimalByteUnit.GB
 import matt.model.data.byte.ByteSize.DecimalByteUnit.KB
@@ -54,7 +54,12 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
     constructor(bytes: Number) : this(bytes.toLong())
 
 
-    enum class BinaryByteUnit(val size: Long) {
+    interface ByteUnit {
+        val name: String
+        val size: Long
+    }
+
+    enum class BinaryByteUnit(override val size: Long) : ByteUnit {
         B(1), KiB(1024), MiB(KiB.size * KiB.size), GiB(MiB.size * KiB.size), TiB(GiB.size * KiB.size);
 
 
@@ -63,42 +68,41 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
     val BinaryByteUnit.traditionalName
         get() = when (this) {
             B   -> DecimalByteUnit.B.name
-            KiB -> DecimalByteUnit.KB.name
-            MiB -> DecimalByteUnit.MB.name
-            GiB -> DecimalByteUnit.GB.name
-            TiB -> DecimalByteUnit.TB.name
+            KiB -> KB.name
+            MiB -> MB.name
+            GiB -> GB.name
+            TiB -> TB.name
         }
 
-    enum class DecimalByteUnit(val size: Long) {
+    enum class DecimalByteUnit(override val size: Long) : ByteUnit {
         B(1), KB(1000), MB(KB.size * KB.size), GB(MB.size * KB.size), TB(GB.size * KB.size);
     }
 
-    private fun binaryUnitRep(u: BinaryByteUnit) = bytes.toDouble() / u.size
-    private fun decimalUnitRep(u: DecimalByteUnit) = bytes.toDouble() / u.size
+    private fun unitRep(u: ByteUnit) = bytes.toDouble() / u.size
 
 
-    val b by lazy { binaryUnitRep(B) }
-    val kiB by lazy { binaryUnitRep(KiB) }
-    val miB by lazy { binaryUnitRep(MiB) }
-    val giB by lazy { binaryUnitRep(GiB) }
-    val tiB by lazy { binaryUnitRep(TiB) }
+    val b by lazy { unitRep(B) }
+    val kiB by lazy { unitRep(KiB) }
+    val miB by lazy { unitRep(MiB) }
+    val giB by lazy { unitRep(GiB) }
+    val tiB by lazy { unitRep(TiB) }
 
-    val decimalB by lazy { decimalUnitRep(DecimalByteUnit.B) }
-    val kb by lazy { decimalUnitRep(KB) }
-    val mb by lazy { decimalUnitRep(MB) }
-    val gb by lazy { decimalUnitRep(GB) }
-    val tb by lazy { decimalUnitRep(TB) }
+    val decimalB by lazy { unitRep(DecimalByteUnit.B) }
+    val kb by lazy { unitRep(KB) }
+    val mb by lazy { unitRep(MB) }
+    val gb by lazy { unitRep(GB) }
+    val tb by lazy { unitRep(TB) }
 
 
     val bestBinaryUnit by lazy {
         BinaryByteUnit.values().reversed().firstOrNull {
-            val rep = binaryUnitRep(it)
+            val rep = unitRep(it)
             rep > 1 || rep < -1
         } ?: B
     }
     val bestDecimalUnit by lazy {
         DecimalByteUnit.values().reversed().firstOrNull {
-            val rep = decimalUnitRep(it)
+            val rep = unitRep(it)
             rep > 1 || rep < -1
         } ?: DecimalByteUnit.B
     }
@@ -106,45 +110,45 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
 
     val largestWholeBinaryUnit by lazy {
         BinaryByteUnit.values().reversed().firstOrNull {
-            val rep = binaryUnitRep(it)
+            val rep = unitRep(it)
             rep.isWhole()
         } ?: B
     }
     val largestWholeDecimalUnit by lazy {
         DecimalByteUnit.values().reversed().firstOrNull {
-            val rep = decimalUnitRep(it)
+            val rep = unitRep(it)
             rep.isWhole()
         } ?: DecimalByteUnit.B
     }
 
 
     val formattedBinary by lazy {
-        FormattedBinaryByteSize(
-            binaryUnitRep(bestBinaryUnit),
+        FormattedByteSize(
+            unitRep(bestBinaryUnit),
             bestBinaryUnit,
             includeSpace = true,
             singleLetterUnit = false
         )
     }
     val formattedDecimal by lazy {
-        FormattedDecimalByteSize(
-            decimalUnitRep(bestDecimalUnit),
+        FormattedByteSize(
+            unitRep(bestDecimalUnit),
             bestDecimalUnit,
             includeSpace = false,
             singleLetterUnit = false
         )
     }
     val formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit by lazy {
-        FormattedBinaryByteSize(
-            binaryUnitRep(largestWholeBinaryUnit),
+        FormattedByteSize(
+            unitRep(largestWholeBinaryUnit),
             largestWholeBinaryUnit,
             includeSpace = false,
             singleLetterUnit = true
         )
     }
     val formattedDecimalNoSpaceNoDecimalsAndSingleLetterUnit by lazy {
-        FormattedDecimalByteSize(
-            decimalUnitRep(largestWholeDecimalUnit),
+        FormattedByteSize(
+            unitRep(largestWholeDecimalUnit),
             largestWholeDecimalUnit,
             includeSpace = false,
             singleLetterUnit = true
@@ -154,8 +158,10 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
 
     override fun toString() = formattedBinary.toString()
     override fun compareTo(other: ByteSize) = this.bytes.compareTo(other.bytes)
-    override fun div(n: Number): ByteSize = ByteSize(bytes / n.toLong())
-    override fun times(n: Number) = ByteSize(bytes * n.toLong())
+    override fun div(n: Number): ByteSize = ByteSize(bytes / n.toDouble())
+
+    override fun times(n: Number) = ByteSize(bytes * n.toDouble())
+
     override val isZero: Boolean
         get() = bytes == 0L
     override val isNaN: Boolean
@@ -176,6 +182,17 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
     override fun div(m: ByteSize) = bytes / m.bytes
     override operator fun plus(m: ByteSize) = ByteSize(bytes + m.bytes)
     override operator fun minus(m: ByteSize) = ByteSize(bytes - m.bytes)
+
+
+    fun roundToNearest(unit: ByteUnit): ByteSize {
+        val minPossible = floor(bytes.toDouble() / unit.size)
+        val maxPossible = minPossible + 1
+        val halfwayPoint = listOf(minPossible, maxPossible).sum() / 2.0
+        return if (bytes >= halfwayPoint) ByteSize(maxPossible * unit.size)
+        else ByteSize(minPossible * unit.size)
+    }
+
+
 }
 
 
@@ -190,23 +207,9 @@ inline fun <T> Iterable<T>.sumOf(selector: (T) -> ByteSize): ByteSize {
     return sum
 }
 
-class FormattedBinaryByteSize(
+class FormattedByteSize(
     val num: Double,
-    val unit: BinaryByteUnit,
-    includeSpace: Boolean,
-    singleLetterUnit: Boolean
-) {
-    private val unitName = if (singleLetterUnit) unit.name.first() else unit.name
-    private val space = if (includeSpace) ' '.toString() else ""
-    override fun toString(): String {
-        return if (unit == B) "$num$space$unitName"
-        else "${(num * 1000).roundToLong() / 1000}$space$unitName"
-    }
-}
-
-class FormattedDecimalByteSize(
-    val num: Double,
-    val unit: DecimalByteUnit,
+    val unit: ByteUnit,
     includeSpace: Boolean,
     singleLetterUnit: Boolean
 ) {

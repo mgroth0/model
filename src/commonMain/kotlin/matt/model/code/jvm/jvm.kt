@@ -31,9 +31,29 @@ data class JvmArgs(
 
     val useParallelGC: Boolean = false,
 
+    val kotlinxCoroutinesDebug: Boolean = true,
+
     val otherArgs: List<JvmArg> = listOf(),
 
     ) {
+
+    companion object {
+        val EMPTY by lazy {
+            JvmArgs(
+                xmx = null,
+                stackTraceInFastThrow = false,
+                enableAssertionsAndCoroutinesDebugMode = false,
+                prism = false,
+                unlockDiagnosticVmOptions = false,
+                showHiddenFrames = false,
+                kotlinxCoroutinesDebug = false
+            ).also {
+                require(it.args.isEmpty()) {
+                    "EMPTY should be empty but it has ${it.args.size} values: ${it.args.joinToString { it }}"
+                }
+            }
+        }
+    }
 
     init {
         if (showHiddenFrames && !unlockDiagnosticVmOptions) {
@@ -70,8 +90,11 @@ data class JvmArgs(
 
             I tested it, and this definitely works! And the correct format is in fact "-Dkotlinx.coroutines.debug". "-Dkotlinx.coroutines.debug=true" may work, I have not tested it. But  "-Dkotlinx.coroutines.debug" definitely works.
             * */
-            @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
-            "-Dkotlinx.coroutines.debug",
+
+            *If(kotlinxCoroutinesDebug).then(
+                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
+                "-Dkotlinx.coroutines.debug"
+            ),
 
             *otherArgs.map { it.toRawArg() }.toTypedArray(),
 

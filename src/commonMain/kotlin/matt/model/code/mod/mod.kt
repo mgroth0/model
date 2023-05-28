@@ -85,6 +85,7 @@ val RelativeToKMod.gradlePath get() = ":k:${relToKNames.joinToString(":")}"
 val RelativeToKMod.jarBaseName get() = relToKNames.joinToString("-")
 val RelativeToKMod.jsFileName get() = "$jarBaseName.js"
 
+
 interface AbsoluteMod : RelativeMod {
     val modName: String
     val groupName: String?
