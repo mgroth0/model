@@ -10,11 +10,6 @@
     },
     {
       "type": "Lib",
-      "cfg": "jsMainApi",
-      "key": "kt-stdlib-js"
-    },
-    {
-      "type": "Lib",
       "cfg": "commonMainApi",
       "key": "kotlinx-datetime"
     },
