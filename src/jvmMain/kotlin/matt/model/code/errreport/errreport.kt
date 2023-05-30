@@ -1,5 +1,6 @@
 package matt.model.code.errreport
 
+import matt.lang.go
 import matt.prim.str.mybuild.string
 
 
@@ -12,6 +13,18 @@ abstract class Report {
 }
 
 fun Throwable.printReport() = ThrowReport(this).print()
+
+fun Throwable.thisAndAllCauses(): List<Throwable> {
+    val r = mutableListOf(this)
+    var n = this
+    do {
+        n.cause?.go {
+            r += it
+            n = it
+        }
+    } while (n.cause != null)
+    return r.toList()
+}
 
 /*can later collect machine and context info, etc*/
 class ThrowReport(private val t: Thread?, private val e: Throwable?) : Report() {
