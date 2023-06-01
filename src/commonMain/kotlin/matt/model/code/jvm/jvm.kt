@@ -5,6 +5,8 @@ import matt.lang.If
 import matt.lang.anno.SeeURL
 import matt.lang.ifTrue
 import matt.lang.opt
+import matt.model.code.jvm.agentpath.AgentPathArg
+import matt.model.code.jvm.agentpath.fullArg
 import matt.model.data.byte.ByteSize
 import kotlin.jvm.JvmInline
 
@@ -32,6 +34,8 @@ data class JvmArgs(
     val useParallelGC: Boolean = false,
 
     val kotlinxCoroutinesDebug: Boolean = true,
+
+    val agentPath: AgentPathArg? = null,
 
     val otherArgs: List<JvmArg> = listOf(),
 
@@ -82,6 +86,7 @@ data class JvmArgs(
 
             *opt(maxStackTraceDepth) { "-XX:MaxJavaStackTraceDepth=$this" },
             *opt(maxStackSize) { "-Xss$this" },
+            *opt(agentPath) { fullArg() },
 
             /*
             "Overhead of this feature is negligible and it can be safely turned on by default to simplify logging and diagnostic." - kotlinx.coroutines
