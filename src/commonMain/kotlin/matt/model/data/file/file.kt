@@ -8,4 +8,5 @@ interface FilePath {
   fun isDir(): Boolean
 }
 
+
 interface FolderPath: FilePath

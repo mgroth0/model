@@ -12,9 +12,11 @@ sealed interface AgentPathArg {
 
 fun AgentPathArg.fullArg() = "-agentpath:${argValue()}"
 
+const val MAC_LIBJPROFILERTI_PATH = "/Applications/JProfiler.app/Contents/Resources/app/bin/macos/libjprofilerti.jnilib"
+
 @Serializable
 data class JProfilerAgentPathArg(
-    val libjprofilertiPath: String = "/Applications/JProfiler.app/Contents/Resources/app/bin/macos/libjprofilerti.jnilib",
+    val libjprofilertiPath: String = MAC_LIBJPROFILERTI_PATH,
     val offline: Boolean = false,
     val port: Int? = 33809,
     val config: SFile? = null,
