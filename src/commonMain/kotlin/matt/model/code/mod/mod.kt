@@ -37,7 +37,9 @@ fun GradleProjectPath.asKSubPath() = GradleKSubProjectPath(path)
 @JvmInline
 value class GradleProjectPathImpl(override val path: String) : GradleProjectPath {
     init {
-        require(path.startsWith(":"))
+        require(path.startsWith(":")) {
+            "\"$path\" does not start with ':'"
+        }
     }
 }
 
