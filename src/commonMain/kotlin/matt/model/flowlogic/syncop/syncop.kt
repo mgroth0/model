@@ -1,6 +1,5 @@
 package matt.model.flowlogic.syncop
 
-import matt.lang.YesIUseLang
 import matt.lang.anno.NullToReduceObjects
 import matt.lang.anno.OnlySynchronizedOnJvm
 import matt.lang.function.Op
@@ -8,17 +7,15 @@ import matt.lang.sync.inSync
 
 
 class AntiDeadlockSynchronizer {
-    companion object {
-        val yesIUseLang = YesIUseLang
-    }
-
-    private var currentWorkerCount = 0
-
+    @PublishedApi
+    internal var currentWorkerCount = 0
 
     @NullToReduceObjects
-    private var opQueue: MutableList<Op>? = null
+    @PublishedApi
+    internal var opQueue: MutableList<Op>? = null
 
-    fun useInternalData(op: Op) {
+
+    inline fun useInternalData(op: Op) {
         inSync(this) {
             currentWorkerCount += 1
         }

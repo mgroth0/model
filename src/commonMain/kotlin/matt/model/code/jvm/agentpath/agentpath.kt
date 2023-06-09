@@ -14,6 +14,7 @@ fun AgentPathArg.fullArg() = "-agentpath:${argValue()}"
 
 const val MAC_LIBJPROFILERTI_PATH = "/Applications/JProfiler.app/Contents/Resources/app/bin/macos/libjprofilerti.jnilib"
 
+@SeeURL("https://www.ej-technologies.com/resources/jprofiler/help/doc/main/profiling.html")
 @Serializable
 data class JProfilerAgentPathArg(
     val libjprofilertiPath: String = MAC_LIBJPROFILERTI_PATH,
@@ -25,7 +26,7 @@ data class JProfilerAgentPathArg(
     override fun argValue(): String {
         val args = mutableListOf<String>()
         if (offline) {
-            args += "=offline"
+            args += "offline"
 
         }
         if (port != null) {
@@ -37,7 +38,8 @@ data class JProfilerAgentPathArg(
         if (sessionId != null) {
             args += "id=$sessionId"
         }
-        return "$libjprofilertiPath${
+        val maybeEquals = if (args.isNotEmpty()) "=" else ""
+        return "$libjprofilertiPath$maybeEquals${
             args.joinToString(
                 separator = ","
             )
@@ -65,7 +67,7 @@ data class YourKitAgentPathArg(
     val samplingMode: Boolean = DEFAULT_SAMPLE_IN_YOURKIT
 ) : AgentPathArg {
     override fun argValue(): String {
-        val resFolder = yourKitAppFolder.path.removeSuffix("/") + "Contents/Resources"
+        val resFolder = yourKitAppFolder.path.removeSuffix("/") + "/Contents/Resources"
         var r = resFolder + "/bin/mac/libyjpagent.dylib" + "=profiler_dir=${resFolder}"
         if (samplingMode) {
             r += ",sampling"
