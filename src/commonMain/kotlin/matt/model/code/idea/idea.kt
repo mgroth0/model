@@ -1,6 +1,8 @@
 package matt.model.code.idea
 
-interface Idea
+import matt.lang.idea.Idea
+
+
 interface UserActionIdea : Idea
 interface UIIdea : Idea
 interface ProceedingIdea : Idea

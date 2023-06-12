@@ -1,6 +1,7 @@
 package matt.model.rest
 
-import matt.model.code.idea.Idea
+import matt.lang.idea.Idea
+
 
 interface EndpointIdea : Idea
 

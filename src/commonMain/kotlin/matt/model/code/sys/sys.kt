@@ -1,8 +1,9 @@
 package matt.model.code.sys
 
 import matt.lang.anno.SeeURL
+import matt.lang.platform.OSIdea
 
-sealed interface OS {
+sealed interface OS: OSIdea {
   val caseSensitive: Boolean
   val pathSep: String
   val wrongPathSep: String
