@@ -50,5 +50,7 @@ object PortRegistry {
     val localKtorServers by portRange(10)
 
 
+    val omniFxGui by aPort
+
     val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
 }
