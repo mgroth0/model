@@ -3,7 +3,13 @@ package matt.model.code.valjson
 import matt.lang.delegation.provider
 import matt.lang.delegation.valProp
 
-
+/*I SHOULD START PHASING THIS OUT IN FAVOR OF DYNAMIC PORTS (e.g. 0) FOR MANY REASONS INCLUDING
+*
+* - https://youtrack.jetbrains.com/issue/KTOR-5996/Configure-server-to-find-first-available-port-matching-predicat
+* - Not robustly portable to other machines
+* - Issues arise when running multiple applications using different versions of this library
+*
+* */
 object PortRegistry {
     private var num = 65000 /*max port possible is 65_535*/
     private val aPort
@@ -24,33 +30,20 @@ object PortRegistry {
         }
     }
 
-    /*put them higher if I want them to change less often*/
     val ide by aPort
-
     val task by aPort
     val top by aPort
     val notify by aPort
     val launch by aPort
-
-    /*val slidespace by aPort*/
     val brainstorm by aPort
     val kjg by aPort
     val pdf by aPort
-
     val graphviz by aPort
-
     val spotify by aPort
-    val profileAgent by aPort
-
     val multiDesktop by aPort
-
     val seleniumDaemon by aPort
     val seleniumService by aPort
-
-    val localKtorServers by portRange(10)
-
-
     val omniFxGui by aPort
-
+    val localKtorServers by portRange(10)
     val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
 }

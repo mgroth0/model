@@ -13,7 +13,7 @@ class Auth(
     val secret: String
 )
 
-
+@Serializable
 data class GitHubKeys(
     val readPackagesForever: String,
     val pushReleasesForever: String,
