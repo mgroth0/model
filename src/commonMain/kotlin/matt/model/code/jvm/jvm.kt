@@ -71,7 +71,7 @@ data class JvmArgs(
             *If(prism).then("-Dprism.maxvram=2G"),
 
             *opt(xmx) { "-Xms$formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit" },
-            *opt(xmx) { "-Xmx$formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit" },
+            *opt(xmx) { Xmx(this).toRawArg() },
             *ifTrue(enableAssertionsAndCoroutinesDebugMode) { "-enableassertions" },
 
             /*OmitStackTraceInFastThrow: makes sure that exceptions get a full stack trace always.*/
@@ -110,6 +110,15 @@ data class JvmArgs(
     }
 }
 
+
+
+@Serializable
+@JvmInline
+value class Xmx(private val size: ByteSize) : JvmArg {
+    override fun toRawArg(): String {
+        return "-Xmx${size.formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit}"
+    }
+}
 
 interface JvmArg {
     fun toRawArg(): String

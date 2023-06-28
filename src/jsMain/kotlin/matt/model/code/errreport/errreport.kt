@@ -1,26 +1,17 @@
-@file:JvmName("ErrReportJvmKt")
-
 package matt.model.code.errreport
 
 import matt.prim.str.mybuild.string
 
-
-fun Throwable.printReport() = ThrowReport(this).print()
-
-actual fun throwReport(e: Throwable): CommonThrowReport = ThrowReport(e)
+actual fun throwReport(e: Throwable): CommonThrowReport = JsThrowReport(e)
 
 /*can later collect machine and context info, etc*/
-class ThrowReport(
-    private val t: Thread?,
+class JsThrowReport(
     private val e: Throwable?
 ) : Report(), CommonThrowReport {
-    constructor(e: Throwable) : this(Thread.currentThread(), e)
-
     override val text by lazy {
         string {
             lineDelimited {
-                +"ERROR REPORT"
-                +"Thread: $t"
+                +"JS ERROR REPORT"
                 +"Throwable: ${e?.infoString()}"
             }
         }

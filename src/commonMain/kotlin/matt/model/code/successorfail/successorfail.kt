@@ -35,7 +35,6 @@ object FailableDSL {
 }
 
 sealed interface FailableReturn<T>: FailableIdea
-
 fun <T> FailableReturn<T>.requireSuccess() = (this as SuccessfulReturn<T>).value
 
 inline fun <T> FailableReturn<T>.resultOr(op: (FailedReturn<T>)->Unit): T {

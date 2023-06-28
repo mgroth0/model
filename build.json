@@ -20,7 +20,7 @@
     },
     {
       "type": "Project",
-      "cfg": "jvmMainApi",
+      "cfg": "commonMainApi",
       "path": ":k:prim"
     },
     {
