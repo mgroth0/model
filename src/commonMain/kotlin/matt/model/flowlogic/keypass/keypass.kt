@@ -1,6 +1,7 @@
 package matt.model.flowlogic.keypass
 
 import matt.lang.anno.OnlySynchronizedOnJvm
+import matt.lang.require.requireNot
 
 class KeyPass {
 
@@ -20,7 +21,7 @@ class KeyPass {
 
   @OnlySynchronizedOnJvm
   fun hold() {
-	require(!isHeld)
+	requireNot(isHeld)
 	isHeld = true
   }
 

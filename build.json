@@ -1,7 +1,7 @@
 {
   "type": "MultiPlatformModule",
   "jvm": {},
-  "js": "LIB",
+  "js": {"type":"lib"},
   "dependencies": [
     {
       "type": "Lib",
@@ -22,11 +22,6 @@
       "type": "Project",
       "cfg": "commonMainApi",
       "path": ":k:prim"
-    },
-    {
-      "type": "Lib",
-      "cfg": "commonMainImplementation",
-      "key": "ktorUtil"
     }
   ]
 }

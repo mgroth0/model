@@ -1,6 +1,8 @@
 package matt.model.code.mod
 
 import kotlinx.serialization.Serializable
+import matt.lang.require.requireContains
+import matt.lang.require.requireStartsWith
 import matt.model.code.idea.ModIdea
 import kotlin.jvm.JvmInline
 
@@ -37,9 +39,7 @@ fun GradleProjectPath.asKSubPath() = GradleKSubProjectPath(path)
 @JvmInline
 value class GradleProjectPathImpl(override val path: String) : GradleProjectPath {
     init {
-        require(path.startsWith(":")) {
-            "\"$path\" does not start with ':'"
-        }
+        requireStartsWith(path, ":")
     }
 }
 
@@ -71,9 +71,7 @@ value class GradleKSubProjectPath(override val path: String) : GradleProjectPath
     }
 
     init {
-        require(path.startsWith(REQUIRED_PREFIX)) {
-            "$path does not start with $REQUIRED_PREFIX"
-        }
+        requireStartsWith(path, REQUIRED_PREFIX)
     }
 
     override val relToKNames get() = path.split(":").filter { it.isNotBlank() }.drop(1)
@@ -86,6 +84,7 @@ value class GradleKSubProjectPath(override val path: String) : GradleProjectPath
 val RelativeToKMod.gradlePath get() = ":k:${relToKNames.joinToString(":")}"
 val RelativeToKMod.jarBaseName get() = relToKNames.joinToString("-")
 val RelativeToKMod.jsFileName get() = "$jarBaseName.js"
+val RelativeToKMod.jsGzFileName get() = "$jarBaseName.js.gz"
 
 
 interface AbsoluteMod : RelativeMod {
@@ -102,7 +101,7 @@ interface AbsoluteKMod : AbsoluteMod, RelativeToKMod {
 @JvmInline
 value class GradleTaskPath(val path: String) {
     init {
-        require(":" in path) {
+        requireContains(path, ":") {
             "task path \"$path\" should have at least one colon, right? Or do root project tasks not have colons?"
         }
     }
@@ -111,4 +110,6 @@ value class GradleTaskPath(val path: String) {
     override fun toString(): String {
         return path
     }
+
+    fun isTaskOfRootProject() = path.substringBeforeLast(":").isBlank()
 }

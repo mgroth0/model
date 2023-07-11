@@ -1,6 +1,7 @@
 package matt.model.obj.single
 
 import matt.lang.anno.OnlySynchronizedOnJvm
+import matt.lang.require.requireNot
 import kotlin.reflect.KClass
 
 //internal val singletons = mutableSetOf<KClass<*>>()
@@ -15,43 +16,43 @@ import kotlin.reflect.KClass
 
 open class Singleton {
 
-  companion object {
-	private val instanced = mutableSetOf<KClass<out Singleton>>()
-  }
+    companion object {
+        private val instanced = mutableSetOf<KClass<out Singleton>>()
+    }
 
-  init {
-	if (this::class in instanced) throw RuntimeException("can only create one instance of a singleton")
-	else instanced.add(this::class)
-  }
+    init {
+        if (this::class in instanced) throw RuntimeException("can only create one instance of a singleton")
+        else instanced.add(this::class)
+    }
 }
 
 abstract class SingleCallBase {
 
-  var called: Boolean = false
-	@OnlySynchronizedOnJvm get
-	@OnlySynchronizedOnJvm protected set
+    var called: Boolean = false
+        @OnlySynchronizedOnJvm get
+        @OnlySynchronizedOnJvm protected set
 
 
 }
 
-class SingleCall(protected val op: ()->Unit = {}): SingleCallBase() {
+class SingleCall(protected val op: () -> Unit = {}) : SingleCallBase() {
 
-  @OnlySynchronizedOnJvm
-  operator fun invoke() {
-	require(!called)
-	op()
-	called = true
-  }
+    @OnlySynchronizedOnJvm
+    operator fun invoke() {
+        requireNot(called)
+        op()
+        called = true
+    }
 
 
 }
 
-class SingleCallWithArg<A>(val op: (A)->Unit = {}): SingleCallBase() {
-  @OnlySynchronizedOnJvm
-  operator fun invoke(arg: A) {
-	require(!called)
-	op(arg)
-	called = true
-  }
+class SingleCallWithArg<A>(val op: (A) -> Unit = {}) : SingleCallBase() {
+    @OnlySynchronizedOnJvm
+    operator fun invoke(arg: A) {
+        requireNot(called)
+        op(arg)
+        called = true
+    }
 
 }

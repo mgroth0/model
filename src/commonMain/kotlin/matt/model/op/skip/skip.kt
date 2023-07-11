@@ -1,10 +1,12 @@
 package matt.model.op.skip
 
+import matt.lang.require.requireNonNegative
+
 class Skipper(
   val numElementsToSkip: Int = 0
 ) {
   init {
-	require(numElementsToSkip >= 0)
+	requireNonNegative(numElementsToSkip)
   }
 
   private var skipIndex = -1

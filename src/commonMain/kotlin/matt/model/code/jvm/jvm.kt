@@ -5,10 +5,24 @@ import matt.lang.If
 import matt.lang.anno.SeeURL
 import matt.lang.ifTrue
 import matt.lang.opt
+import matt.lang.require.requireEmpty
+import matt.lang.require.requireEquals
 import matt.model.code.jvm.agentpath.AgentPathArg
 import matt.model.code.jvm.agentpath.fullArg
 import matt.model.data.byte.ByteSize
 import kotlin.jvm.JvmInline
+
+@SeeURL("https://blogs.oracle.com/javamagazine/post/java-garbage-collectors-evolution")
+@SeeURL("https://docs.oracle.com/en/java/javase/18/gctuning/available-collectors.html#GUID-C7B19628-27BA-4945-9004-EC0F08C76003")
+enum class GarbageCollector {
+    Serial,
+    Parallel,
+    G1,
+    ZG,
+    Shenandoah
+}
+
+const val HEROKU_FORWARDED_PORT = 9090
 
 
 @Serializable
@@ -24,20 +38,35 @@ data class JvmArgs(
     val maxStackTraceDepth: Int? = null,
     /*JVM will fail to start if less than 208K*/
     /*nvm, I just programmatically print both the top and bottom of the stack now. Much better.*/
-    val maxStackSize: String? = null,
+    val maxStackSize: ByteSize? = null,
 
     val prism: Boolean = true,
 
     val unlockDiagnosticVmOptions: Boolean = true,
     val showHiddenFrames: Boolean = true,
 
-    val useParallelGC: Boolean = false,
+    val gc: GarbageCollector? = null,
 
     val kotlinxCoroutinesDebug: Boolean = true,
 
     val agentPath: AgentPathArg? = null,
 
+
+    val useContainerSupport: Boolean = false,
+
+    val printGarbageCollectorDetails: Boolean = false,
+    val printGarbageDateStamps: Boolean = false,
+    val printTenuringDistribution: Boolean = false,
+
+    val printGarbageCollectorLogs: Boolean = false,
+
+    val compilerThreadCount: Int? = null,
+
+    val jmx: Boolean = false,
+
+
     val otherArgs: List<JvmArg> = listOf(),
+
 
     ) {
 
@@ -52,7 +81,7 @@ data class JvmArgs(
                 showHiddenFrames = false,
                 kotlinxCoroutinesDebug = false
             ).also {
-                require(it.args.isEmpty()) {
+                requireEmpty(it.args) {
                     "EMPTY should be empty but it has ${it.args.size} values: ${it.args.joinToString { it }}"
                 }
             }
@@ -63,42 +92,101 @@ data class JvmArgs(
         if (showHiddenFrames && !unlockDiagnosticVmOptions) {
             println("WARNING: I think showHiddenFrames requires unlockDiagnosticVmOptions")
         }
+        if (printGarbageDateStamps) {
+            error("PrintGCDateStamps seems to be removed from java 1.9, see https://openjdk.org/jeps/271")
+        }
+        if (printTenuringDistribution) {
+            error("I'm guessing this was removed from java 1.9 too, but not sure. I should spend my energy learning the new logging framework anyway. see https://openjdk.org/jeps/271 ")
+        }
+    }
+
+
+    private val systemProps by lazy {
+        arrayOf(
+            /*https://stackoverflow.com/questions/65565209/nullpointers-in-javafx-when-using-a-large-canvas*/
+            *If(prism).then("prism.maxvram=2G"),
+
+            /*
+       "Overhead of this feature is negligible and it can be safely turned on by default to simplify logging and diagnostic." - kotlinx.coroutines
+
+       gives better stack traces with coroutines. Given the message above, I should have this enabled always.
+
+       I tested it, and this definitely works! And the correct format is in fact "-Dkotlinx.coroutines.debug". "-Dkotlinx.coroutines.debug=true" may work, I have not tested it. But  "-Dkotlinx.coroutines.debug" definitely works.
+       * */
+
+            *If(kotlinxCoroutinesDebug).then(
+                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
+                "kotlinx.coroutines.debug"
+            ),
+
+
+            *If(jmx).then(
+                *listOf(
+                    @SeeURL("https://kubos.cz/2016/01/13/visualvm-connecting-through-ssh.html")
+                    "port=$HEROKU_FORWARDED_PORT", /*just the default for heroku port forwarding I think*/
+                    "ssl=false",
+                    "authenticate=false"
+                ).map {
+                    "com.sun.management.jmxremote.$it"
+                }.toTypedArray()
+            )
+        )
+    }
+
+    private val jvmArgs by lazy {
+        arrayOf(
+            /*OmitStackTraceInFastThrow: makes sure that exceptions get a full stack trace always.*/
+            /*https://stackoverflow.com/questions/2411487/nullpointerexception-in-java-with-no-stacktrace*/
+            *ifTrue(stackTraceInFastThrow) { "-OmitStackTraceInFastThrow" },
+            /*VM option 'ShowHiddenFrames' is diagnostic and must be enabled via -XX:+UnlockDiagnosticVMOptions.*/
+            *If(unlockDiagnosticVmOptions).then("+UnlockDiagnosticVMOptions"),
+            *If(showHiddenFrames).then("+ShowHiddenFrames"),
+            *ifTrue(diagnosticVMOptions) { "+UnlockDiagnosticVMOptions" },
+            *opt(gc) { "+Use${this.name}GC" },
+            *opt(maxStackTraceDepth) { "MaxJavaStackTraceDepth=$this" },
+
+
+            *If(useContainerSupport).then(
+                @SeeURL("https://devcenter.heroku.com/articles/java-memory-issues")
+                "+UseContainerSupport"
+            ),
+
+            *If(printGarbageCollectorDetails).then(
+                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage")
+                "+PrintGCDetails"
+            ),
+            *If(printGarbageDateStamps).then(
+                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage")
+                "+PrintGCDateStamps"
+            ),
+            *If(printTenuringDistribution).then(
+                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage")
+                "+PrintTenuringDistribution"
+            ),
+            *opt(compilerThreadCount) { "CICompilerCount=$this" },
+        )
     }
 
     val args by lazy {
         arrayOf(
-            /*https://stackoverflow.com/questions/65565209/nullpointers-in-javafx-when-using-a-large-canvas*/
-            *If(prism).then("-Dprism.maxvram=2G"),
+
+            *systemProps.map { "-D$it" }.toTypedArray(),
 
             *opt(xmx) { "-Xms$formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit" },
             *opt(xmx) { Xmx(this).toRawArg() },
             *ifTrue(enableAssertionsAndCoroutinesDebugMode) { "-enableassertions" },
 
-            /*OmitStackTraceInFastThrow: makes sure that exceptions get a full stack trace always.*/
-            /*https://stackoverflow.com/questions/2411487/nullpointerexception-in-java-with-no-stacktrace*/
-            *ifTrue(stackTraceInFastThrow) { "-XX:-OmitStackTraceInFastThrow" },
-            /*VM option 'ShowHiddenFrames' is diagnostic and must be enabled via -XX:+UnlockDiagnosticVMOptions.*/
-            *If(unlockDiagnosticVmOptions).then("-XX:+UnlockDiagnosticVMOptions"),
-            *If(showHiddenFrames).then("-XX:+ShowHiddenFrames"),
-            *ifTrue(diagnosticVMOptions) { "-XX:+UnlockDiagnosticVMOptions" },
+            *jvmArgs.map { "-XX:$it" }.toTypedArray(),
 
-            *If(useParallelGC).then("-XX:+UseParallelGC"),
 
-            *opt(maxStackTraceDepth) { "-XX:MaxJavaStackTraceDepth=$this" },
-            *opt(maxStackSize) { "-Xss$this" },
+            *opt(maxStackSize) { "-Xss$formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit" },
             *opt(agentPath) { fullArg() },
 
-            /*
-            "Overhead of this feature is negligible and it can be safely turned on by default to simplify logging and diagnostic." - kotlinx.coroutines
 
-            gives better stack traces with coroutines. Given the message above, I should have this enabled always.
-
-            I tested it, and this definitely works! And the correct format is in fact "-Dkotlinx.coroutines.debug". "-Dkotlinx.coroutines.debug=true" may work, I have not tested it. But  "-Dkotlinx.coroutines.debug" definitely works.
-            * */
-
-            *If(kotlinxCoroutinesDebug).then(
-                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
-                "-Dkotlinx.coroutines.debug"
+            *If(printGarbageCollectorLogs).then(
+                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage")
+                @SeeURL("https://openjdk.org/jeps/158")
+                "-Xlog:gc"
             ),
 
             *otherArgs.map { it.toRawArg() }.toTypedArray(),
@@ -109,7 +197,6 @@ data class JvmArgs(
         JvmArgsList(args)
     }
 }
-
 
 
 @Serializable
@@ -129,6 +216,6 @@ value class JvmArgsList(val args: List<String>) : List<String> by args {
     constructor(args: Array<String>) : this(args.toList())
 
     init {
-        require(args.toSet().size == args.size)
+        requireEquals(args.toSet().size, args.size)
     }
 }

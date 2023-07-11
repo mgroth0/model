@@ -18,6 +18,7 @@ interface WritableBytes : HasBytes {
 
 interface MightExist {
     fun exists(): Boolean
+    val doesNotExist get() = !exists()
 }
 
 fun <T : MightExist> T.takeIfExists() = takeIf { exists() }

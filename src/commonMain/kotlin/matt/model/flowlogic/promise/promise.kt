@@ -3,6 +3,7 @@ package matt.model.flowlogic.promise
 import matt.lang.anno.OnlySynchronizedOnJvm
 import matt.lang.function.Op
 import matt.lang.function.Produce
+import matt.lang.require.requireNot
 import matt.model.code.idea.ProceedingIdea
 import matt.model.flowlogic.await.Awaitable
 
@@ -11,72 +12,72 @@ import matt.model.flowlogic.await.Awaitable
 /*why don't I just call these Promises...*/
 
 
-interface AwaitableCommitment: Commitment, Awaitable<Unit>
+interface AwaitableCommitment : Commitment, Awaitable<Unit>
 
-interface Commitment: ProceedingIdea {
-  val isFulfilled: Boolean
-  fun then(op: Op): Commitment
-  fun thenAsync(op: Produce<Commitment>): Commitment
-  val debugID: Int
+interface Commitment : ProceedingIdea {
+    val isFulfilled: Boolean
+    fun then(op: Op): Commitment
+    fun thenAsync(op: Produce<Commitment>): Commitment
+    val debugID: Int
 }
 
-class MadeCommitment(private val maker: CommitmentMaker): Commitment by maker
-class MadeAwaitableCommitment(private val maker: AwaitableCommitment): AwaitableCommitment by maker
+class MadeCommitment(private val maker: CommitmentMaker) : Commitment by maker
+class MadeAwaitableCommitment(private val maker: AwaitableCommitment) : AwaitableCommitment by maker
 
-open class CommitmentMaker: Commitment {
+open class CommitmentMaker : Commitment {
 
-  companion object {
-	var nextID = 0
-  }
+    companion object {
+        var nextID = 0
+    }
 
-  override val debugID = nextID++
+    override val debugID = nextID++
 
-  final override var isFulfilled = false
-	private set
+    final override var isFulfilled = false
+        private set
 
-  @OnlySynchronizedOnJvm
-  fun fulfilled() {
-	require(!isFulfilled) {
-	  "fulfilled twice"
-	}
-	isFulfilled = true
-	thens.forEach {
-	  it()
-	}
-  }
+    @OnlySynchronizedOnJvm
+    fun fulfilled() {
+        requireNot(isFulfilled) {
+            "fulfilled twice"
+        }
+        isFulfilled = true
+        thens.forEach {
+            it()
+        }
+    }
 
-  private val thens = mutableListOf<Op>()
+    private val thens = mutableListOf<Op>()
 
-  @OnlySynchronizedOnJvm
-  override fun then(op: Op): Commitment {
-	val c = CommitmentMaker()
-	if (isFulfilled) {
-	  op()
-	  c.fulfilled()
-	} else {
-	  thens += {
-		op()
-		c.fulfilled()
-	  }
-	}
-	return c
-  }
+    @OnlySynchronizedOnJvm
+    override fun then(op: Op): Commitment {
+        val c = CommitmentMaker()
+        if (isFulfilled) {
+            op()
+            c.fulfilled()
+        } else {
+            thens += {
+                op()
+                c.fulfilled()
+            }
+        }
+        return c
+    }
 
 
-  @OnlySynchronizedOnJvm
-  override fun thenAsync(op: Produce<Commitment>): Commitment {
-	val c = CommitmentMaker()
-	if (isFulfilled) {
-	  op().then {
-		c.fulfilled()
-	  }
-	} else {
-	  thens += {
-		op().then {
-		  c.fulfilled()
-		}
-	  }
-	}
-	return c
-  }
+    @OnlySynchronizedOnJvm
+    override fun thenAsync(op: Produce<Commitment>): Commitment {
+        val c = CommitmentMaker()
+        if (isFulfilled) {
+            op().then {
+                c.fulfilled()
+            }
+        } else {
+            thens += {
+                op().then {
+                    c.fulfilled()
+                }
+            }
+        }
+        return c
+    }
 }
