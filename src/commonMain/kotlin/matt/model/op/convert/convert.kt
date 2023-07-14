@@ -4,6 +4,7 @@ import matt.model.data.byte.ByteSize
 import matt.prim.byte.toInt
 import matt.prim.int.toByteArray
 import matt.prim.str.elementsToString
+import matt.prim.str.takeIfNotBlank
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -129,6 +130,18 @@ interface StringConverter<T> : Converter<String, T> {
 
     fun asSingularStringListConverter() = StringListConverter.fromStringConverterAsSingular(this)
 
+    fun nullAsBlank() = object : Converter<String, T?> {
+        override fun convertToB(a: String): T? {
+            return a.takeIfNotBlank()?.toB()
+        }
+
+        override fun convertToA(b: T?): String {
+            return b?.toA() ?: ""
+        }
+
+
+    }
+
 }
 
 typealias StringList = List<String>
@@ -158,6 +171,7 @@ interface StringListConverter<T> : Converter<StringList, T> {
         override fun toStringList(t: T?): StringList {
             return if (t == null) emptyList() else this@StringListConverter.toStringList(t)
         }
+
         override fun fromStringList(s: StringList): T? {
             return if (s.isEmpty()) null else this@StringListConverter.fromStringList(s)
         }
@@ -180,20 +194,25 @@ class StringListBySingleElementConverter<T>(private val elementConverter: String
     }
 
     override fun fromStringList(s: StringList): T {
-        return elementConverter.fromString(s.singleOrNull() ?: error("only 1 element allowed, but got ${s.size}: ${s.elementsToString()}"))
+        return elementConverter.fromString(
+            s.singleOrNull() ?: error("only 1 element allowed, but got ${s.size}: ${s.elementsToString()}")
+        )
     }
 
 }
 
-class StringListBySingleElementOrNullConverter<T>(private val elementConverter: StringConverter<T>) : StringListConverter<T?> {
+class StringListBySingleElementOrNullConverter<T>(private val elementConverter: StringConverter<T>) :
+    StringListConverter<T?> {
     override fun toStringList(t: T?): StringList {
-        if (t==null) return emptyList()
+        if (t == null) return emptyList()
         return listOf(elementConverter.toString(t))
     }
 
     override fun fromStringList(s: StringList): T? {
         if (s.isEmpty()) return null
-        return elementConverter.fromString(s.singleOrNull() ?: error("only 0-1 elements allowed, but got ${s.size}: ${s.elementsToString()}"))
+        return elementConverter.fromString(
+            s.singleOrNull() ?: error("only 0-1 elements allowed, but got ${s.size}: ${s.elementsToString()}")
+        )
     }
 
 }
