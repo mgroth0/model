@@ -95,13 +95,13 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
 
 
     val bestBinaryUnit by lazy {
-        BinaryByteUnit.values().reversed().firstOrNull {
+        BinaryByteUnit.entries.reversed().firstOrNull {
             val rep = unitRep(it)
             rep > 1 || rep < -1
         } ?: B
     }
     val bestDecimalUnit by lazy {
-        DecimalByteUnit.values().reversed().firstOrNull {
+        DecimalByteUnit.entries.reversed().firstOrNull {
             val rep = unitRep(it)
             rep > 1 || rep < -1
         } ?: DecimalByteUnit.B
@@ -109,13 +109,13 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
 
 
     val largestWholeBinaryUnit by lazy {
-        BinaryByteUnit.values().reversed().firstOrNull {
+        BinaryByteUnit.entries.reversed().firstOrNull {
             val rep = unitRep(it)
             rep.isWhole()
         } ?: B
     }
     val largestWholeDecimalUnit by lazy {
-        DecimalByteUnit.values().reversed().firstOrNull {
+        DecimalByteUnit.entries.reversed().firstOrNull {
             val rep = unitRep(it)
             rep.isWhole()
         } ?: DecimalByteUnit.B
