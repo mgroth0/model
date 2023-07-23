@@ -283,6 +283,11 @@ object IntStringConverter : FailableStringConverter<Int> {
     override fun fromString(s: String) = s.toIntOrNull()
 }
 
+object DefiniteIntStringConverter : StringConverter<Int> {
+    override fun toString(t: Int) = t.toString()
+    override fun fromString(s: String) = s.toInt()
+}
+
 object IntBytesConverter : BytesConverter<Int> {
     override fun toBytes(t: Int): ByteArray {
         return t.toByteArray()
