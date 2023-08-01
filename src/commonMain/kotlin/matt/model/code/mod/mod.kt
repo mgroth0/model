@@ -96,10 +96,28 @@ interface AbsoluteKMod : AbsoluteMod, RelativeToKMod {
     override val modName get() = relToKNames.last()
 }
 
+interface GradleTask {
+    val taskName: String
+}
 
 @Serializable
 @JvmInline
-value class GradleTaskPath(val path: String) {
+value class GradleTaskSelector(val selector: String): GradleTask {
+    val specifiesAProject get() = ":" in selector
+    fun asTaskPath(): GradleTaskPath {
+        if (!specifiesAProject) {
+            error("GradleTaskSelector can only be a GradleTaskPath if it specifies a project")
+        }
+        return GradleTaskPath(path = selector)
+    }
+
+    override val taskName get() = selector.substringAfter(":")
+}
+
+
+@Serializable
+@JvmInline
+value class GradleTaskPath(val path: String): GradleTask {
     init {
         requireContains(path, ":") {
             "task path \"$path\" should have at least one colon, right? Or do root project tasks not have colons?"
@@ -112,4 +130,10 @@ value class GradleTaskPath(val path: String) {
     }
 
     fun isTaskOfRootProject() = path.substringBeforeLast(":").isBlank()
+
+    override val taskName get() = path.substringAfter(":")
+
+    fun asGradleTaskSelector() = GradleTaskSelector(selector = path)
+    fun asGradleTaskSelectorForAllProjects() = GradleTaskSelector(selector = path.substringAfter(":"))
+
 }
