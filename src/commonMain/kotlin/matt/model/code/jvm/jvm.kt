@@ -1,5 +1,6 @@
 package matt.model.code.jvm
 
+import matt.model.code.jvm.args.JvmArg
 import kotlinx.serialization.Serializable
 import matt.lang.If
 import matt.lang.anno.SeeURL
@@ -9,32 +10,25 @@ import matt.lang.require.requireEmpty
 import matt.lang.require.requireEquals
 import matt.model.code.jvm.agentpath.AgentPathArg
 import matt.model.code.jvm.agentpath.fullArg
+import matt.model.code.jvm.args.gc.GarbageCollector
+import matt.model.code.jvm.bytearg.Xms
+import matt.model.code.jvm.bytearg.Xmx
+import matt.model.code.jvm.bytearg.Xss
 import matt.model.data.byte.ByteSize
 import kotlin.jvm.JvmInline
 
-@SeeURL("https://blogs.oracle.com/javamagazine/post/java-garbage-collectors-evolution")
-@SeeURL("https://docs.oracle.com/en/java/javase/18/gctuning/available-collectors.html#GUID-C7B19628-27BA-4945-9004-EC0F08C76003")
-enum class GarbageCollector {
-    Serial,
-    Parallel,
-    G1,
-    ZG,
-    Shenandoah
-}
+
 
 const val HEROKU_FORWARDED_PORT = 9090
 
 
 @Serializable
 data class JvmArgs(
-    @SeeURL("https://stackoverflow.com/questions/32855984/does-java-xmx1g-mean-109-or-230-bytes")
-    val xmx: ByteSize?,
-    @SeeURL("https://stackoverflow.com/questions/32855984/does-java-xmx1g-mean-109-or-230-bytes")
-    val xms: ByteSize? = null,
+    @SeeURL("https://stackoverflow.com/questions/32855984/does-java-xmx1g-mean-109-or-230-bytes") val xmx: ByteSize?,
+    @SeeURL("https://stackoverflow.com/questions/32855984/does-java-xmx1g-mean-109-or-230-bytes") val xms: ByteSize? = null,
     val stackTraceInFastThrow: Boolean = true,
     val diagnosticVMOptions: Boolean = false,
-    @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
-    val enableAssertionsAndCoroutinesDebugMode: Boolean = true,
+    @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery") val enableAssertionsAndCoroutinesDebugMode: Boolean = true,
     val maxStackTraceDepth: Int? = null,
     /*JVM will fail to start if less than 208K*/
     /*nvm, I just programmatically print both the top and bottom of the stack now. Much better.*/
@@ -102,8 +96,7 @@ data class JvmArgs(
 
 
     private val systemProps by lazy {
-        arrayOf(
-            /*https://stackoverflow.com/questions/65565209/nullpointers-in-javafx-when-using-a-large-canvas*/
+        arrayOf(/*https://stackoverflow.com/questions/65565209/nullpointers-in-javafx-when-using-a-large-canvas*/
             *If(prism).then("prism.maxvram=2G"),
 
             /*
@@ -115,17 +108,14 @@ data class JvmArgs(
        * */
 
             *If(kotlinxCoroutinesDebug).then(
-                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
-                "kotlinx.coroutines.debug"
+                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery") "kotlinx.coroutines.debug"
             ),
 
 
             *If(jmx).then(
                 *listOf(
-                    @SeeURL("https://kubos.cz/2016/01/13/visualvm-connecting-through-ssh.html")
-                    "port=$HEROKU_FORWARDED_PORT", /*just the default for heroku port forwarding I think*/
-                    "ssl=false",
-                    "authenticate=false"
+                    @SeeURL("https://kubos.cz/2016/01/13/visualvm-connecting-through-ssh.html") "port=$HEROKU_FORWARDED_PORT", /*just the default for heroku port forwarding I think*/
+                    "ssl=false", "authenticate=false"
                 ).map {
                     "com.sun.management.jmxremote.$it"
                 }.toTypedArray()
@@ -147,21 +137,17 @@ data class JvmArgs(
 
 
             *If(useContainerSupport).then(
-                @SeeURL("https://devcenter.heroku.com/articles/java-memory-issues")
-                "+UseContainerSupport"
+                @SeeURL("https://devcenter.heroku.com/articles/java-memory-issues") "+UseContainerSupport"
             ),
 
             *If(printGarbageCollectorDetails).then(
-                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage")
-                "+PrintGCDetails"
+                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage") "+PrintGCDetails"
             ),
             *If(printGarbageDateStamps).then(
-                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage")
-                "+PrintGCDateStamps"
+                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage") "+PrintGCDateStamps"
             ),
             *If(printTenuringDistribution).then(
-                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage")
-                "+PrintTenuringDistribution"
+                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage") "+PrintTenuringDistribution"
             ),
             *opt(compilerThreadCount) { "CICompilerCount=$this" },
         )
@@ -171,22 +157,19 @@ data class JvmArgs(
         arrayOf(
 
             *systemProps.map { "-D$it" }.toTypedArray(),
-
-            *opt(xmx) { "-Xms$formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit" },
+            *opt(xmx) { Xms(this).toRawArg() },
             *opt(xmx) { Xmx(this).toRawArg() },
             *ifTrue(enableAssertionsAndCoroutinesDebugMode) { "-enableassertions" },
 
             *jvmArgs.map { "-XX:$it" }.toTypedArray(),
 
 
-            *opt(maxStackSize) { "-Xss$formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit" },
+            *opt(maxStackSize) { Xss(this).toRawArg() },
             *opt(agentPath) { fullArg() },
 
 
             *If(printGarbageCollectorLogs).then(
-                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage")
-                @SeeURL("https://openjdk.org/jeps/158")
-                "-Xlog:gc"
+                @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage") @SeeURL("https://openjdk.org/jeps/158") "-Xlog:gc"
             ),
 
             *otherArgs.map { it.toRawArg() }.toTypedArray(),
@@ -199,17 +182,8 @@ data class JvmArgs(
 }
 
 
-@Serializable
-@JvmInline
-value class Xmx(private val size: ByteSize) : JvmArg {
-    override fun toRawArg(): String {
-        return "-Xmx${size.formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit}"
-    }
-}
 
-interface JvmArg {
-    fun toRawArg(): String
-}
+
 
 @JvmInline
 value class JvmArgsList(val args: List<String>) : List<String> by args {
