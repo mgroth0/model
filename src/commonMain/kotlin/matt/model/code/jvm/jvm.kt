@@ -1,6 +1,5 @@
 package matt.model.code.jvm
 
-import matt.model.code.jvm.args.JvmArg
 import kotlinx.serialization.Serializable
 import matt.lang.If
 import matt.lang.anno.SeeURL
@@ -10,13 +9,13 @@ import matt.lang.require.requireEmpty
 import matt.lang.require.requireEquals
 import matt.model.code.jvm.agentpath.AgentPathArg
 import matt.model.code.jvm.agentpath.fullArg
+import matt.model.code.jvm.args.JvmArg
 import matt.model.code.jvm.args.gc.GarbageCollector
 import matt.model.code.jvm.bytearg.Xms
 import matt.model.code.jvm.bytearg.Xmx
 import matt.model.code.jvm.bytearg.Xss
 import matt.model.data.byte.ByteSize
 import kotlin.jvm.JvmInline
-
 
 
 const val HEROKU_FORWARDED_PORT = 9090
@@ -157,7 +156,7 @@ data class JvmArgs(
         arrayOf(
 
             *systemProps.map { "-D$it" }.toTypedArray(),
-            *opt(xmx) { Xms(this).toRawArg() },
+            *opt(xms) { Xms(this).toRawArg() },
             *opt(xmx) { Xmx(this).toRawArg() },
             *ifTrue(enableAssertionsAndCoroutinesDebugMode) { "-enableassertions" },
 
