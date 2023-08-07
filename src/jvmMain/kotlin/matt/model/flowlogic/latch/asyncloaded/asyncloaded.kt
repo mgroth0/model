@@ -6,6 +6,7 @@ import matt.lang.model.value.ValueWrapperIdea
 import matt.lang.require.requireEquals
 import matt.lang.weak.lazyWeak
 import matt.model.flowlogic.await.Awaitable
+import matt.model.flowlogic.latch.LatchCancelled
 import matt.model.flowlogic.latch.SimpleLatch
 import java.lang.Thread.State
 import java.util.concurrent.atomic.AtomicInteger
@@ -59,6 +60,8 @@ open class SyncLoadedValueOp<T>(private val op: () -> T) : Async<T>() {
 }
 
 open class LoadedValueSlot<T> : Async<T>() {
+
+
     @Synchronized
     fun putLoadedValue(t: T) {
         require(latch!!.isClosed)
@@ -66,7 +69,7 @@ open class LoadedValueSlot<T> : Async<T>() {
         openAndDisposeLatch()
     }
 
-    fun isDone() = latch?.isOpen ?: true
+    fun isDoneOrCancelled() = latch?.isOpen ?: true
 }
 
 
@@ -97,23 +100,54 @@ class DelegatedSlot<T : Any> : AsyncBase<T>() {
     }
 }
 
+
+
 abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
 
     private var setListeners: Lazy<MutableList<(T) -> Unit>>? = lazy { mutableListOf() }
 
+    private var failure: LatchCancelled? = null
+
+    @Synchronized
+    fun cancel(e: Throwable? = null) {
+        failure = LatchCancelled(cause = e)
+        value = null
+        cancelLatch(e)
+    }
+
+    @Synchronized
+    fun cancel(message: String) {
+        failure = LatchCancelled(message = message)
+        value = null
+        cancelLatch(message)
+    }
+
+
     @Suppress("UNCHECKED_CAST")
     protected var value: T? = null
+        @Synchronized
+        get() {
+//            println("getting value from ${this}, failure=${failure}, field=${field}")
+            failure?.go { throw it }
+            return field
+        }
         @Synchronized set(value) {
-            field = value
-            setListeners?.go {
-                if (it.isInitialized()) {
-                    it.value.forEach { operation ->
-                        operation(value as T)
+            if (failure == null) {
+                field = value
+                setListeners?.go {
+                    if (it.isInitialized()) {
+                        it.value.forEach { operation ->
+                            operation(value as T)
+                        }
                     }
+                    setListeners = null
                 }
-                setListeners = null
+            } else {
+                field = null
+                if (value != null) {
+                    println("WARNING: Async value was set to $value after it was cancelled. Overriding with null.")
+                }
             }
-
         }
 
 
@@ -143,6 +177,12 @@ abstract class AsyncBase<T> : Awaitable<T> {
     protected fun openAndDisposeLatch() {
         latch?.open()
         latch = null
+    }
+    protected fun cancelLatch(e: Throwable?) {
+        latch?.cancel(e)
+    }
+    protected fun cancelLatch(message: String) {
+        latch?.cancel(message)
     }
 
     protected var latch: SimpleLatch? = SimpleLatch()

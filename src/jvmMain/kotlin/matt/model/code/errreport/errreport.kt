@@ -26,3 +26,14 @@ class ThrowReport(
         }
     }
 }
+
+
+inline fun reportAndReThrowErrorsBetter(op: () -> Unit) {
+    try {
+        op()
+    } catch (throwable: Throwable) {
+        ThrowReport(throwable).print()
+        throw throwable
+    }
+}
+

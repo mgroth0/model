@@ -1,6 +1,5 @@
-package matt.model.code.valjson
+package matt.model.code.vals.portreg
 
-import matt.lang.anno.SeeURL
 import matt.lang.delegation.provider
 import matt.lang.delegation.valProp
 
@@ -45,13 +44,6 @@ object PortRegistry {
     val seleniumDaemon by aPort
     val seleniumService by aPort
     val omniFxGui by aPort
-    val localKtorServers by portRange(10)
+    val localKtorServers by portRange(100)
     val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
-}
-
-@SeeURL("https://youtrack.jetbrains.com/issue/KTOR-5996/Configure-server-to-find-first-available-port-matching-predicate")
-enum class LocalKtorPort {
-    Base, Web, Chrome, Python, HerokuRun;
-
-    val port = PortRegistry.localKtorServers.toList()[ordinal]
 }

@@ -7,6 +7,11 @@ import matt.lang.ifTrue
 import matt.lang.opt
 import matt.lang.require.requireEmpty
 import matt.lang.require.requireEquals
+import matt.lang.sysprop.props.JmxRemoteAuthenticate
+import matt.lang.sysprop.props.JmxRemotePort
+import matt.lang.sysprop.props.JmxRemoteSsl
+import matt.lang.sysprop.props.KotlinXCoroutinesDebug
+import matt.lang.sysprop.props.PrismMaxVram
 import matt.model.code.jvm.agentpath.AgentPathArg
 import matt.model.code.jvm.agentpath.fullArg
 import matt.model.code.jvm.args.JvmArg
@@ -95,8 +100,11 @@ data class JvmArgs(
 
 
     private val systemProps by lazy {
-        arrayOf(/*https://stackoverflow.com/questions/65565209/nullpointers-in-javafx-when-using-a-large-canvas*/
-            *If(prism).then("prism.maxvram=2G"),
+
+        mapOf(
+            /*https://stackoverflow.com/questions/65565209/nullpointers-in-javafx-when-using-a-large-canvas*/
+            *If(prism).then(PrismMaxVram to "2G"),
+
 
             /*
        "Overhead of this feature is negligible and it can be safely turned on by default to simplify logging and diagnostic." - kotlinx.coroutines
@@ -107,19 +115,49 @@ data class JvmArgs(
        * */
 
             *If(kotlinxCoroutinesDebug).then(
-                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery") "kotlinx.coroutines.debug"
+                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
+                KotlinXCoroutinesDebug to ""
             ),
 
 
             *If(jmx).then(
                 *listOf(
-                    @SeeURL("https://kubos.cz/2016/01/13/visualvm-connecting-through-ssh.html") "port=$HEROKU_FORWARDED_PORT", /*just the default for heroku port forwarding I think*/
-                    "ssl=false", "authenticate=false"
-                ).map {
-                    "com.sun.management.jmxremote.$it"
-                }.toTypedArray()
+                    JmxRemotePort to "$HEROKU_FORWARDED_PORT",
+                    JmxRemoteSsl to "false",
+                    JmxRemoteAuthenticate to "false"
+                ).toTypedArray()
             )
+
         )
+//
+//        arrayOf(
+//
+//            *If(prism).then("prism.maxvram=2G"),
+//
+//            /*
+//       "Overhead of this feature is negligible and it can be safely turned on by default to simplify logging and diagnostic." - kotlinx.coroutines
+//
+//       gives better stack traces with coroutines. Given the message above, I should have this enabled always.
+//
+//       I tested it, and this definitely works! And the correct format is in fact "-Dkotlinx.coroutines.debug". "-Dkotlinx.coroutines.debug=true" may work, I have not tested it. But  "-Dkotlinx.coroutines.debug" definitely works.
+//       * */
+//
+//            *If(kotlinxCoroutinesDebug).then(
+//                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery") "kotlinx.coroutines.debug"
+//            ),
+//
+//
+//            *If(jmx).then(
+//                *listOf(
+//                    @SeeURL("https://kubos.cz/2016/01/13/visualvm-connecting-through-ssh.html")
+//                    "port=$HEROKU_FORWARDED_PORT", /*just the default for heroku port forwarding I think*/
+//                    "ssl=false",
+//                    "authenticate=false"
+//                ).map {
+//                    "com.sun.management.jmxremote.$it"
+//                }.toTypedArray()
+//            )
+//        )
     }
 
     private val jvmArgs by lazy {
@@ -155,7 +193,14 @@ data class JvmArgs(
     val args by lazy {
         arrayOf(
 
-            *systemProps.map { "-D$it" }.toTypedArray(),
+            *systemProps.map {
+                if (it.value.isBlank()) {
+                    "-D${it.key.key}" /*flag prop*/
+                } else {
+                    "-D${it.key.key}=${it.value}"
+                }
+
+            }.toTypedArray(),
             *opt(xms) { Xms(this).toRawArg() },
             *opt(xmx) { Xmx(this).toRawArg() },
             *ifTrue(enableAssertionsAndCoroutinesDebugMode) { "-enableassertions" },
@@ -179,9 +224,6 @@ data class JvmArgs(
         JvmArgsList(args)
     }
 }
-
-
-
 
 
 @JvmInline

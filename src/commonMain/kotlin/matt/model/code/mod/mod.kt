@@ -1,9 +1,11 @@
 package matt.model.code.mod
 
 import kotlinx.serialization.Serializable
+import matt.lang.SubRoots
 import matt.lang.require.requireContains
 import matt.lang.require.requireStartsWith
 import matt.model.code.idea.ModIdea
+import matt.prim.str.ensurePrefix
 import kotlin.jvm.JvmInline
 
 
@@ -34,6 +36,7 @@ interface GradlePath {
 interface GradleProjectPath : GradlePath, ModType
 
 val GradleProjectPath.isRoot get() = path == ":"
+val GradleProjectPath.isSubRoot get() = path == ":${SubRoots.k.name}"
 fun GradleProjectPath.asKSubPath() = GradleKSubProjectPath(path)
 
 @JvmInline
@@ -52,9 +55,11 @@ fun RelativeToKMod.asGradleKSubProjectPath() = when (this) {
 @Serializable
 @JvmInline
 value class GradleKSubProjectPath(override val path: String) : GradleProjectPath, RelativeToKMod {
+    constructor(vararg parts: String) : this((listOf(SubRoots.k.name) + parts).joinToString(separator = ":").ensurePrefix(":"))
+
     companion object {
 
-        private const val REQUIRED_PREFIX = ":k:"
+        private val REQUIRED_PREFIX = ":${SubRoots.k.name}:"
 
         fun fromUniqueCamelCaseName(camelCaseID: String): GradleKSubProjectPath {
             val parts = mutableListOf("")
@@ -64,7 +69,7 @@ value class GradleKSubProjectPath(override val path: String) : GradleProjectPath
                 }
                 parts[parts.size - 1] = parts.last() + it.lowercase()
             }
-            return GradleKSubProjectPath(":k:${parts.joinToString(separator = ":")}")
+            return GradleKSubProjectPath(":${SubRoots.k.name}:${parts.joinToString(separator = ":")}")
         }
 
 
@@ -81,10 +86,13 @@ value class GradleKSubProjectPath(override val path: String) : GradleProjectPath
     }
 }
 
-val RelativeToKMod.gradlePath get() = ":k:${relToKNames.joinToString(":")}"
+val RelativeToKMod.gradlePath get() = ":${SubRoots.k.name}:${relToKNames.joinToString(":")}"
 val RelativeToKMod.jarBaseName get() = relToKNames.joinToString("-")
 val RelativeToKMod.jsFileName get() = "$jarBaseName.js"
 val RelativeToKMod.jsGzFileName get() = "$jarBaseName.js.gz"
+
+
+
 
 
 interface AbsoluteMod : RelativeMod {
@@ -102,7 +110,7 @@ interface GradleTask {
 
 @Serializable
 @JvmInline
-value class GradleTaskSelector(val selector: String): GradleTask {
+value class GradleTaskSelector(val selector: String) : GradleTask {
     val specifiesAProject get() = ":" in selector
     fun asTaskPath(): GradleTaskPath {
         if (!specifiesAProject) {
@@ -117,7 +125,7 @@ value class GradleTaskSelector(val selector: String): GradleTask {
 
 @Serializable
 @JvmInline
-value class GradleTaskPath(val path: String): GradleTask {
+value class GradleTaskPath(val path: String) : GradleTask {
     init {
         requireContains(path, ":") {
             "task path \"$path\" should have at least one colon, right? Or do root project tasks not have colons?"

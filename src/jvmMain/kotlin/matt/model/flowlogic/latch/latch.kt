@@ -2,6 +2,7 @@ package matt.model.flowlogic.latch
 
 import matt.lang.function.Op
 import matt.lang.function.Produce
+import matt.lang.go
 import matt.model.code.successorfail.Fail
 import matt.model.code.successorfail.FailableReturn
 import matt.model.code.successorfail.FailedReturn
@@ -25,11 +26,37 @@ enum class LatchAwaitResult {
 class SimpleLatch : Awaitable<Unit> {
 
 
+    private var failure: LatchCancelled? = null
+
+
+    fun cancel(e: Throwable? = null) {
+        if (failure != null) {
+            println("warning: latch already has failure")
+        }
+        failure = LatchCancelled(cause = e)
+        open()
+    }
+
+    fun cancel(message: String) {
+        if (failure != null) {
+            println("warning: latch already has failure")
+        }
+        failure = LatchCancelled(message = message)
+        open()
+    }
+
+
     private val latch = CountDownLatch(1)
-    override fun await() = latch.await()
+    override fun await() {
+        latch.await()
+        failure?.go { throw it }
+    }
+
     fun await(timeout: Duration): LatchAwaitResult {
-        return if (latch.await(timeout.inWholeMilliseconds, MILLISECONDS)) LATCH_OPENED
-        else TIMEOUT
+        return if (latch.await(timeout.inWholeMilliseconds, MILLISECONDS)) {
+            failure?.go { throw it }
+            LATCH_OPENED
+        } else TIMEOUT
     }
 
     fun awaitOrThrow(timeout: Duration) {
@@ -81,3 +108,12 @@ class OpResultWithReturnValueHandler<R>(private val failMessage: String) : Await
     override fun await() = result.await()
 
 }
+
+
+class LatchCancelled(
+    message: String? = null,
+    cause: Throwable? = null
+) : Exception("Latch was cancelled" + (message?.let { ": $it" } ?: ""), cause)
+
+
+
