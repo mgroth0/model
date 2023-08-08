@@ -23,6 +23,7 @@ data class JProfilerAgentPathArg(
     val config: SFile? = null,
     val sessionId: Int? = null
 ) : AgentPathArg {
+
     override fun argValue(): String {
         val args = mutableListOf<String>()
         if (offline) {

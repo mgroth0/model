@@ -94,6 +94,13 @@ object CLOSE : InterAppAction
 class OpenRelative(val thing: String) : InterAppAction
 
 @Serializable
+class OpenSpecific(
+    val qualifiedName: String,
+    val fileName: String,
+    val lineNumber: Int
+) : InterAppAction
+
+@Serializable
 object OpenNearestGradleBuildscript : InterAppAction
 
 @Serializable
