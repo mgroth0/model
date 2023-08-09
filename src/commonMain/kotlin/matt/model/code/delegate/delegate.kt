@@ -92,18 +92,3 @@ class RequireAlwaysEverySetEqual<V> : ReadWriteProperty<Any?, V?> {
 }
 
 
-class Retryable<V : Any>(private val op: () -> V?) : ReadOnlyProperty<Any?, V?> {
-
-    private var value: V? = null
-
-    override fun getValue(
-        thisRef: Any?,
-        property: KProperty<*>
-    ): V? {
-        if (value == null) {
-            value = op()
-        }
-        return value
-    }
-
-}
