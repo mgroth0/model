@@ -67,9 +67,7 @@ object Success: SucceedOrFailWithException {
 sealed interface Failure: SuccessOrFail
 
 class Fail(override val message: String): Failure {
-  override fun toString(): String {
-	return "Fail[message=\"$message\"]"
-  }
+  override fun toString() = "Fail[message=\"$message\"]"
 }
 
 class FailWithException(val exception: Exception): Failure, SucceedOrFailWithException {

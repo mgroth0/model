@@ -94,7 +94,7 @@ object CLOSE : InterAppAction
 class OpenRelative(val thing: String) : InterAppAction
 
 @Serializable
-class OpenSpecific(
+data class OpenSpecific(
     val qualifiedName: String,
     val fileName: String,
     val lineNumber: Int
