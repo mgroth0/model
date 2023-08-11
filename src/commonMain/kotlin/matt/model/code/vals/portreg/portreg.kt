@@ -10,6 +10,9 @@ import matt.lang.delegation.valProp
 * - Issues arise when running multiple applications using different versions of this library
 *
 * */
+
+
+/*Relocate these to VariablePortRegistry*/
 object PortRegistry {
     private var num = 65000 /*max port possible is 65_535*/
     private val aPort
@@ -47,3 +50,4 @@ object PortRegistry {
     val localKtorServers by portRange(100)
     val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
 }
+
