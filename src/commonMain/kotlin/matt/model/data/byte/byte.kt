@@ -51,8 +51,12 @@ fun Double.isWhole() = ceil(this) == floor(this)
 @Serializable
 data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrapper<ByteSize> {
 
+
     constructor(bytes: Number) : this(bytes.toLong())
 
+    companion object {
+        val ZERO = ByteSize(0)
+    }
 
     interface ByteUnit {
         val name: String
