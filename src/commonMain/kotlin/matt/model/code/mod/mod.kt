@@ -139,7 +139,7 @@ value class GradleTaskPath(val path: String) : GradleTask {
 
     fun isTaskOfRootProject() = path.substringBeforeLast(":").isBlank()
 
-    override val taskName get() = path.substringAfter(":")
+    override val taskName get() = path.substringAfterLast(":")
 
     fun asGradleTaskSelector() = GradleTaskSelector(selector = path)
     fun asGradleTaskSelectorForAllProjects() = GradleTaskSelector(selector = path.substringAfter(":"))
