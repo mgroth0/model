@@ -1,5 +1,6 @@
 package matt.model.data.proxy.list
 
+import matt.model.data.proxy.collect.ProxyCollection
 import matt.model.op.convert.Converter
 
 fun <S, T> List<S>.proxy(converter: Converter<S, T>) = ImmutableProxyList(this, converter)
@@ -8,21 +9,17 @@ fun <S, T> MutableList<S>.proxy(converter: Converter<S, T>) = ProxyList(this, co
 open class ImmutableProxyList<S, T>(
     private val innerList: List<S>,
     private val converter: Converter<S, T>
-) : List<T> {
+) : ProxyCollection<S, T>(innerList, converter), List<T> {
 
     protected fun S.toT() = converter.convertToB(this)
     protected fun T.toS() = converter.convertToA(this)
 
-    final override val size: Int
-        get() = innerList.size
+
 
     final override fun get(index: Int): T {
         return innerList[index].toT()
     }
 
-    final override fun isEmpty(): Boolean {
-        return innerList.isEmpty()
-    }
 
     override fun iterator() = listIterator()
 
@@ -60,7 +57,10 @@ open class ImmutableProxyList<S, T>(
 
     }
 
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
+    override fun subList(
+        fromIndex: Int,
+        toIndex: Int
+    ): MutableList<T> {
         TODO()
     }
 
@@ -96,11 +96,17 @@ class ProxyList<S, T>(
         return innerList.addAll(elements.map { it.toS() })
     }
 
-    override fun addAll(index: Int, elements: Collection<T>): Boolean {
+    override fun addAll(
+        index: Int,
+        elements: Collection<T>
+    ): Boolean {
         return innerList.addAll(index, elements.map { it.toS() })
     }
 
-    override fun add(index: Int, element: T) {
+    override fun add(
+        index: Int,
+        element: T
+    ) {
         return innerList.add(index, element.toS())
     }
 
@@ -158,11 +164,17 @@ class ProxyList<S, T>(
         return innerList.removeAt(index).toT()
     }
 
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
+    override fun subList(
+        fromIndex: Int,
+        toIndex: Int
+    ): MutableList<T> {
         TODO()
     }
 
-    override fun set(index: Int, element: T): T {
+    override fun set(
+        index: Int,
+        element: T
+    ): T {
         return innerList.set(index, element.toS()).toT()
     }
 

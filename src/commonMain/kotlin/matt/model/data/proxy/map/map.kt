@@ -1,6 +1,6 @@
 package matt.model.data.proxy.map
 
-import matt.lang.err
+import matt.model.data.proxy.set.ProxyMutableSet
 import matt.model.op.convert.Converter
 import kotlin.collections.Map.Entry
 import kotlin.collections.MutableMap.MutableEntry
@@ -23,8 +23,18 @@ fun <SK : Any, SV : Any, TK : Any, TV : Any> MutableMap<SK, SV>.proxy(
     valueConverter
 )
 
+class EntryImpl<K, V>(
+    override val key: K,
+    override val value: V
+) : Entry<K, V>
+
 fun <K, V> Entry<K, V>.toFakeMutableEntry() = FakeMutableEntry(this)
 class FakeMutableEntry<K, V>(entry: Entry<K, V>) : MutableEntry<K, V> {
+    constructor(
+        key: K,
+        value: V
+    ) : this(EntryImpl(key, value))
+
     override val key = entry.key
     override val value = entry.value
 
@@ -113,72 +123,6 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
 
 }
 
-open class FakeMutableIterator<E>(val itr: Iterator<E>) : Iterator<E> by itr, MutableIterator<E> {
-
-    init {
-        println("WARNING: there are two FakeMutableIterator classes. UGH!")
-    }
-
-    override fun remove() {
-        err("tried remove in ${FakeMutableIterator::class.simpleName}")
-    }
-
-}
-
-
-fun <E> Set<E>.toFakeMutableSet() = FakeMutableSet(this)
-
-class FakeMutableSet<E>(val set: Collection<E>) : MutableSet<E> {
-
-
-    init {
-        println("WARNING: there are two FakeMutableSet classes. UGH!")
-    }
-
-    override fun add(element: E): Boolean {
-        err("tried to add in ${FakeMutableSet::class.simpleName}")
-    }
-
-    override fun addAll(elements: Collection<E>): Boolean {
-        err("tried to addAll in ${FakeMutableSet::class.simpleName}")
-    }
-
-    override fun clear() {
-        err("tried to clear in ${FakeMutableSet::class.simpleName}")
-    }
-
-    override fun iterator(): MutableIterator<E> {
-        return FakeMutableIterator(set.iterator())
-    }
-
-    override fun remove(element: E): Boolean {
-        err("tried to remove in ${FakeMutableSet::class.simpleName}")
-    }
-
-    override fun removeAll(elements: Collection<E>): Boolean {
-        err("tried to removeAll in ${FakeMutableSet::class.simpleName}")
-    }
-
-    override fun retainAll(elements: Collection<E>): Boolean {
-        err("tried to retainAll in ${FakeMutableSet::class.simpleName}")
-    }
-
-    override val size: Int
-        get() = set.size
-
-    override fun contains(element: E): Boolean {
-        return set.contains(element)
-    }
-
-    override fun containsAll(elements: Collection<E>): Boolean {
-        return set.containsAll(elements)
-    }
-
-    override fun isEmpty(): Boolean {
-        return set.isEmpty()
-    }
-
-}
 
 class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     private val innerMap: MutableMap<SK, SV>,
@@ -196,7 +140,19 @@ class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
 
 
     override val entries: MutableSet<MutableEntry<TK, TV>>
-        get() = super.entries.map { it.toFakeMutableEntry() }.toSet().toFakeMutableSet()
+        get() = ProxyMutableSet(innerMap.entries, object : Converter<MutableEntry<SK, SV>, MutableEntry<TK, TV>> {
+
+            override fun convertToB(a: MutableEntry<SK, SV>): MutableEntry<TK, TV> {
+                return FakeMutableEntry(EntryImpl(keyConverter.convertToB(a.key), valueConverter.convertToB(a.value)))
+            }
+
+            override fun convertToA(b: MutableEntry<TK, TV>): MutableEntry<SK, SV> {
+                return FakeMutableEntry(EntryImpl(keyConverter.convertToA(b.key), valueConverter.convertToA(b.value)))
+            }
+
+        })
+
+            /*.map { it.toFakeMutableEntry() }.toSet().toFakeMutableSet()*/
 
     override val keys: MutableSet<TK>
         get() = TODO("Not yet implemented")
