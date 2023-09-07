@@ -1,6 +1,5 @@
 package matt.model.data.bytes
 
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encoding.Decoder
@@ -15,12 +14,11 @@ fun ByteArray.toView(
 ) = BytesView(offset = offset, length = length, array = this)
 
 
-@OptIn(InternalSerializationApi::class)
 private object BytesViewSerializer : KSerializer<BytesView> {
 
 
     private val byteArraySerializer by lazy {
-        ByteArray::class.serializer()
+        serializer<ByteArray>()
     }
 
     override val descriptor by lazy {

@@ -1,5 +1,6 @@
 package matt.model.obsmod.proceeding.man.stop
 
+import matt.async.thread.namedThread
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
 import matt.model.code.successorfail.Failure
@@ -13,7 +14,6 @@ import matt.model.obsmod.proceeding.man.ManualProceeding
 import matt.model.obsmod.proceeding.stop.StoppableProceeding
 import matt.obs.bindings.bool.ObsB
 import matt.obs.prop.VarProp
-import kotlin.concurrent.thread
 
 abstract class StoppableManualProceeding(
   override val noun: String,
@@ -42,7 +42,7 @@ abstract class StoppableManualProceeding(
 	  RUNNING                 -> {
 		statusProp v STOPPING
 		messageProp v ""
-		thread(name = "Stop $name") {
+		namedThread(name = "Stop $name") {
 		  val result = exceptionHandler.with { stop() }
 		  messageProp v result.message
 		  statusProp v when (result) {

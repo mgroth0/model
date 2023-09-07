@@ -1,9 +1,9 @@
 package matt.model.op.debugger
 
 import matt.lang.require.requireNot
+import matt.lang.service.ThreadProvider
 import matt.model.code.idea.DebuggerIdea
 import java.lang.Thread.sleep
-import kotlin.concurrent.thread
 import kotlin.time.Duration
 
 class StackTraceDebugger() : DebuggerIdea {
@@ -22,7 +22,10 @@ class StackTraceDebugger() : DebuggerIdea {
     }
 }
 
-class ReportNothingDoneDebugger(private val enable: Boolean = true) : DebuggerIdea {
+class ReportNothingDoneDebugger(
+    private val threadProvider: ThreadProvider,
+    private val enable: Boolean = true
+) : DebuggerIdea {
     private var lastThingDoneTime = System.currentTimeMillis()
     var lastThingDone = "${ReportNothingDoneDebugger::class.simpleName} created"
         set(value) {
@@ -45,7 +48,7 @@ class ReportNothingDoneDebugger(private val enable: Boolean = true) : DebuggerId
         refreshMillis: Long,
         thresholdMillis: Long
     ) {
-        if (enable) thread(isDaemon = true) {
+        if (enable) threadProvider.namedThread(isDaemon = true, name = "ReportNothingDoneDebugger start Thread") {
             while (true) {
                 if (System.currentTimeMillis() - lastThingDoneTime > thresholdMillis) {
                     freezeDetected = true

@@ -1,6 +1,6 @@
 package matt.model.flowlogic.promise
 
-import matt.model.flowlogic.latch.SimpleLatch
+import matt.model.flowlogic.latch.SimpleThreadLatch
 
 fun commit(make: AwaitableCommitmentMakerImpl.()->Unit): AwaitableCommitment {
   val commitment = AwaitableCommitmentMakerImpl()
@@ -12,7 +12,7 @@ fun commit(make: AwaitableCommitmentMakerImpl.()->Unit): AwaitableCommitment {
 class AwaitableCommitmentMakerImpl(): CommitmentMaker(), AwaitableCommitment {
 
   private val latch by lazy {
-	SimpleLatch().also {
+	SimpleThreadLatch().also {
 	  this@AwaitableCommitmentMakerImpl.then {
 		it.open()
 	  }

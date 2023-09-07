@@ -3,16 +3,16 @@ package matt.model.flowlogic.promise
 import matt.lang.anno.OnlySynchronizedOnJvm
 import matt.lang.function.Op
 import matt.lang.function.Produce
+import matt.lang.idea.ProceedingIdea
 import matt.lang.require.requireNot
-import matt.model.code.idea.ProceedingIdea
-import matt.model.flowlogic.await.Awaitable
+import matt.model.flowlogic.await.ThreadAwaitable
 
 /*Loosely based on the general computer science construct Promise and its javascript implementation and inspired by its name. For me, the name has literal significance too. Used in a case when an abstract function is supposed to do something asynchronously. But since there is sometimes nothing to return, there is less enforcement that the subclass actually implements the asynchronous function. The Commitment is a way for the subclass to "commit" that it is doing the async operation that it is supposed to be doing*/
 
 /*why don't I just call these Promises...*/
 
 
-interface AwaitableCommitment : Commitment, Awaitable<Unit>
+interface AwaitableCommitment : Commitment, ThreadAwaitable<Unit>
 
 interface Commitment : ProceedingIdea {
     val isFulfilled: Boolean

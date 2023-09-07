@@ -1,9 +1,9 @@
 package matt.model.obsmod.proceeding
 
-import matt.model.code.idea.ProceedingIdea
+import matt.lang.idea.ProceedingIdea
+import matt.model.flowlogic.startstop.Startable
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.Proceeding.Status.RUNNING
-import matt.model.flowlogic.startstop.Startable
 import matt.obs.bindings.bool.ObsB
 import matt.obs.prop.ObsVal
 

@@ -1,5 +1,6 @@
 package matt.model.obsmod.proceeding.man.thread
 
+import matt.async.thread.namedThread
 import matt.lang.go
 import matt.lang.require.requireEquals
 import matt.log.profile.err.ExceptionHandler
@@ -8,7 +9,6 @@ import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.Proceeding.Status.RUNNING
 import matt.model.obsmod.proceeding.err.with
 import matt.model.obsmod.proceeding.man.ManualProceeding
-import kotlin.concurrent.thread
 
 abstract class ThreadProceeding(
     startButtonLabel: String,
@@ -17,7 +17,7 @@ abstract class ThreadProceeding(
     abstract fun run()
     private var thr: Thread? = null
     final override fun Startup.startup() {
-        thr = thread(name = "ThreadProceeding ($startButtonLabel)") {
+        thr = namedThread(name = "ThreadProceeding ($startButtonLabel)") {
             val result = exceptionHandler.with(InterruptedException::class) {
                 run()
             }

@@ -1,15 +1,17 @@
+@file:JvmName("LatchJvmKt")
 package matt.model.flowlogic.latch
 
 import matt.lang.function.Op
 import matt.lang.function.Produce
 import matt.lang.go
 import matt.model.code.successorfail.Fail
+import matt.model.code.successorfail.FailableDSL.FailException
 import matt.model.code.successorfail.FailableReturn
 import matt.model.code.successorfail.FailedReturn
 import matt.model.code.successorfail.Success
 import matt.model.code.successorfail.SuccessOrFail
 import matt.model.code.successorfail.SuccessfulReturn
-import matt.model.flowlogic.await.Awaitable
+import matt.model.flowlogic.await.ThreadAwaitable
 import matt.model.flowlogic.latch.LatchAwaitResult.LATCH_OPENED
 import matt.model.flowlogic.latch.LatchAwaitResult.TIMEOUT
 import matt.model.flowlogic.latch.asyncloaded.LoadedValueSlot
@@ -18,12 +20,9 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
 
-enum class LatchAwaitResult {
-    LATCH_OPENED,
-    TIMEOUT
-}
 
-class SimpleLatch : Awaitable<Unit> {
+
+class SimpleThreadLatch : SimpleLatch, ThreadAwaitable<Unit> {
 
 
     private var failure: LatchCancelled? = null
@@ -66,7 +65,11 @@ class SimpleLatch : Awaitable<Unit> {
         }
     }
 
-    fun open() = latch.countDown()
+    override fun open() = latch.countDown()
+//    override fun awaitBlocking() {
+//        await()
+//    }
+
     val isOpen get() = latch.count == 0L
     val isClosed get() = !isOpen
     fun opened() = apply {
@@ -75,7 +78,7 @@ class SimpleLatch : Awaitable<Unit> {
 }
 
 
-class OpResultHandler(private val failMessage: String) : Awaitable<SuccessOrFail> {
+class OpResultHandler(private val failMessage: String) : ThreadAwaitable<SuccessOrFail> {
     private val result = LoadedValueSlot<SuccessOrFail>()
 
     fun handle(op: Op) {
@@ -93,27 +96,21 @@ class OpResultHandler(private val failMessage: String) : Awaitable<SuccessOrFail
 }
 
 
-class OpResultWithReturnValueHandler<R>(private val failMessage: String) : Awaitable<FailableReturn<R>> {
+class OpResultWithReturnValueHandler<R>(private val failMessage: String) : ThreadAwaitable<FailableReturn<R>> {
     private val result = LoadedValueSlot<FailableReturn<R>>()
 
     fun handle(op: Produce<R>) {
-        var r: FailableReturn<R> = FailedReturn<R>(failMessage)
+        var r: FailableReturn<R>? = null
         try {
             r = SuccessfulReturn<R>(op())
         } finally {
-            result.putLoadedValue(r)
+            result.putLoadedValue(r ?: FailedReturn<R>(FailException(failMessage)))
         }
     }
 
     override fun await() = result.await()
 
 }
-
-
-class LatchCancelled(
-    message: String? = null,
-    cause: Throwable? = null
-) : Exception("Latch was cancelled" + (message?.let { ": $it" } ?: ""), cause)
 
 
 

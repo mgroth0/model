@@ -1,6 +1,7 @@
 package matt.model.flowlogic.startstop
 
-import matt.model.code.idea.ProceedingIdea
+import matt.lang.idea.ProceedingIdea
+
 
 interface Startable: ProceedingIdea {
   fun sendStartSignal()

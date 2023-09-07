@@ -55,7 +55,9 @@ fun RelativeToKMod.asGradleKSubProjectPath() = when (this) {
 @Serializable
 @JvmInline
 value class GradleKSubProjectPath(override val path: String) : GradleProjectPath, RelativeToKMod {
-    constructor(vararg parts: String) : this((listOf(SubRoots.k.name) + parts).joinToString(separator = ":").ensurePrefix(":"))
+    constructor(vararg parts: String) : this(
+        (listOf(SubRoots.k.name) + parts).joinToString(separator = ":").ensurePrefix(":")
+    )
 
     companion object {
 
@@ -90,9 +92,6 @@ val RelativeToKMod.gradlePath get() = ":${SubRoots.k.name}:${relToKNames.joinToS
 val RelativeToKMod.jarBaseName get() = relToKNames.joinToString("-")
 val RelativeToKMod.jsFileName get() = "$jarBaseName.js"
 val RelativeToKMod.jsGzFileName get() = "$jarBaseName.js.gz"
-
-
-
 
 
 interface AbsoluteMod : RelativeMod {
@@ -144,4 +143,12 @@ value class GradleTaskPath(val path: String) : GradleTask {
     fun asGradleTaskSelector() = GradleTaskSelector(selector = path)
     fun asGradleTaskSelectorForAllProjects() = GradleTaskSelector(selector = path.substringAfter(":"))
 
+}
+
+@Serializable
+@JvmInline
+value class GradleTaskName(override val taskName: String) : GradleTask {
+    init {
+        require(":" !in taskName)
+    }
 }

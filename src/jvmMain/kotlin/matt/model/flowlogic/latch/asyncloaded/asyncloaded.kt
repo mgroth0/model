@@ -4,16 +4,18 @@ import matt.lang.go
 import matt.lang.model.value.Value
 import matt.lang.model.value.ValueWrapperIdea
 import matt.lang.require.requireEquals
+import matt.lang.service.ThreadProvider
 import matt.lang.weak.lazyWeak
-import matt.model.flowlogic.await.Awaitable
+import matt.model.flowlogic.await.ThreadAwaitable
 import matt.model.flowlogic.latch.LatchCancelled
-import matt.model.flowlogic.latch.SimpleLatch
+import matt.model.flowlogic.latch.SimpleThreadLatch
 import java.lang.Thread.State
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.concurrent.thread
 
 class DaemonLoadedValueOp<T>(
+    threadProvider: ThreadProvider,
     name: String? = null,
+
     private val op: () -> T
 ) : Async<T>() {
 
@@ -22,7 +24,7 @@ class DaemonLoadedValueOp<T>(
     }
 
     private val myThread by lazy {
-        thread(
+        threadProvider.namedThread(
             name = "DaemonLoadedValue Thread ${threadIndex.getAndIncrement()}",
             start = false,
             isDaemon = true
@@ -101,7 +103,6 @@ class DelegatedSlot<T : Any> : AsyncBase<T>() {
 }
 
 
-
 abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
 
     private var setListeners: Lazy<MutableList<(T) -> Unit>>? = lazy { mutableListOf() }
@@ -173,19 +174,21 @@ abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
 }
 
 /*is this just a future? or a modified lazy?*/
-abstract class AsyncBase<T> : Awaitable<T> {
+abstract class AsyncBase<T> : ThreadAwaitable<T> {
     protected fun openAndDisposeLatch() {
         latch?.open()
         latch = null
     }
+
     protected fun cancelLatch(e: Throwable?) {
         latch?.cancel(e)
     }
+
     protected fun cancelLatch(message: String) {
         latch?.cancel(message)
     }
 
-    protected var latch: SimpleLatch? = SimpleLatch()
+    protected var latch: SimpleThreadLatch? = SimpleThreadLatch()
         private set
 
 }

@@ -11,3 +11,13 @@ interface ObjectLoader<out T, S> {
         onPartProgress: Consume<Double>
     )
 }
+
+
+//interface PostLoader<out T, S> {
+//    suspend fun generateFrom(
+//        s: S,
+//        onLoad: Consume<T>,
+//        onErr: Op,
+//        onPartProgress: Consume<Double>
+//    )
+//}

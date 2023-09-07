@@ -5,7 +5,7 @@ interface SimpleSuspendProperty<T : Any> {
     suspend fun set(value: T?)
 }
 
-suspend fun <T : Any> SimpleSuspendProperty<T>.unsynchronizedGetOrPut(op: () -> T): T {
+suspend fun <T : Any> SimpleSuspendProperty<T>.nonSynchronizedGetOrPut(op: () -> T): T {
     val t = get()
     return if (t == null) {
         val r = op()

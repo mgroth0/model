@@ -1,40 +1,50 @@
 {
-    "type": "MultiPlatformModule",
-    "dependencies": [
-        {
-            "type": "Lib",
-            "cfg": "commonMainApi",
-            "key": "kotlinx-serialization-json"
-        },
-        {
-            "type": "Lib",
-            "cfg": "commonMainApi",
-            "key": "kotlinx-datetime"
-        },
-        {
-            "type": "Project",
-            "cfg": "commonMainApi",
-            "path": ":k:lang"
-        },
-        {
-            "type": "Project",
-            "cfg": "commonMainApi",
-            "path": ":k:prim"
-        },
-        {
-            "type": "Lib",
-            "cfg": "jvmMainImplementation",
-            "key": "kt-reflect"
-        },
-        {
-            "type": "Project",
-            "cfg": "jvmTestImplementation",
-            "path": ":k:test"
-        }
-    ],
-    "jvm": {
+  "type": "MultiPlatformModule",
+  "dependencies": [
+    {
+      "type": "Lib",
+      "cfg": "commonMainApi",
+      "key": "kotlinx-serialization-json"
     },
-    "js": {
-        "type": "lib"
+    {
+      "type": "Lib",
+      "cfg": "commonMainApi",
+      "key": "kotlinx-datetime"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:lang"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:image"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:prim"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:report"
+    },
+    {
+      "type": "Lib",
+      "cfg": "jvmMainImplementation",
+      "key": "kt-reflect"
+    },
+    {
+      "type": "Project",
+      "cfg": "jvmTestImplementation",
+      "path": ":k:test"
     }
+  ],
+  "jvm": {
+  },
+  "js": {
+    "type": "lib"
+  }
 }

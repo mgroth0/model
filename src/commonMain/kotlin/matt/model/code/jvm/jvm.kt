@@ -5,6 +5,7 @@ import matt.lang.If
 import matt.lang.anno.SeeURL
 import matt.lang.ifTrue
 import matt.lang.opt
+import matt.lang.optArray
 import matt.lang.require.requireEmpty
 import matt.lang.require.requireEquals
 import matt.lang.sysprop.props.JmxRemoteAuthenticate
@@ -61,6 +62,9 @@ data class JvmArgs(
     val compilerThreadCount: Int? = null,
 
     val jmx: Boolean = false,
+
+
+    val addExports: List<String>? = null,
 
 
     val otherArgs: List<JvmArg> = listOf(),
@@ -215,6 +219,10 @@ data class JvmArgs(
             *If(printGarbageCollectorLogs).then(
                 @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage") @SeeURL("https://openjdk.org/jeps/158") "-Xlog:gc"
             ),
+
+            *optArray(addExports) {
+                map { "--add-exports=$it" }.toTypedArray()
+            },
 
             *otherArgs.map { it.toRawArg() }.toTypedArray(),
 

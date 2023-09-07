@@ -277,7 +277,7 @@ object StringStringConverter : StringConverter<String> {
 
 object BooleanStringConverter : StringConverter<Boolean> {
     override fun toString(t: Boolean) = t.toString()
-    override fun fromString(s: String) = s.toBoolean()
+    override fun fromString(s: String) = s.toBooleanStrict()
 }
 
 object IntStringConverter : FailableStringConverter<Int> {

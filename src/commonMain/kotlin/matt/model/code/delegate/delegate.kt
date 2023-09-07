@@ -39,6 +39,7 @@ class LimitedInt(
     { it in min..max }
 )
 
+
 class SimpleGetter<T, V>(private val o: V) : ReadOnlyProperty<T, V> {
     override fun getValue(
         thisRef: T,

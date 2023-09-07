@@ -2,7 +2,7 @@
 
 package matt.model.data.file
 
-import matt.model.code.ok.JavaIoFileIsOk
+import matt.lang.anno.ok.JavaIoFileIsOk
 import java.io.File
 
 /*provides a case-insensitive file (lowercase path) on case-insensitive file systems and case-sensitive files on case-sensitive systens*/

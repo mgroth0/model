@@ -1,12 +1,12 @@
 package matt.model.obsmod.proceeding.err
 
+import matt.async.thread.namedThread
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.ExceptionResponse.IGNORE
 import matt.log.profile.err.ExceptionResponse.THROW
 import matt.log.report.BugReport
 import matt.model.code.successorfail.Fail
 import matt.model.code.successorfail.SuccessOrFail
-import kotlin.concurrent.thread
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 import kotlin.system.exitProcess
@@ -33,7 +33,7 @@ fun ExceptionHandler.withResult(vararg ignore: KClass<out java.lang.Exception>, 
 	  matt.log.profile.err.ExceptionResponse.EXIT   -> when {
 		ignore.any { e::class.isSubclassOf(it) } -> Fail("${e::class.simpleName}")
 		else                                     -> {
-		  thread(isDaemon = true) {
+		  namedThread(isDaemon = true,name = "withResult Thread") {
 			/*needs to be in thread to avoid *circular blockage of threads waiting for other threads to end in shutdown process*/
 			exitProcess(1)
 		  }
