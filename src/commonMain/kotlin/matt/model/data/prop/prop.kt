@@ -13,3 +13,12 @@ suspend fun <T : Any> SimpleSuspendProperty<T>.nonSynchronizedGetOrPut(op: () ->
         r
     } else t
 }
+
+suspend fun <T : Any> SimpleSuspendProperty<T>.nonSynchronizedGetOrPutIfNotNull(op: () -> T?): T? {
+    val t = get()
+    return if (t == null) {
+        val r = op()
+        if (r!=null) set(r)
+        r
+    } else t
+}
