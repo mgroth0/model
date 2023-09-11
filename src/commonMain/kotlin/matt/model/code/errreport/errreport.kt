@@ -1,7 +1,7 @@
 package matt.model.code.errreport
 
+import matt.lang.classname.mostInformativeClassName
 import matt.lang.go
-import matt.lang.nametoclass.mostInformativeClassName
 import matt.prim.str.mybuild.string
 
 interface CommonThrowReport

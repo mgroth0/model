@@ -7,6 +7,7 @@ import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder.Companion.DECODE_DONE
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.serializer
+import matt.lang.require.requireNot
 import kotlin.system.exitProcess
 
 
@@ -41,7 +42,7 @@ object Arguments : ArgumentsFormat {
 
 
 class ArgumentDecoder(
-    args: Array<String>,
+    private val args: Array<String>,
     private val descriptor: SerialDescriptor
 ) : AbstractDecoder() {
     override val serializersModule = ArgsSerializerModule
@@ -49,11 +50,24 @@ class ArgumentDecoder(
     private val itr = args.asList().listIterator()
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+
         return if (itr.hasNext()) {
             itr.nextIndex()
         } else {
             DECODE_DONE
         }
+    }
+
+    override fun decodeSequentially() = true
+
+    private var decodingVararg = false
+
+    override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
+        requireNot(decodingVararg) {
+            "can only decode vararg once"
+        }
+        decodingVararg = true
+        return args.size - itr.nextIndex()
     }
 
     override fun decodeString() = nextRaw()

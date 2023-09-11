@@ -1,4 +1,5 @@
 @file:JvmName("LatchJvmKt")
+
 package matt.model.flowlogic.latch
 
 import matt.lang.function.Op
@@ -19,7 +20,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
-
 
 
 class SimpleThreadLatch : SimpleLatch, ThreadAwaitable<Unit> {
@@ -102,9 +102,9 @@ class OpResultWithReturnValueHandler<R>(private val failMessage: String) : Threa
     fun handle(op: Produce<R>) {
         var r: FailableReturn<R>? = null
         try {
-            r = SuccessfulReturn<R>(op())
+            r = SuccessfulReturn(op())
         } finally {
-            result.putLoadedValue(r ?: FailedReturn<R>(FailException(failMessage)))
+            result.putLoadedValue(r ?: FailedReturn(FailException(failMessage)))
         }
     }
 

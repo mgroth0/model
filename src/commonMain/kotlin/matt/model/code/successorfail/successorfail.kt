@@ -15,18 +15,17 @@ object FailableDSL {
             val r = op.invoke(this)
             SuccessfulReturn(r)
         } catch (f: FailException) {
-            FailedReturn<Any?>(f).cast()
-            /*f.failure.cast()*/
+            FailedReturn(f)
         }
     }
 
     fun fail(message: String) {
-        val exception = FailException(message=message)
+        val exception = FailException(message = message)
         /*val f = FailedReturn<Any?>(exception)*/
         throw exception
     }
 
-    fun fail(failure: FailedReturn<*>) {
+    fun fail(failure: FailedReturn) {
         /*val f = failure.cast<Any?>()
         throw FailException(f)*/
         throw failure.exception
@@ -37,11 +36,11 @@ object FailableDSL {
 
 }
 
-sealed interface FailableReturn<T> : FailableIdea
+sealed interface FailableReturn<out T> : FailableIdea
 
 fun <T> FailableReturn<T>.requireSuccess() = (this as SuccessfulReturn<T>).value
 
-inline fun <T> FailableReturn<T>.resultOr(op: (FailedReturn<T>) -> Unit): T {
+inline fun <T> FailableReturn<T>.resultOr(op: (FailedReturn) -> Unit): T {
     when (this) {
         is SuccessfulReturn -> return this.value
         is FailedReturn     -> {
@@ -53,9 +52,7 @@ inline fun <T> FailableReturn<T>.resultOr(op: (FailedReturn<T>) -> Unit): T {
 
 
 class SuccessfulReturn<T>(val value: T) : FailableReturn<T>
-class FailedReturn<T>(val exception: Exception) : FailableReturn<T> {
-    fun <R> cast() = FailedReturn<R>(exception = exception)
-}
+class FailedReturn(val exception: Exception) : FailableReturn<Nothing>
 
 
 sealed interface SuccessOrFail : FailableIdea {

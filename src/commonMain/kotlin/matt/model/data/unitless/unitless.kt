@@ -20,6 +20,10 @@ I am once again changing this from a value class to a normal(data) class, becaus
 I will make a custom serializer though to serialize it like a value class, so if I ever really fix this and make it inline again all my serialized data will be compatible.
 
 
+before doing anything read this:
+https://kotlinlang.org/docs/inline-classes.html#mangling
+sections: "mangling" and "calling from java code"
+
 
 */
 

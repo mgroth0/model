@@ -11,7 +11,7 @@ import kotlinx.serialization.descriptors.serialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
-import matt.model.data.file.FilePath
+import matt.lang.model.file.FilePath
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 

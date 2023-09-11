@@ -17,12 +17,16 @@ class ThrowReport(
     constructor(e: Throwable) : this(Thread.currentThread(), e)
 
     override val text by lazy {
-        string {
-            lineDelimited {
-                +"ERROR REPORT"
-                +"Thread: $t"
-                +"Throwable: ${e?.infoString()}"
+        try {
+            string {
+                lineDelimited {
+                    +"ERROR REPORT"
+                    +"Thread: $t"
+                    +"Throwable: ${e?.infoString()}"
+                }
             }
+        } catch (e: Exception) {
+            "EXCEPTION WHILE CREATING THROW REPORT: $e"
         }
     }
 }
