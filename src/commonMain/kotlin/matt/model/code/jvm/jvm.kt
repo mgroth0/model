@@ -27,8 +27,23 @@ import kotlin.jvm.JvmInline
 const val HEROKU_FORWARDED_PORT = 9090
 
 
+interface CommonJvmArgs {
+    @SeeURL("https://stackoverflow.com/a/42541096/6596010")
+    val addExports: List<String>?
+    val addOpens: List<String>?
+    fun getExportArgs(exports: List<String>?) = optArray(addExports) {
+        map { "--add-exports=$it" }.toTypedArray()
+    }
+
+    fun getOpenArgs(opens: List<String>?) = optArray(addOpens) {
+        map { "--add-opens=$it" }.toTypedArray()
+    }
+}
+
+const val miscModule = "java.base/jdk.internal.misc=ALL-UNNAMED"
+
 @Serializable
-data class JvmArgs(
+data class JavaExecArgs(
     @SeeURL("https://stackoverflow.com/questions/32855984/does-java-xmx1g-mean-109-or-230-bytes") val xmx: ByteSize?,
     @SeeURL("https://stackoverflow.com/questions/32855984/does-java-xmx1g-mean-109-or-230-bytes") val xms: ByteSize? = null,
     val stackTraceInFastThrow: Boolean = true,
@@ -64,17 +79,18 @@ data class JvmArgs(
     val jmx: Boolean = false,
 
 
-    val addExports: List<String>? = null,
+    override val addExports: List<String>? = null,
+    override val addOpens: List<String>? = null,
 
 
     val otherArgs: List<JvmArg> = listOf(),
 
 
-    ) {
+    ) : CommonJvmArgs {
 
     companion object {
         val EMPTY by lazy {
-            JvmArgs(
+            JavaExecArgs(
                 xmx = null,
                 stackTraceInFastThrow = false,
                 enableAssertionsAndCoroutinesDebugMode = false,
@@ -220,9 +236,9 @@ data class JvmArgs(
                 @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage") @SeeURL("https://openjdk.org/jeps/158") "-Xlog:gc"
             ),
 
-            *optArray(addExports) {
-                map { "--add-exports=$it" }.toTypedArray()
-            },
+            *getExportArgs(addExports),
+            *getOpenArgs(addOpens),
+
 
             *otherArgs.map { it.toRawArg() }.toTypedArray(),
 
