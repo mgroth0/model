@@ -1,15 +1,15 @@
 package matt.model.op.convert
 
+import matt.lang.convert.BiConverter
 import matt.model.data.byte.ByteSize
 import matt.prim.byte.toInt
+import matt.prim.converters.StringConverter
 import matt.prim.int.toByteArray
-import matt.prim.str.elementsToString
-import matt.prim.str.takeIfNotBlank
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 
-class NotAConverter<T> : Converter<T, T> {
+class NotAConverter<T> : BiConverter<T, T> {
     override fun convertToB(a: T): T {
         return a
     }
@@ -54,57 +54,9 @@ object NullToBlankStringConverter : StringConverter<String?> {
 
 }
 
-interface Converter<A, B> {
-
-    companion object {
-        /*TODO: should be WeakMap*/
-        val invertedConverters = mutableMapOf<Converter<*, *>, Converter<*, *>>()
-    }
-
-    fun convertToB(a: A): B
-    fun A.toB() = convertToB(this)
-    fun convertToA(b: B): A
-    fun B.toA() = convertToA(this)
-    fun invert(): Converter<B, A> {
-        val i = invertedConverters[this]
-        @Suppress("UNCHECKED_CAST")
-        if (i != null) return i as Converter<B, A>
-        val outer = this
-        val inv = object : Converter<B, A> {
-
-            override fun convertToB(a: B): A {
-                return outer.convertToA(a)
-            }
-
-            override fun convertToA(b: A): B {
-                return outer.convertToB(b)
-            }
-
-        }
-        invertedConverters[this] = inv
-        return inv
-    }
-
-    fun nullable(): Converter<A?, B?> = object : Converter<A?, B?> {
-        override fun convertToB(a: A?): B? {
-            if (a == null) return null
-            return this@Converter.convertToB(a)
-        }
-
-        override fun convertToA(b: B?): A? {
-            if (b == null) return null
-            return this@Converter.convertToA(b)
-        }
 
 
-    }
-
-    /*cannot have invoke both ways. Its some sort of jvm clash*/
-    operator fun invoke(a: A) = a.toB()
-}
-
-
-fun <A, B : Any> Converter<A, B>.asFailable() = object : FailableConverter<A, B> {
+fun <A, B : Any> BiConverter<A, B>.asFailable() = object : FailableConverter<A, B> {
     override fun convertToB(a: A): B {
         return this@asFailable.convertToB(a)
     }
@@ -122,117 +74,18 @@ interface FailableConverter<A, B : Any> {
     fun B.toA() = convertToA(this)
 }
 
-interface StringConverter<T> : Converter<String, T> {
-    fun toString(t: T): String
-    fun fromString(s: String): T
-    override fun convertToA(b: T): String = toString(b)
-    override fun convertToB(a: String) = fromString(a)
-
-    fun asSingularStringListConverter() = StringListConverter.fromStringConverterAsSingular(this)
-
-    fun nullAsBlank() = object : Converter<String, T?> {
-        override fun convertToB(a: String): T? {
-            return a.takeIfNotBlank()?.toB()
-        }
-
-        override fun convertToA(b: T?): String {
-            return b?.toA() ?: ""
-        }
-
-
-    }
-
-}
 
 
 
-typealias StringList = List<String>
 
-
-interface StringListConverter<T> : Converter<StringList, T> {
-    companion object {
-        fun <T> fromStringConverterAsList(
-            stringConverter: StringConverter<T>
-        ) = StringListByElementConverter(stringConverter)
-
-        fun <T> fromStringConverterAsSingular(
-            stringConverter: StringConverter<T>
-        ) = StringListBySingleElementConverter(stringConverter)
-
-        fun <T> fromStringConverterAsSingularOrEmpty(
-            stringConverter: StringConverter<T>
-        ) = StringListBySingleElementOrNullConverter(stringConverter)
-    }
-
-    fun toStringList(t: T): StringList
-    fun fromStringList(s: StringList): T
-    override fun convertToA(b: T): StringList = toStringList(b)
-    override fun convertToB(a: StringList) = fromStringList(a)
-
-    fun emptyIsNull(): StringListConverter<T?> = object : StringListConverter<T?> {
-        override fun toStringList(t: T?): StringList {
-            return if (t == null) emptyList() else this@StringListConverter.toStringList(t)
-        }
-
-        override fun fromStringList(s: StringList): T? {
-            return if (s.isEmpty()) null else this@StringListConverter.fromStringList(s)
-        }
-    }
-}
-
-class StringListByElementConverter<T>(private val elementConverter: StringConverter<T>) : StringListConverter<List<T>> {
-    override fun toStringList(t: List<T>): StringList {
-        return t.map { elementConverter.toString(it) }
-    }
-
-    override fun fromStringList(s: StringList): List<T> {
-        return s.map { elementConverter.fromString(it) }
-    }
-}
-
-class StringListBySingleElementConverter<T>(private val elementConverter: StringConverter<T>) : StringListConverter<T> {
-    override fun toStringList(t: T): StringList {
-        return listOf(elementConverter.toString(t))
-    }
-
-    override fun fromStringList(s: StringList): T {
-        return elementConverter.fromString(
-            s.singleOrNull() ?: error("only 1 element allowed, but got ${s.size}: ${s.elementsToString()}")
-        )
-    }
-
-}
-
-class StringListBySingleElementOrNullConverter<T>(private val elementConverter: StringConverter<T>) :
-    StringListConverter<T?> {
-    override fun toStringList(t: T?): StringList {
-        if (t == null) return emptyList()
-        return listOf(elementConverter.toString(t))
-    }
-
-    override fun fromStringList(s: StringList): T? {
-        if (s.isEmpty()) return null
-        return elementConverter.fromString(
-            s.singleOrNull() ?: error("only 0-1 elements allowed, but got ${s.size}: ${s.elementsToString()}")
-        )
-    }
-
-}
-
-
-object StringListStringListConverter : StringListConverter<StringList> {
-    override fun toStringList(t: StringList) = t
-    override fun fromStringList(s: StringList) = s
-}
-
-interface BytesConverter<T> : Converter<ByteArray, T> {
+interface BytesConverter<T> : BiConverter<ByteArray, T> {
     fun toBytes(t: T): ByteArray
     fun fromBytes(s: ByteArray): T
     override fun convertToA(b: T): ByteArray = toBytes(b)
     override fun convertToB(a: ByteArray) = fromBytes(a)
 }
 
-fun <X, Y, Z> Converter<X, Y>.then(converter: Converter<Y, Z>) = object : Converter<X, Z> {
+fun <X, Y, Z> BiConverter<X, Y>.then(converter: BiConverter<Y, Z>) = object : BiConverter<X, Z> {
     override fun convertToB(a: X): Z {
         return converter.convertToB(this@then.convertToB(a))
 
@@ -264,10 +117,6 @@ interface FailableStringConverter<T : Any> : FailableConverter<String, T> {
 }
 
 
-object ByteArrayStringConverter : StringConverter<ByteArray> {
-    override fun toString(t: ByteArray) = t.decodeToString()
-    override fun fromString(s: String) = s.encodeToByteArray()
-}
 
 
 object StringStringConverter : StringConverter<String> {
@@ -312,7 +161,7 @@ object MyNumberStringConverter : StringConverter<Number> {
 }
 
 
-object LongMillisConverter : Converter<Long, Duration> {
+object LongMillisConverter : BiConverter<Long, Duration> {
     override fun convertToB(a: Long): Duration {
         return a.milliseconds
     }
@@ -322,7 +171,7 @@ object LongMillisConverter : Converter<Long, Duration> {
     }
 }
 
-object DoubleLongConverter : Converter<Double, Long> {
+object DoubleLongConverter : BiConverter<Double, Long> {
     override fun convertToB(a: Double): Long {
         return a.toLong()
     }

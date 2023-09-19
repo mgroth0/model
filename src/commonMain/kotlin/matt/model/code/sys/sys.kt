@@ -1,23 +1,29 @@
 package matt.model.code.sys
 
 import matt.lang.anno.SeeURL
+import matt.lang.model.file.BaseFileSystem
+import matt.lang.model.file.CaseSensitivity.CaseInSensitive
+import matt.lang.model.file.CaseSensitivity.CaseSensitive
+import matt.lang.model.file.FileSystem
+import matt.lang.model.file.MacFileSystem
+import matt.lang.model.file.UnixFileSystem
 import matt.lang.platform.OSIdea
 import matt.lang.require.requireEquals
 
 sealed interface OS : OSIdea {
-    val caseSensitive: Boolean
-    val pathSep: String
+    val fileSystem: FileSystem
     val wrongPathSep: String
-    fun replaceFileSeparators(string: String) = string.replace(wrongPathSep, pathSep)
+    fun replaceFileSeparators(string: String) = string.replace(wrongPathSep, fileSystem.separatorChar.toString())
 }
 
 sealed interface Unix : OS {
-    override val pathSep get() = "/"
+    override val fileSystem: UnixFileSystem
     override val wrongPathSep get() = "\\"
 }
 
+
 sealed interface Mac : Unix {
-    override val caseSensitive get() = false
+    override val fileSystem get() = MacFileSystem
 }
 
 sealed interface IntelMac : Mac
@@ -60,9 +66,13 @@ object NEW_MAC : SiliconMacMachine(
 class UnknownIntelMacMachine(homeDir: String) : IntelMacMachine(homeDir = homeDir, registeredDir = null)
 class UnknownSiliconMacMachine(homeDir: String) : SiliconMacMachine(homeDir = homeDir, registeredDir = null)
 
+object WindowsFileSystem : BaseFileSystem() {
+    override val caseSensitivity = CaseInSensitive
+    override val separatorChar = '\\'
+}
+
 sealed interface Windows : OS {
-    override val caseSensitive get() = false
-    override val pathSep get() = "\\"
+    override val fileSystem get() = WindowsFileSystem
     override val wrongPathSep get() = "/"
 }
 
@@ -93,9 +103,14 @@ class UnknownWindowsMachine() : WindowsMachine(
     getRegisteredDir = { "idk what the registered dir of $this is" },
 )
 
+/*Careful! Android's OS is case-sensitive yes, but commonly attached file devices like sd cards are often case-insensitive! */
+@SeeURL("https://stackoverflow.com/a/6502881/6596010")
+object LinuxFileSystem : UnixFileSystem() {
+    override val caseSensitivity = CaseSensitive
+}
 
 sealed interface Linux : Unix {
-    override val caseSensitive get() = true
+    override val fileSystem get() = LinuxFileSystem
     val isAarch64: Boolean
 }
 

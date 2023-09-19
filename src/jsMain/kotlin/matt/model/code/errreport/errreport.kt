@@ -1,6 +1,6 @@
 package matt.model.code.errreport
 
-import matt.prim.str.mybuild.string
+import matt.prim.str.mybuild.api.string
 
 actual fun throwReport(e: Throwable): CommonThrowReport = JsThrowReport(e)
 

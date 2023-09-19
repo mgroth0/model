@@ -2,7 +2,7 @@ package matt.model.code.jvm.agentpath
 
 import kotlinx.serialization.Serializable
 import matt.lang.anno.SeeURL
-import matt.model.data.message.SFile
+import matt.model.data.message.MacFile
 
 
 @Serializable
@@ -20,7 +20,7 @@ data class JProfilerAgentPathArg(
     val libjprofilertiPath: String = MAC_LIBJPROFILERTI_PATH,
     val offline: Boolean = false,
     val port: Int? = 33809,
-    val config: SFile? = null,
+    val config: MacFile? = null,
     val sessionId: Int? = null
 ) : AgentPathArg {
 
@@ -64,7 +64,7 @@ const val DEFAULT_SAMPLE_IN_YOURKIT = false
 @Serializable
 @SeeURL("https://www.yourkit.com/docs/java/help/agent.jsp")
 data class YourKitAgentPathArg(
-    val yourKitAppFolder: SFile,
+    val yourKitAppFolder: MacFile,
     val samplingMode: Boolean = DEFAULT_SAMPLE_IN_YOURKIT
 ) : AgentPathArg {
     override fun argValue(): String {

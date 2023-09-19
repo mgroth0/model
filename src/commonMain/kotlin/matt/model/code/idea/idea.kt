@@ -12,7 +12,6 @@ interface ProjectIdea : Idea
 interface SerIdea : Idea
 interface DebuggerIdea : Idea
 interface LinearGradientIdea : Idea
-interface FailableIdea : Idea
 interface PythonThing : Idea
 interface MyJavaExecIdea: Idea
 

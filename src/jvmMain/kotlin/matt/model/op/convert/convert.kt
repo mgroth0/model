@@ -6,6 +6,7 @@ import matt.prim.base64.decodeFromBase64
 import matt.prim.base64.decodeFromURLBase64
 import matt.prim.base64.encodeToBase64
 import matt.prim.base64.encodeToURLBase64
+import matt.prim.converters.StringConverter
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.primaryConstructor

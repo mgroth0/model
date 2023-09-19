@@ -1,6 +1,6 @@
 package matt.model.code.successorfail
 
-import matt.model.code.idea.FailableIdea
+import matt.lang.idea.FailableIdea
 
 
 inline fun <R> mightFail(op: FailableDSL.() -> R): FailableReturn<R> {

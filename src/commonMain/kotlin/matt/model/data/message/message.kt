@@ -11,21 +11,30 @@ import kotlinx.serialization.descriptors.serialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
-import matt.lang.model.file.FilePath
+import matt.lang.anno.Duplicated
+import matt.lang.model.file.CaseInSensitiveFilePath
+import matt.lang.model.file.FileSystem
+import matt.lang.model.file.FsFile
+import matt.lang.model.file.FsFilePath
+import matt.lang.model.file.MacFileSystem
+import matt.lang.model.file.constructFilePath
+import matt.lang.model.file.exts.contains
+import matt.lang.model.file.fixFilePath
+import matt.prim.str.ensureSuffix
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
 /*only using this as a workaround for an internal kotlinx.serialization bug*/
-object SFileDebugSerializer : KSerializer<SFile> {
+internal object MacFileDebugSerializer : KSerializer<MacFile> {
     override val descriptor = serialDescriptor<String>()
 
-    override fun deserialize(decoder: Decoder): SFile {
-        return SFile(decoder.decodeString())
+    override fun deserialize(decoder: Decoder): MacFile {
+        return MacFile(decoder.decodeString())
     }
 
     override fun serialize(
         encoder: Encoder,
-        value: SFile
+        value: MacFile
     ) {
         encoder.encodeString(value.path)
     }
@@ -33,82 +42,105 @@ object SFileDebugSerializer : KSerializer<SFile> {
 }
 
 @JvmInline
-@Serializable(with = SFileDebugSerializer::class)
-value class SFile(val path: String) : FilePath {
+@Serializable(with = MacFileDebugSerializer::class)
+value class MacFile(private val fPath: String) : FsFile {
 
+    override val fsFilePath: FsFilePath get() = CaseInSensitiveFilePath(fPath, MacFileSystem)
 
-    override val fName: String
-        get() = when {
-            "/" in path  -> path.substringAfterLast("/")
-            "\\" in path -> path.substringAfterLast("\\")
-            else         -> path
-        }
-
-
-    override val filePath: String
-        get() = path
     override val partSep: String
-        get() = TODO("Not yet implemented")
+        get() = MacFileSystem.separatorChar.toString()
 
-    override fun isDir(): Boolean {
-        TODO("Not yet implemented")
+    override fun get(item: String): FsFile {
+        require(!item.startsWith(partSep))
+        return MacFile(fsFilePath.path.ensureSuffix(partSep) + item)
     }
 
-    override fun toString() = path
+    override fun toString() = filePath
+
+    override val fileSystem: FileSystem
+        get() = MacFileSystem
+
+    override val isAbsolute: Boolean
+        get() = path.startsWith(partSep)
+    override val parent: FsFile?
+        get() = if (isRoot) null else MacFile(fPath.substringBeforeLast(partSep))
+    override val isRoot: Boolean
+        get() = fsFilePath.path == partSep
+
+    @Duplicated
+    override fun relativeTo(other: FsFile): FsFile {
+        require(this in other) {
+            "$this must be in $other in order to get the relative path"
+        }
+        val path = fileSystem.constructFilePath(
+            this.path.removePrefix(other.path).removePrefix(partSep)
+        )
+        return MacFile(path.path)
+    }
 }
 
-typealias SafeFile = AbsCaseInsensitiveFile
+@Serializable(with = AbsMacFile.Companion::class)
+class AbsMacFile(path: String) : FsFile {
 
-@Serializable(with = AbsCaseInsensitiveFile.Companion::class)
-class AbsCaseInsensitiveFile(path: String) : FilePath {
+    override val isAbsolute = true
 
-    companion object : KSerializer<AbsCaseInsensitiveFile> {
+    companion object : KSerializer<AbsMacFile> {
         override val descriptor by lazy { serialDescriptor<String>() }
 
-        override fun deserialize(decoder: Decoder): AbsCaseInsensitiveFile {
-            return AbsCaseInsensitiveFile(decoder.decodeString())
+        override fun deserialize(decoder: Decoder): AbsMacFile {
+            return AbsMacFile(decoder.decodeString())
         }
 
         override fun serialize(
             encoder: Encoder,
-            value: AbsCaseInsensitiveFile
+            value: AbsMacFile
         ) {
             encoder.encodeString(value.idFile)
         }
     }
 
-    private val idFile = path.lowercase().let {
+    private val idFile = fixFilePath(path.lowercase().let {
         if (it.startsWith("/")) it
         else "/$it"
-    }
+    })
+
+    override val fsFilePath: FsFilePath get() = CaseInSensitiveFilePath(idFile, MacFileSystem)
 
     override fun equals(other: Any?): Boolean {
-        return other is AbsCaseInsensitiveFile && other.idFile == idFile
+        return other is AbsMacFile && other.filePath == filePath
     }
 
     override fun hashCode(): Int {
-        return idFile.hashCode()
+        return filePath.hashCode()
     }
 
-    override val fName: String
-        get() = when {
-            "/" in idFile  -> idFile.substringAfterLast("/")
-            "\\" in idFile -> idFile.substringAfterLast("\\")
-            else           -> idFile
-        }
-
-
-    override val filePath: String
-        get() = idFile
     override val partSep: String
-        get() = TODO("Not yet implemented")
+        get() = MacFileSystem.separatorChar.toString()
 
-    override fun isDir(): Boolean {
-        TODO("Not yet implemented")
+    override fun get(item: String): FsFile {
+        require(!item.startsWith(partSep))
+        return AbsMacFile(fsFilePath.path.ensureSuffix(partSep) + item)
     }
 
-    override fun toString() = idFile
+    override fun toString() = filePath
+    override val fileSystem: FileSystem
+        get() = MacFileSystem
 
+    override val parent: FsFile?
+        get() = if (isRoot) null else MacFile(path.substringBeforeLast(partSep))
+    override val isRoot: Boolean
+        get() = fsFilePath.path == partSep
+
+    @Duplicated
+    override fun relativeTo(other: FsFile): FsFile {
+        require(this in other) {
+            "$this must be in $other in order to get the relative path"
+        }
+        val path = fileSystem.constructFilePath(
+            this.path.removePrefix(other.path).removePrefix(partSep)
+        )
+        return MacFile(path.path)
+    }
 }
 
 /*only using this as a workaround for an internal kotlinx.serialization bug*/
@@ -119,7 +151,7 @@ object SFileDebugFileListSerializer : KSerializer<FileList> {
     private val innerSerializer by lazy { ListSerializer(serializer<String>()) }
 
     override fun deserialize(decoder: Decoder): FileList {
-        return FileList(decoder.decodeSerializableValue(innerSerializer).map { SFile(it) })
+        return FileList(decoder.decodeSerializableValue(innerSerializer).map { MacFile(it) })
     }
 
     override fun serialize(
@@ -132,4 +164,4 @@ object SFileDebugFileListSerializer : KSerializer<FileList> {
 }
 
 @Serializable(with = SFileDebugFileListSerializer::class)
-data class FileList(val files: List<SFile>) : List<SFile> by files
+data class FileList(val files: List<MacFile>) : List<MacFile> by files

@@ -2,7 +2,7 @@
 
 package matt.model.code.errreport
 
-import matt.prim.str.mybuild.string
+import matt.prim.str.mybuild.api.string
 
 
 fun Throwable.printReport() = ThrowReport(this).print()

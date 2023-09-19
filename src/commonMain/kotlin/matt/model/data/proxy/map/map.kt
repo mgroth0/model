@@ -1,13 +1,13 @@
 package matt.model.data.proxy.map
 
+import matt.lang.convert.BiConverter
 import matt.model.data.proxy.set.ProxyMutableSet
-import matt.model.op.convert.Converter
 import kotlin.collections.Map.Entry
 import kotlin.collections.MutableMap.MutableEntry
 
 fun <SK : Any, SV : Any, TK : Any, TV : Any> Map<SK, SV>.proxy(
-    keyConverter: Converter<SK, TK>,
-    valueConverter: Converter<SV, TV>
+    keyConverter: BiConverter<SK, TK>,
+    valueConverter: BiConverter<SV, TV>
 ) = ImmutableProxyMap(
     this,
     keyConverter,
@@ -15,8 +15,8 @@ fun <SK : Any, SV : Any, TK : Any, TV : Any> Map<SK, SV>.proxy(
 )
 
 fun <SK : Any, SV : Any, TK : Any, TV : Any> MutableMap<SK, SV>.proxy(
-    keyConverter: Converter<SK, TK>,
-    valueConverter: Converter<SV, TV>
+    keyConverter: BiConverter<SK, TK>,
+    valueConverter: BiConverter<SV, TV>
 ) = ProxyMap(
     this,
     keyConverter,
@@ -45,8 +45,8 @@ class FakeMutableEntry<K, V>(entry: Entry<K, V>) : MutableEntry<K, V> {
 
 open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     private val innerMap: Map<SK, SV>,
-    private val keyConverter: Converter<SK, TK>,
-    private val valueConverter: Converter<SV, TV>
+    private val keyConverter: BiConverter<SK, TK>,
+    private val valueConverter: BiConverter<SV, TV>
 ) : Map<TK, TV> {
     protected fun SK.toTK() = keyConverter.convertToB(this)
     protected fun SV.toTV() = valueConverter.convertToB(this)
@@ -126,8 +126,8 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
 
 class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     private val innerMap: MutableMap<SK, SV>,
-    private val keyConverter: Converter<SK, TK>,
-    private val valueConverter: Converter<SV, TV>
+    private val keyConverter: BiConverter<SK, TK>,
+    private val valueConverter: BiConverter<SV, TV>
 ) : ImmutableProxyMap<SK, SV, TK, TV>(
     innerMap,
     keyConverter,
@@ -140,7 +140,7 @@ class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
 
 
     override val entries: MutableSet<MutableEntry<TK, TV>>
-        get() = ProxyMutableSet(innerMap.entries, object : Converter<MutableEntry<SK, SV>, MutableEntry<TK, TV>> {
+        get() = ProxyMutableSet(innerMap.entries, object : BiConverter<MutableEntry<SK, SV>, MutableEntry<TK, TV>> {
 
             override fun convertToB(a: MutableEntry<SK, SV>): MutableEntry<TK, TV> {
                 return FakeMutableEntry(EntryImpl(keyConverter.convertToB(a.key), valueConverter.convertToB(a.value)))

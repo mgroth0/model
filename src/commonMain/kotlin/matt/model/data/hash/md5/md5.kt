@@ -1,7 +1,7 @@
 package matt.model.data.hash.md5
 
 import kotlinx.serialization.Serializable
-import matt.model.op.convert.StringConverter
+import matt.prim.converters.StringConverter
 import kotlin.jvm.JvmInline
 
 object MD5Converter : StringConverter<MD5> {

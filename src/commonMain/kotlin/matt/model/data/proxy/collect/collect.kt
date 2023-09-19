@@ -1,6 +1,6 @@
 package matt.model.data.proxy.collect
 
-import matt.model.op.convert.Converter
+import matt.lang.convert.Converter
 
 
 abstract class ProxyCollection<S, T>(

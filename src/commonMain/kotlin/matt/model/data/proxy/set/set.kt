@@ -1,12 +1,12 @@
 package matt.model.data.proxy.set
 
+import matt.lang.convert.BiConverter
 import matt.model.data.proxy.collect.ProxyCollection
-import matt.model.op.convert.Converter
 
 
 open class ProxySet<S, T>(
     private val innerSet: Set<S>,
-    private val converter: Converter<S, T>
+    private val converter: BiConverter<S, T>
 ) : ProxyCollection<S, T>(innerSet, converter), Set<T> {
     override fun contains(element: T): Boolean {
         return innerSet.contains(converter.convertToA(element))
@@ -32,7 +32,7 @@ open class ProxySet<S, T>(
 
 class ProxyMutableSet<S, T>(
     private val innerSet: MutableSet<S>,
-    private val converter: Converter<S, T>
+    private val converter: BiConverter<S, T>
 ) : ProxySet<S, T>(innerSet, converter), MutableSet<T> {
     override fun add(element: T): Boolean {
         return innerSet.add(converter.convertToA(element))

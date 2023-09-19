@@ -1,6 +1,7 @@
 package matt.model.data.byte
 
 import kotlinx.serialization.Serializable
+import matt.lang.convert.BiConverter
 import matt.model.data.byte.ByteSize.BinaryByteUnit.B
 import matt.model.data.byte.ByteSize.BinaryByteUnit.GiB
 import matt.model.data.byte.ByteSize.BinaryByteUnit.KiB
@@ -14,7 +15,6 @@ import matt.model.data.byte.ByteSize.DecimalByteUnit.MB
 import matt.model.data.byte.ByteSize.DecimalByteUnit.TB
 import matt.model.data.mathable.MathAndComparable
 import matt.model.data.mathable.NumberWrapper
-import matt.model.op.convert.Converter
 import kotlin.jvm.JvmName
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -226,7 +226,7 @@ class FormattedByteSize(
 }
 
 
-object BinaryByteSizeDoubleConverter : Converter<ByteSize, Double> {
+object BinaryByteSizeDoubleConverter : BiConverter<ByteSize, Double> {
     override fun convertToB(a: ByteSize): Double {
         return a.bytes.toDouble()
     }

@@ -1,8 +1,8 @@
 package matt.model.data.index
 
 import kotlinx.serialization.Serializable
+import matt.lang.convert.BiConverter
 import matt.model.data.mathable.IntWrapper
-import matt.model.op.convert.Converter
 import kotlin.math.absoluteValue
 
 fun <T> MyIndexedValue<T, Index>.toKotlinIndexedValue() = IndexedValue(index = index.i, value = element)
@@ -38,7 +38,7 @@ object All: RemovalIndex
 	get() = Index(i.absoluteValue)
 }
 
-object IndexWrapperConverter: Converter<Index, Double> {
+object IndexWrapperConverter: BiConverter<Index, Double> {
   override fun convertToB(a: Index): Double {
 	return a.asInt.toDouble()
   }
@@ -49,7 +49,7 @@ object IndexWrapperConverter: Converter<Index, Double> {
 
 }
 
-object IndexWrapperIntConverter: Converter<Index, Int> {
+object IndexWrapperIntConverter: BiConverter<Index, Int> {
   override fun convertToB(a: Index): Int {
 	return a.asInt
   }

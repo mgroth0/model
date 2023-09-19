@@ -1,6 +1,7 @@
 {
   "type": "MultiPlatformModule",
   "dependencies": [
+
     {
       "type": "Lib",
       "cfg": "commonMainApi",
@@ -10,11 +11,6 @@
       "type": "Lib",
       "cfg": "commonMainApi",
       "key": "kotlinx-datetime"
-    },
-    {
-      "type": "Project",
-      "cfg": "commonMainApi",
-      "path": ":k:lang"
     },
     {
       "type": "Project",
@@ -29,7 +25,8 @@
     {
       "type": "Project",
       "cfg": "commonMainApi",
-      "path": ":k:report"
+      "path": ":k:report",
+      "checkIfUsed": false
     },
     {
       "type": "Lib",

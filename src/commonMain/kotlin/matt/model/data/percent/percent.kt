@@ -1,7 +1,7 @@
 package matt.model.data.percent
 
+import matt.lang.convert.BiConverter
 import matt.model.data.mathable.DoubleWrapper
-import matt.model.op.convert.Converter
 import kotlin.jvm.JvmInline
 
 interface PercentIdea
@@ -20,7 +20,7 @@ value class Percent(val percent: Double) : PercentIdea, DoubleWrapper<Percent> {
         get() = percent
 }
 
-object PercentDoubleConverter : Converter<Percent, Double> {
+object PercentDoubleConverter : BiConverter<Percent, Double> {
     override fun convertToB(a: Percent): Double {
         return a.asDouble
     }

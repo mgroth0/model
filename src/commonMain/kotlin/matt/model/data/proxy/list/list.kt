@@ -1,14 +1,14 @@
 package matt.model.data.proxy.list
 
+import matt.lang.convert.BiConverter
 import matt.model.data.proxy.collect.ProxyCollection
-import matt.model.op.convert.Converter
 
-fun <S, T> List<S>.proxy(converter: Converter<S, T>) = ImmutableProxyList(this, converter)
-fun <S, T> MutableList<S>.proxy(converter: Converter<S, T>) = ProxyList(this, converter)
+fun <S, T> List<S>.proxy(converter: BiConverter<S, T>) = ImmutableProxyList(this, converter)
+fun <S, T> MutableList<S>.proxy(converter: BiConverter<S, T>) = ProxyList(this, converter)
 
 open class ImmutableProxyList<S, T>(
     private val innerList: List<S>,
-    private val converter: Converter<S, T>
+    private val converter: BiConverter<S, T>
 ) : ProxyCollection<S, T>(innerList, converter), List<T> {
 
     protected fun S.toT() = converter.convertToB(this)
@@ -84,7 +84,7 @@ open class ImmutableProxyList<S, T>(
 
 class ProxyList<S, T>(
     private val innerList: MutableList<S>,
-    converter: Converter<S, T>
+    converter: BiConverter<S, T>
 ) : ImmutableProxyList<S, T>(innerList, converter), MutableList<T> {
 
 
