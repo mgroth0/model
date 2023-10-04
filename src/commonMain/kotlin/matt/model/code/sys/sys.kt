@@ -9,6 +9,10 @@ import matt.lang.model.file.MacFileSystem
 import matt.lang.model.file.UnixFileSystem
 import matt.lang.platform.OSIdea
 import matt.lang.require.requireEquals
+import matt.model.code.sys.OsArchitecture.LinuxAarch64
+import matt.model.code.sys.OsArchitecture.MacIntel
+import matt.model.code.sys.OsArchitecture.MacSilicon
+import matt.model.code.sys.OsArchitecture.OtherLinux
 
 sealed interface OS : OSIdea {
     val fileSystem: FileSystem
@@ -35,6 +39,7 @@ sealed class Machine(
 ) : OS {
     val homeDir by lazy { getHomeDir() }
     val registeredDir by lazy { getRegisteredDir() }
+    abstract val architecture: OsArchitecture
 }
 
 sealed class SiliconMacMachine(
@@ -43,7 +48,9 @@ sealed class SiliconMacMachine(
 ) : Machine(
     getHomeDir = { homeDir },
     getRegisteredDir = { registeredDir }
-), SiliconMac
+), SiliconMac {
+    override val architecture = MacSilicon
+}
 
 sealed class IntelMacMachine(
     homeDir: String,
@@ -51,14 +58,16 @@ sealed class IntelMacMachine(
 ) : Machine(
     getHomeDir = { homeDir },
     getRegisteredDir = { registeredDir }
-), IntelMac
+), IntelMac {
+    override val architecture = MacIntel
+}
 
-object OLD_MAC : IntelMacMachine(
+object OldMac : IntelMacMachine(
     homeDir = "/Users/matt",
     registeredDir = "Desktop/registered",
 )
 
-object NEW_MAC : SiliconMacMachine(
+object NewMac : SiliconMacMachine(
     homeDir = "/Users/matthewgroth",
     registeredDir = "registered",
 )
@@ -66,7 +75,7 @@ object NEW_MAC : SiliconMacMachine(
 class UnknownIntelMacMachine(homeDir: String) : IntelMacMachine(homeDir = homeDir, registeredDir = null)
 class UnknownSiliconMacMachine(homeDir: String) : SiliconMacMachine(homeDir = homeDir, registeredDir = null)
 
-object WindowsFileSystem : BaseFileSystem() {
+data object WindowsFileSystem : BaseFileSystem() {
     override val caseSensitivity = CaseInSensitive
     override val separatorChar = '\\'
 }
@@ -82,15 +91,17 @@ sealed class WindowsMachine(
 ) : Machine(
     getHomeDir = getHomeDir,
     getRegisteredDir = getRegisteredDir
-), Windows
+), Windows {
+    override val architecture = OsArchitecture.Windows
+}
 
 object WINDOWS_11_PAR_WORK : WindowsMachine(
     getHomeDir = { "C:\\Users\\matthewgroth" },
     getRegisteredDir = { "registered" },
 )
 
-object GAMING_WINDOWS : WindowsMachine(
-    getHomeDir = { error("idk what the homedir of gaming windows is") },
+object WindowsLaptop : WindowsMachine(
+    getHomeDir = { error("idk what the homedir of windows laptop is") },
     getRegisteredDir = {
         error(
             "idk what the registered dir of gaming windows is, btw, delete .registeredDir file on windows home folder"
@@ -105,13 +116,12 @@ class UnknownWindowsMachine() : WindowsMachine(
 
 /*Careful! Android's OS is case-sensitive yes, but commonly attached file devices like sd cards are often case-insensitive! */
 @SeeURL("https://stackoverflow.com/a/6502881/6596010")
-object LinuxFileSystem : UnixFileSystem() {
+data object LinuxFileSystem : UnixFileSystem() {
     override val caseSensitivity = CaseSensitive
 }
 
 sealed interface Linux : Unix {
     override val fileSystem get() = LinuxFileSystem
-    val isAarch64: Boolean
 }
 
 sealed class LinuxMachine(
@@ -139,14 +149,14 @@ class OpenMind(
         requireEquals(inSlurmJob, node is OpenMindSlurmNode)
     }
 
-    override val isAarch64: Boolean
-        get() = TODO("Not yet implemented")
+
+    override val architecture get() = TODO()
 }
 
 sealed class OpenMindNode
-object Polestar : OpenMindNode()
-object OpenMindDTN : OpenMindNode()
-object OpenMindMainHeadNode : OpenMindNode()
+data object Polestar : OpenMindNode()
+data object OpenMindDTN : OpenMindNode()
+data object OpenMindMainHeadNode : OpenMindNode()
 class OpenMindSlurmNode(val n: Int) : OpenMindNode()
 
 //enum class OpenMindNode {
@@ -164,8 +174,7 @@ class VagrantLinuxMachine : LinuxMachine(
     getHomeDir = { TODO() },
     getRegisteredDir = { TODO() },
 ) {
-    override val isAarch64: Boolean
-        get() = TODO("Not yet implemented")
+    override val architecture get() = TODO()
 }
 
 class UnknownLinuxMachine(
@@ -177,5 +186,18 @@ class UnknownLinuxMachine(
     getRegisteredDir = { null },
 ) {
     override fun toString() = "[${UnknownLinuxMachine::class.simpleName} with hostname=$hostname]"
-    override val isAarch64 by isAarch64
+    override val architecture by lazy {
+        if (isAarch64.value) LinuxAarch64 else OtherLinux
+    }
+}
+
+
+interface OsArchitectureIdea
+
+enum class OsArchitecture : OsArchitectureIdea {
+    MacIntel,
+    MacSilicon,
+    LinuxAarch64,
+    OtherLinux, /*todo*/
+    Windows /*todo*/
 }

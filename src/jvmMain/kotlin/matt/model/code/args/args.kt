@@ -121,7 +121,7 @@ internal class ArgumentCompositeDecoder(
     decoder = decoder
 ) {
 
-    val originalSize = argReader.numberOfRemainingArguments()
+    private val originalSize = argReader.numberOfRemainingArguments()
 
     private var decodingVararg = false
 

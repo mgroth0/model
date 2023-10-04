@@ -7,7 +7,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.listSerialDescriptor
-import kotlinx.serialization.descriptors.serialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
@@ -17,33 +16,34 @@ import matt.lang.model.file.FileSystem
 import matt.lang.model.file.FsFile
 import matt.lang.model.file.FsFilePath
 import matt.lang.model.file.MacFileSystem
+import matt.lang.model.file.casefix.fixFilePath
 import matt.lang.model.file.constructFilePath
 import matt.lang.model.file.exts.contains
-import matt.lang.model.file.fixFilePath
+import matt.model.ser.EncodedAsStringKSerializer
 import matt.prim.str.ensureSuffix
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
 /*only using this as a workaround for an internal kotlinx.serialization bug*/
-internal object MacFileDebugSerializer : KSerializer<MacFile> {
-    override val descriptor = serialDescriptor<String>()
+internal object MacFileDebugSerializer : EncodedAsStringKSerializer<MacFile>() {
 
-    override fun deserialize(decoder: Decoder): MacFile {
-        return MacFile(decoder.decodeString())
+    override fun String.decode(): MacFile {
+        return MacFile(this)
     }
 
-    override fun serialize(
-        encoder: Encoder,
-        value: MacFile
-    ) {
-        encoder.encodeString(value.path)
+    override fun MacFile.encodeToString(): String {
+        return path
     }
+
 
 }
 
 @JvmInline
 @Serializable(with = MacFileDebugSerializer::class)
 value class MacFile(private val fPath: String) : FsFile {
+    override fun withinFileSystem(newFileSystem: FileSystem): FsFile {
+        TODO("Not yet implemented")
+    }
 
     override val fsFilePath: FsFilePath get() = CaseInSensitiveFilePath(fPath, MacFileSystem)
 
@@ -79,23 +79,20 @@ value class MacFile(private val fPath: String) : FsFile {
     }
 }
 
+
 @Serializable(with = AbsMacFile.Companion::class)
 class AbsMacFile(path: String) : FsFile {
 
     override val isAbsolute = true
 
-    companion object : KSerializer<AbsMacFile> {
-        override val descriptor by lazy { serialDescriptor<String>() }
+    companion object : EncodedAsStringKSerializer<AbsMacFile>() {
 
-        override fun deserialize(decoder: Decoder): AbsMacFile {
-            return AbsMacFile(decoder.decodeString())
+        override fun String.decode(): AbsMacFile {
+            return AbsMacFile(this)
         }
 
-        override fun serialize(
-            encoder: Encoder,
-            value: AbsMacFile
-        ) {
-            encoder.encodeString(value.idFile)
+        override fun AbsMacFile.encodeToString(): String {
+            return idFile
         }
     }
 
@@ -103,6 +100,10 @@ class AbsMacFile(path: String) : FsFile {
         if (it.startsWith("/")) it
         else "/$it"
     })
+
+    override fun withinFileSystem(newFileSystem: FileSystem): FsFile {
+        TODO("Not yet implemented")
+    }
 
     override val fsFilePath: FsFilePath get() = CaseInSensitiveFilePath(idFile, MacFileSystem)
 
@@ -165,3 +166,21 @@ object SFileDebugFileListSerializer : KSerializer<FileList> {
 
 @Serializable(with = SFileDebugFileListSerializer::class)
 data class FileList(val files: List<MacFile>) : List<MacFile> by files
+
+
+/*
+@Serializable
+data class AbsSfsFile(
+    val path: String,
+
+) : FsFile {
+    init {
+
+    }
+}*/
+
+
+
+
+
+

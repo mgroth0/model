@@ -35,19 +35,19 @@ sealed class InterAppResult : InterAppMessage
 sealed interface Result : InterAppMessage
 
 @Serializable
-object SUCCESS : Result
+data object SUCCESS : Result
 
 @Serializable
-object FAIL : Result
+data object FAIL : Result
 
 @Serializable
 class Text(val text: String) : InterAppMessage
 
 @Serializable
-object PONG : InterAppMessage
+data object PONG : InterAppMessage
 
 @Serializable
-object YES : InterAppMessage
+data object YES : InterAppMessage
 
 
 @Serializable
@@ -62,21 +62,19 @@ class FilesMessage(val files: List<MacFile>) : InterAppMessage {
 sealed interface InterAppAction : InterAppMessage
 
 @Serializable
-object ACTIVATE : InterAppAction
+data object ACTIVATE : InterAppAction
 
 @Serializable
-object EXIT : InterAppAction
+data object EXIT : InterAppAction
 
 @Serializable
-object PING : InterAppAction {
-
-}
+data object PING : InterAppAction
 
 @Serializable
-object GET_ACTIVE_FILE : InterAppAction
+data object GET_ACTIVE_FILE : InterAppAction
 
 @Serializable
-object GET_ALL_OPEN_FILES : InterAppAction
+data object GET_ALL_OPEN_FILES : InterAppAction
 
 @Serializable
 class Go(val id: String) : InterAppAction
@@ -85,29 +83,48 @@ class Go(val id: String) : InterAppAction
 class Open(val thing: String) : InterAppAction
 
 @Serializable
-object CommitAction : InterAppAction
+data object CommitAction : InterAppAction
 
 @Serializable
-object CLOSE : InterAppAction
+data object CLOSE : InterAppAction
 
 @Serializable
 class OpenRelative(val thing: String) : InterAppAction
 
 @Serializable
+sealed interface OpenSpecificInter: InterAppAction
+
+@Serializable
+sealed interface OpenSpecificByIdentifier : OpenSpecificInter {
+    val qualifiedName: String
+}
+
+@Serializable
+data class OpenMyBookmark(
+    val bookmark: String,
+) : OpenSpecificInter
+
+@Serializable
 data class OpenSpecific(
-    val qualifiedName: String,
+    override val qualifiedName: String,
+) : OpenSpecificByIdentifier
+
+@Serializable
+data class OpenVerySpecific(
+    override val qualifiedName: String,
     val fileName: String,
-    val lineNumber: Int
-) : InterAppAction
+    val lineIndex: Int
+) : OpenSpecificByIdentifier
 
 @Serializable
-object OpenNearestGradleBuildscript : InterAppAction
+data object OpenNearestGradleBuildscript : InterAppAction
 
 @Serializable
-object OpenNearestBuildJson : InterAppAction
+data object OpenNearestBuildJson : InterAppAction
 
 @Serializable
-object OpenNearestKotlinDescendant : InterAppAction
+data object OpenNearestKotlinDescendant : InterAppAction
+
 
 @Serializable
 class HarvardAuthor(val thing: String) : InterAppAction
@@ -122,10 +139,10 @@ class KJGNav(val thing: String) : InterAppAction
 class GoPage(val pageIndex: Int) : InterAppAction
 
 @Serializable
-object GetPageIndex : InterAppAction
+data object GetPageIndex : InterAppAction
 
 @Serializable
-object GetFile : InterAppAction
+data object GetFile : InterAppAction
 
 @Serializable
 data class PDFFileMessage(val file: String) : InterAppMessage

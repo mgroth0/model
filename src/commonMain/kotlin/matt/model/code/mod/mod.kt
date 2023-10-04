@@ -107,9 +107,13 @@ interface GradleTask {
     val taskName: String
 }
 
-@Serializable
+interface GradleTaskSelector {
+    val selectorArgument: String
+}
+
 @JvmInline
-value class GradleTaskSelector(val selector: String) : GradleTask {
+@Serializable
+value class GradleTaskSelectorImpl(val selector: String) : GradleTask, GradleTaskSelector {
     val specifiesAProject get() = ":" in selector
     fun asTaskPath(): GradleTaskPath {
         if (!specifiesAProject) {
@@ -119,12 +123,14 @@ value class GradleTaskSelector(val selector: String) : GradleTask {
     }
 
     override val taskName get() = selector.substringAfter(":")
+
+    override val selectorArgument get() = selector
 }
 
 
 @Serializable
 @JvmInline
-value class GradleTaskPath(val path: String) : GradleTask {
+value class GradleTaskPath(val path: String) : GradleTask, GradleTaskSelector {
     init {
         requireContains(path, ":") {
             "task path \"$path\" should have at least one colon, right? Or do root project tasks not have colons?"
@@ -140,8 +146,9 @@ value class GradleTaskPath(val path: String) : GradleTask {
 
     override val taskName get() = path.substringAfterLast(":")
 
-    fun asGradleTaskSelector() = GradleTaskSelector(selector = path)
-    fun asGradleTaskSelectorForAllProjects() = GradleTaskSelector(selector = path.substringAfter(":"))
+    override val selectorArgument get() = path
+
+    fun asGradleTaskSelectorForAllProjects() = GradleTaskSelectorImpl(selector = path.substringAfter(":"))
 
 }
 
@@ -151,4 +158,6 @@ value class GradleTaskName(override val taskName: String) : GradleTask {
     init {
         require(":" !in taskName)
     }
+
+    fun asTaskOfRootProject() = GradleTaskPath(":$taskName")
 }

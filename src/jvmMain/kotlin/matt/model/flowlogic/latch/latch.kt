@@ -5,10 +5,9 @@ package matt.model.flowlogic.latch
 import matt.lang.function.Op
 import matt.lang.function.Produce
 import matt.lang.go
+import matt.model.code.successorfail.CodeFailedReturn
 import matt.model.code.successorfail.Fail
-import matt.model.code.successorfail.FailableDSL.FailException
 import matt.model.code.successorfail.FailableReturn
-import matt.model.code.successorfail.FailedReturn
 import matt.model.code.successorfail.Success
 import matt.model.code.successorfail.SuccessOrFail
 import matt.model.code.successorfail.SuccessfulReturn
@@ -104,7 +103,7 @@ class OpResultWithReturnValueHandler<R>(private val failMessage: String) : Threa
         try {
             r = SuccessfulReturn(op())
         } finally {
-            result.putLoadedValue(r ?: FailedReturn(FailException(failMessage)))
+            result.putLoadedValue(r ?: CodeFailedReturn(failMessage))
         }
     }
 

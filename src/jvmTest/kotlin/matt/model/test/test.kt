@@ -2,12 +2,17 @@ package matt.model.test
 
 
 import matt.model.code.delegate.ThrowingVetoable
+import matt.model.flowlogic.command.Command
 import matt.model.flowlogic.command.ExitStatus
+import matt.model.flowlogic.controlflowstatement.ControlFlow
+import matt.model.flowlogic.latch.asyncloaded.LoadedValueSlot
 import matt.model.obj.single.SingleCall
 import matt.model.obj.single.SingleCallWithArg
 import matt.model.obj.single.Singleton
-import matt.test.JupiterTestAssertions.assertRunsInOneMinute
+import matt.test.assertions.JupiterTestAssertions.assertRunsInOneMinute
+import kotlin.enums.enumEntries
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ModelTests {
     @Test
@@ -20,6 +25,24 @@ class ModelTests {
 
     @Test
     fun initEnums() = assertRunsInOneMinute {
-        ExitStatus.entries
+        enumEntries<ControlFlow>()
+        enumEntries<ExitStatus>()
+    }
+
+    @Test
+    fun implementInterfaces() {
+        object : Command {
+            override fun run(arg: String) {
+                TODO("Not yet implemented")
+            }
+        }
+    }
+
+    @Test
+    fun slots() {
+        val slot = LoadedValueSlot<String>()
+        slot.isDoneOrCancelled()
+        slot.putLoadedValue("abc")
+        assertEquals(slot.await(), "abc")
     }
 }

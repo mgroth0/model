@@ -23,6 +23,12 @@ import matt.model.code.jvm.bytearg.Xss
 import matt.model.data.byte.ByteSize
 import kotlin.jvm.JvmInline
 
+val ACCEPTABLE_AUTO_INSERTED_ARGS = setOf(
+    "-Dfile.encoding=UTF-8",
+    "-Duser.country=US",
+    "-Duser.language=en",
+    "-Duser.variant" /*idk why it is added. But seems harmless.*/
+)
 
 const val HEROKU_FORWARDED_PORT = 9090
 

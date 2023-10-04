@@ -1,6 +1,7 @@
 package matt.model.code.successorfail
 
 import matt.lang.idea.FailableIdea
+import matt.model.code.successorfail.FailableDSL.CodeFailException
 
 
 inline fun <R> mightFail(op: FailableDSL.() -> R): FailableReturn<R> {
@@ -15,24 +16,48 @@ object FailableDSL {
             val r = op.invoke(this)
             SuccessfulReturn(r)
         } catch (f: FailException) {
-            FailedReturn(f)
+            when (f) {
+                is CodeFailException -> CodeFailedReturn(f)
+                is UserFailException -> f.userFailure
+            }
         }
     }
 
-    fun fail(message: String) {
-        val exception = FailException(message = message)
-        /*val f = FailedReturn<Any?>(exception)*/
-        throw exception
+    fun codeFail(message: String) {
+        throw CodeFailException(message = message)
+    }
+
+    fun userFail(message: String) {
+        throw UserFailException(message = message)
     }
 
     fun fail(failure: FailedReturn) {
-        /*val f = failure.cast<Any?>()
-        throw FailException(f)*/
-        throw failure.exception
+        when (failure) {
+            is CodeFailedReturn -> throw failure.exception
+            is UserFailedReturn -> throw UserFailException(failure)
+        }
     }
 
-    @PublishedApi
-    internal class FailException(message: String) : Exception(message)
+
+    sealed class FailException(
+        message: String,
+        cause: Throwable? = null
+    ) : Exception(message, cause) {
+
+    }
+
+    class UserFailException(val userFailure: UserFailedReturn) : FailException(userFailure.message) {
+        constructor(message: String) : this(UserFailedReturn(message))
+    }
+
+    class CodeFailException(
+        message: String,
+        cause: Throwable? = null
+    ) : FailException(message, cause) {
+        constructor(
+            message: String,
+        ) : this(message = message, cause = null)
+    }
 
 }
 
@@ -52,7 +77,13 @@ inline fun <T> FailableReturn<T>.resultOr(op: (FailedReturn) -> Unit): T {
 
 
 class SuccessfulReturn<T>(val value: T) : FailableReturn<T>
-class FailedReturn(val exception: Exception) : FailableReturn<Nothing>
+
+sealed interface FailedReturn : FailableReturn<Nothing>
+class CodeFailedReturn(val exception: Exception) : FailedReturn {
+    constructor(message: String) : this(CodeFailException(message))
+}
+
+class UserFailedReturn(val message: String) : FailedReturn
 
 
 sealed interface SuccessOrFail : FailableIdea {
@@ -61,7 +92,7 @@ sealed interface SuccessOrFail : FailableIdea {
 
 sealed interface SucceedOrFailWithException : SuccessOrFail
 
-object Success : SucceedOrFailWithException {
+data object Success : SucceedOrFailWithException {
     override val message = ""
 }
 
