@@ -4,6 +4,7 @@ import matt.lang.convert.BiConverter
 import matt.model.data.byte.ByteSize
 import matt.prim.byte.toInt
 import matt.prim.converters.StringConverter
+import matt.prim.endian.MyByteOrder
 import matt.prim.int.toByteArray
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -139,13 +140,13 @@ object DefiniteIntStringConverter : StringConverter<Int> {
     override fun fromString(s: String) = s.toInt()
 }
 
-object IntBytesConverter : BytesConverter<Int> {
+class IntBytesConverter(private val order: MyByteOrder) : BytesConverter<Int> {
     override fun toBytes(t: Int): ByteArray {
-        return t.toByteArray()
+        return t.toByteArray(order)
     }
 
     override fun fromBytes(s: ByteArray): Int {
-        return s.toInt()
+        return s.toInt(order)
     }
 
 }

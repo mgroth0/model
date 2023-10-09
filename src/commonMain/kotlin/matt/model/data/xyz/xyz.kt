@@ -1,6 +1,9 @@
 package matt.model.data.xyz
 
+import kotlinx.serialization.Serializable
 import matt.lang.NOT_IMPLEMENTED
+import matt.model.code.jpy.ExcludeFromPython
+import matt.model.code.jpy.PyClass
 import matt.model.data.mathable.Mathable
 import matt.prim.str.joinWithCommas
 import kotlin.math.absoluteValue
@@ -10,48 +13,66 @@ fun xyz(
     x: Number = 0,
     y: Number = 0,
     z: Number = 0
-) = XYZ(x = x.toDouble(), y = y.toDouble(), z = z.toDouble())
+) = Xyz(x = x.toDouble(), y = y.toDouble(), z = z.toDouble())
 
-data class XYZ(
+@Serializable
+@PyClass
+data class Xyz(
     override val x: Double,
     override val y: Double,
     override val z: Double
-) : Mathable<XYZ>, XYZBase<Double> {
-    override fun div(n: Number): XYZ {
+) : Mathable<Xyz>, XYZBase<Double> {
+
+//    init {
+//        println("created Xyz: $this")
+//    }
+
+    companion object {
+        val ZERO = Xyz(0.0, 0.0, 0.0)
+    }
+
+    @ExcludeFromPython
+    override fun div(n: Number): Xyz {
         TODO("Not yet implemented")
     }
 
-    override fun times(n: Number): XYZ {
-        return XYZ(x * n.toDouble(), y * n.toDouble(), z * n.toDouble())
+    @ExcludeFromPython
+    override fun times(n: Number): Xyz {
+        return Xyz(x * n.toDouble(), y * n.toDouble(), z * n.toDouble())
     }
 
 
-    override fun div(m: XYZ) = NOT_IMPLEMENTED
+    @ExcludeFromPython
+    override fun div(m: Xyz) = NOT_IMPLEMENTED
 
 
     override fun toString(): String {
         return withCommas()
     }
 
-    override operator fun plus(m: XYZ): XYZ {
-        return XYZ(x + m.x, y + m.y, z + m.z)
+    @ExcludeFromPython
+    override operator fun plus(m: Xyz): Xyz {
+        return Xyz(x + m.x, y + m.y, z + m.z)
     }
 
-    override operator fun minus(m: XYZ): XYZ {
-        return XYZ(x - m.x, y - m.y, z - m.z)
+    @ExcludeFromPython
+    override operator fun minus(m: Xyz): Xyz {
+        return Xyz(x - m.x, y - m.y, z - m.z)
     }
 
-    operator fun minus(n: Number): XYZ {
-        return XYZ(x - n.toDouble(), y - n.toDouble(), z - n.toDouble())
+    @ExcludeFromPython
+    operator fun minus(n: Number): Xyz {
+        return Xyz(x - n.toDouble(), y - n.toDouble(), z - n.toDouble())
     }
 
-    operator fun plus(n: Number): XYZ {
-        return XYZ(x + n.toDouble(), y + n.toDouble(), z + n.toDouble())
+    @ExcludeFromPython
+    operator fun plus(n: Number): Xyz {
+        return Xyz(x + n.toDouble(), y + n.toDouble(), z + n.toDouble())
     }
 
-
-    override val abs: XYZ
-        get() = XYZ(x = x.absoluteValue, y = y.absoluteValue, z = z.absoluteValue)
+    @ExcludeFromPython
+    override val abs: Xyz
+        get() = Xyz(x = x.absoluteValue, y = y.absoluteValue, z = z.absoluteValue)
 
 }
 

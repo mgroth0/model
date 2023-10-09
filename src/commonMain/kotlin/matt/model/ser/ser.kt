@@ -64,3 +64,53 @@ val ExternalSerializersModule by lazy {
         contextual(SimpleClassNameSerializer)
     }
 }
+
+
+data object NullableIntSerializer : KSerializer<Int?> {
+    override val descriptor = serialDescriptor<Int?>()
+
+    override fun deserialize(decoder: Decoder): Int? {
+        return decoder.decodeString().takeIf { it.isNotEmpty() }?.toInt()
+    }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: Int?
+    ) {
+        encoder.encodeString(value?.toString() ?: "")
+    }
+
+}
+
+data object NullableDoubleSerializer : KSerializer<Double?> {
+    override val descriptor = serialDescriptor<Double?>()
+
+    override fun deserialize(decoder: Decoder): Double? {
+        return decoder.decodeString().takeIf { it.isNotEmpty() }?.toDouble()
+    }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: Double?
+    ) {
+        encoder.encodeString(value?.toString() ?: "")
+    }
+
+}
+
+
+data object NullableStrictBooleanSerializer : KSerializer<Boolean?> {
+    override val descriptor = serialDescriptor<Boolean?>()
+
+    override fun deserialize(decoder: Decoder): Boolean? {
+        return decoder.decodeString().takeIf { it.isNotEmpty() }?.toBooleanStrict()
+    }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: Boolean?
+    ) {
+        encoder.encodeString(value?.toString() ?: "")
+    }
+
+}

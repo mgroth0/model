@@ -8,7 +8,11 @@ data class RectSize(
 data class IntRectSize(
     val width: Int,
     val height: Int
-)
+) {
+    companion object {
+        fun squareWithDim(side: Int) = IntRectSize(width = side, height = side)
+    }
+}
 
 
 data class Rect<U>(

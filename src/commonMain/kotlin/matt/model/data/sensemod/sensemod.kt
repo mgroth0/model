@@ -50,4 +50,6 @@ value class DegreesDouble(val value: Double) {
     override fun toString() = "$value$SYMBOL"
 
     fun round() = Degrees(value.roundToInt())
+
+    fun normalized() = DegreesDouble(value % 360.0)
 }
