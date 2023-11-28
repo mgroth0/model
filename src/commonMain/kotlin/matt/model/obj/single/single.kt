@@ -1,7 +1,8 @@
 package matt.model.obj.single
 
-import matt.lang.anno.OnlySynchronizedOnJvm
-import matt.lang.require.requireNot
+import matt.lang.assertions.require.requireNot
+import matt.lang.sync.ReferenceMonitor
+import matt.lang.sync.inSync
 import kotlin.reflect.KClass
 
 //internal val singletons = mutableSetOf<KClass<*>>()
@@ -26,19 +27,26 @@ open class Singleton {
     }
 }
 
-abstract class SingleCallBase {
+abstract class SingleCallBase : ReferenceMonitor {
 
     var called: Boolean = false
-        @OnlySynchronizedOnJvm get
-        @OnlySynchronizedOnJvm protected set
+        get() {
+            inSync {
+                return field
+            }
+        }
+        protected set(value) {
+            inSync {
+                field = value
+            }
+        }
 
 
 }
 
 class SingleCall(protected val op: () -> Unit = {}) : SingleCallBase() {
 
-    @OnlySynchronizedOnJvm
-    operator fun invoke() {
+    operator fun invoke() = inSync {
         requireNot(called)
         op()
         called = true
@@ -48,8 +56,7 @@ class SingleCall(protected val op: () -> Unit = {}) : SingleCallBase() {
 }
 
 class SingleCallWithArg<A>(val op: (A) -> Unit = {}) : SingleCallBase() {
-    @OnlySynchronizedOnJvm
-    operator fun invoke(arg: A) {
+    operator fun invoke(arg: A) = inSync {
         requireNot(called)
         op(arg)
         called = true

@@ -43,6 +43,8 @@ private object TempUnitlessSerializerToMakeItCompatibleWithFutureInlineVersion :
 
 }
 
+val Double.unitless get() = UnitLess(this)
+
 @Serializable
 data class UnitLess(override val asNumber: Double) : DoubleWrapper<UnitLess> {
     companion object {

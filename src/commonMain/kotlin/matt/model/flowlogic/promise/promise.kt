@@ -1,10 +1,11 @@
 package matt.model.flowlogic.promise
 
-import matt.lang.anno.OnlySynchronizedOnJvm
+import matt.lang.assertions.require.requireNot
 import matt.lang.function.Op
 import matt.lang.function.Produce
 import matt.lang.idea.ProceedingIdea
-import matt.lang.require.requireNot
+import matt.lang.sync.ReferenceMonitor
+import matt.lang.sync.inSync
 import matt.model.flowlogic.await.ThreadAwaitable
 
 /*Loosely based on the general computer science construct Promise and its javascript implementation and inspired by its name. For me, the name has literal significance too. Used in a case when an abstract function is supposed to do something asynchronously. But since there is sometimes nothing to return, there is less enforcement that the subclass actually implements the asynchronous function. The Commitment is a way for the subclass to "commit" that it is doing the async operation that it is supposed to be doing*/
@@ -24,7 +25,7 @@ interface Commitment : ProceedingIdea {
 class MadeCommitment(private val maker: CommitmentMaker) : Commitment by maker
 class MadeAwaitableCommitment(private val maker: AwaitableCommitment) : AwaitableCommitment by maker
 
-open class CommitmentMaker : Commitment {
+open class CommitmentMaker : Commitment, ReferenceMonitor {
 
     companion object {
         var nextID = 0
@@ -35,8 +36,7 @@ open class CommitmentMaker : Commitment {
     final override var isFulfilled = false
         private set
 
-    @OnlySynchronizedOnJvm
-    fun fulfilled() {
+    fun fulfilled() = inSync {
         requireNot(isFulfilled) {
             "fulfilled twice"
         }
@@ -48,8 +48,7 @@ open class CommitmentMaker : Commitment {
 
     private val thens = mutableListOf<Op>()
 
-    @OnlySynchronizedOnJvm
-    override fun then(op: Op): Commitment {
+    override fun then(op: Op): Commitment = inSync {
         val c = CommitmentMaker()
         if (isFulfilled) {
             op()
@@ -64,8 +63,7 @@ open class CommitmentMaker : Commitment {
     }
 
 
-    @OnlySynchronizedOnJvm
-    override fun thenAsync(op: Produce<Commitment>): Commitment {
+    override fun thenAsync(op: Produce<Commitment>): Commitment = inSync {
         val c = CommitmentMaker()
         if (isFulfilled) {
             op().then {

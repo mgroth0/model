@@ -1,7 +1,6 @@
 {
   "type": "MultiPlatformModule",
   "dependencies": [
-
     {
       "type": "Lib",
       "cfg": "commonMainApi",
@@ -16,6 +15,11 @@
       "type": "Project",
       "cfg": "commonMainApi",
       "path": ":k:image"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:math:langg"
     },
     {
       "type": "Project",
@@ -43,5 +47,6 @@
   },
   "js": {
     "type": "lib"
-  }
+  },
+  "native": "LIB"
 }

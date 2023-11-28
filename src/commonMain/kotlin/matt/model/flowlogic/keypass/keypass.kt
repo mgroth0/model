@@ -1,32 +1,39 @@
 package matt.model.flowlogic.keypass
 
-import matt.lang.anno.OnlySynchronizedOnJvm
-import matt.lang.require.requireNot
+import matt.lang.assertions.require.requireNot
+import matt.lang.sync.ReferenceMonitor
+import matt.lang.sync.inSync
 
-class  KeyPass {
+class KeyPass : ReferenceMonitor {
 
     var isHeld = false
-        @OnlySynchronizedOnJvm private set
-        @OnlySynchronizedOnJvm get
+        private set(value) {
+            inSync {
+                field = value
+            }
+
+        }
+        get() {
+            inSync {
+                return field
+            }
+        }
 
     val isNotHeld get() = !isHeld
 
-    @OnlySynchronizedOnJvm
-    fun <R> with(op: () -> R): R {
+    fun <R> with(op: () -> R): R = inSync {
         isHeld = true
         val r = op()
         isHeld = false
         return r
     }
 
-    @OnlySynchronizedOnJvm
-    fun hold() {
+    fun hold() = inSync {
         requireNot(isHeld)
         isHeld = true
     }
 
-    @OnlySynchronizedOnJvm
-    fun release() {
+    fun release() = inSync {
         require(isHeld)
         isHeld = false
     }

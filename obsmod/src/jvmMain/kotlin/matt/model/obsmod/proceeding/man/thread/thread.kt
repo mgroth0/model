@@ -2,7 +2,7 @@ package matt.model.obsmod.proceeding.man.thread
 
 import matt.async.thread.namedThread
 import matt.lang.go
-import matt.lang.require.requireEquals
+import matt.lang.assertions.require.requireEquals
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF

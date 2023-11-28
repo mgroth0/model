@@ -8,7 +8,7 @@ import matt.lang.model.file.FileSystem
 import matt.lang.model.file.MacFileSystem
 import matt.lang.model.file.UnixFileSystem
 import matt.lang.platform.OSIdea
-import matt.lang.require.requireEquals
+import matt.lang.assertions.require.requireEquals
 import matt.model.code.sys.OsArchitecture.LinuxAarch64
 import matt.model.code.sys.OsArchitecture.MacIntel
 import matt.model.code.sys.OsArchitecture.MacSilicon

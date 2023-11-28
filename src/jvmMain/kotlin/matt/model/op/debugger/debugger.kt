@@ -1,6 +1,6 @@
 package matt.model.op.debugger
 
-import matt.lang.require.requireNot
+import matt.lang.assertions.require.requireNot
 import matt.lang.service.ThreadProvider
 import matt.model.code.idea.DebuggerIdea
 import java.lang.Thread.sleep

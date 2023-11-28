@@ -42,9 +42,7 @@ object FailableDSL {
     sealed class FailException(
         message: String,
         cause: Throwable? = null
-    ) : Exception(message, cause) {
-
-    }
+    ) : Exception(message, cause)
 
     class UserFailException(val userFailure: UserFailedReturn) : FailException(userFailure.message) {
         constructor(message: String) : this(UserFailedReturn(message))
@@ -78,6 +76,11 @@ inline fun <T> FailableReturn<T>.resultOr(op: (FailedReturn) -> Unit): T {
 
 class SuccessfulReturn<T>(val value: T) : FailableReturn<T>
 
+fun <T, R> FailableReturn<T>.mapSuccess(op: (T) -> R) = when (this) {
+    is FailedReturn     -> this
+    is SuccessfulReturn -> SuccessfulReturn(op(value))
+}
+
 sealed interface FailedReturn : FailableReturn<Nothing>
 class CodeFailedReturn(val exception: Exception) : FailedReturn {
     constructor(message: String) : this(CodeFailException(message))
@@ -105,3 +108,4 @@ class Fail(override val message: String) : Failure {
 class FailWithException(val exception: Exception) : Failure, SucceedOrFailWithException {
     override val message = exception.message ?: "no exception message"
 }
+

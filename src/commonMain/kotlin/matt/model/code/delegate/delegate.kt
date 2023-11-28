@@ -1,8 +1,9 @@
 package matt.model.code.delegate
 
-import matt.lang.anno.OnlySynchronizedOnJvm
-import matt.lang.require.requireEquals
-import matt.lang.require.requireNot
+import matt.lang.assertions.require.requireEquals
+import matt.lang.assertions.require.requireNot
+import matt.lang.sync.ReferenceMonitor
+import matt.lang.sync.inSync
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -48,7 +49,7 @@ class SimpleGetter<T, V>(private val o: V) : ReadOnlyProperty<T, V> {
 }
 
 
-class CanOnlySetOnce<V> : ReadWriteProperty<Any?, V?> {
+class CanOnlySetOnce<V> : ReadWriteProperty<Any?, V?>, ReferenceMonitor {
     private var didSet = false
     private var myValue: V? = null
 
@@ -57,19 +58,18 @@ class CanOnlySetOnce<V> : ReadWriteProperty<Any?, V?> {
         property: KProperty<*>
     ) = myValue
 
-    @OnlySynchronizedOnJvm
     override fun setValue(
         thisRef: Any?,
         property: KProperty<*>,
         value: V?
-    ) {
+    ) = inSync {
         requireNot(didSet)
         didSet = true
         myValue = value
     }
 }
 
-class RequireAlwaysEverySetEqual<V> : ReadWriteProperty<Any?, V?> {
+class RequireAlwaysEverySetEqual<V> : ReadWriteProperty<Any?, V?>, ReferenceMonitor {
     private var didSet = false
     private var myValue: V? = null
 
@@ -78,12 +78,11 @@ class RequireAlwaysEverySetEqual<V> : ReadWriteProperty<Any?, V?> {
         property: KProperty<*>
     ) = myValue
 
-    @OnlySynchronizedOnJvm
     override fun setValue(
         thisRef: Any?,
         property: KProperty<*>,
         value: V?
-    ) {
+    ) = inSync {
         if (didSet) requireEquals(value, myValue)
         else {
             myValue = value

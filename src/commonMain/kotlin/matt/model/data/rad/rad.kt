@@ -1,11 +1,14 @@
 package matt.model.data.rad
 
+import matt.model.data.mathable.DoubleWrapper
 import matt.model.data.sensemod.DegreesDouble
 import kotlin.jvm.JvmInline
 import kotlin.math.PI
 
+val Double.radians get() = Radians(this)
+
 @JvmInline
-value class Radians(val radians: Double) {
+value class Radians(val radians: Double): DoubleWrapper<Radians> {
     companion object {
         val ZERO = Radians(0.0)
         private const val PI_OVER_180 = (PI / 180)
@@ -17,4 +20,18 @@ value class Radians(val radians: Double) {
     fun toDegrees(): DegreesDouble {
         return DegreesDouble(radians * PI_UNDER_180)
     }
+
+    fun cos() = kotlin.math.cos(radians)
+    fun sin() = kotlin.math.sin(radians)
+    fun tan() = kotlin.math.tan(radians)
+    override fun fromDouble(d: Double): Radians {
+        return Radians(d)
+    }
+
+    override val asDouble: Double
+        get() = radians
 }
+
+
+fun degreesToRadians(degrees: Double) = degrees * kotlin.math.PI / 180
+fun degreesToRadians(degrees: Int) = degrees.toDouble() * kotlin.math.PI / 180

@@ -3,13 +3,14 @@ package matt.model.flowlogic.latch.asyncloaded
 import matt.lang.go
 import matt.lang.model.value.Value
 import matt.lang.model.value.ValueWrapperIdea
-import matt.lang.require.requireEquals
+import matt.lang.assertions.require.requireEquals
 import matt.lang.service.ThreadProvider
 import matt.lang.weak.lazyWeak
 import matt.model.flowlogic.await.ThreadAwaitable
 import matt.model.flowlogic.latch.LatchCancelled
 import matt.model.flowlogic.latch.SimpleThreadLatch
 import java.lang.Thread.State
+import java.lang.Thread.State.NEW
 import java.util.concurrent.atomic.AtomicInteger
 
 class DaemonLoadedValueOp<T>(
@@ -38,7 +39,7 @@ class DaemonLoadedValueOp<T>(
     @Synchronized
     fun startLoading() {
         require(latch!!.isClosed)
-        requireEquals(myThread.state, State.NEW)
+        requireEquals(myThread.state, NEW)
         myThread.start()
     }
 

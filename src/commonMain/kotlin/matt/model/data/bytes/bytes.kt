@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
-import matt.lang.require.requireEquals
-import matt.lang.require.requireZero
+import matt.lang.assertions.require.requireEquals
+import matt.lang.assertions.require.requireZero
 
 fun ByteArray.toView(
     offset: Int = 0,

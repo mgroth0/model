@@ -1,7 +1,7 @@
 package matt.model.flowlogic.radio
 
-import matt.lang.anno.OnlySynchronizedOnJvm
 import matt.lang.function.Consume
+import matt.lang.sync.ReferenceMonitor
 import matt.lang.sync.inSync
 
 
@@ -19,14 +19,13 @@ class RadioTransmitter<T> {
 }
 
 /*consider renaming it LiveList?*/
-class Poster<T> {
+class Poster<T>: ReferenceMonitor {
 
     private val listeners = mutableListOf<Consume<T>>()
 
     private val board = mutableListOf<T>()
 
-    @OnlySynchronizedOnJvm
-    fun post(t: T) {
+    fun post(t: T) = inSync {
         board += t
         listeners.forEach {
             it(t)

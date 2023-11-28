@@ -1,7 +1,7 @@
 package matt.model.obsmod.proceeding.man.stop.daemon
 
-import matt.lang.require.requireNot
-import matt.lang.require.requireNull
+import matt.lang.assertions.require.requireNot
+import matt.lang.assertions.require.requireNull
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.ExceptionResponse
 import matt.log.profile.err.StructuredExceptionHandler

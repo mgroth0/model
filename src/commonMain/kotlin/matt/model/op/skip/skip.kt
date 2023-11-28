@@ -1,6 +1,6 @@
 package matt.model.op.skip
 
-import matt.lang.require.requireNonNegative
+import matt.lang.assertions.require.requireNonNegative
 
 class Skipper(
   val numElementsToSkip: Int = 0

@@ -2,8 +2,8 @@ package matt.model.code.mod
 
 import kotlinx.serialization.Serializable
 import matt.lang.SubRoots
-import matt.lang.require.requireContains
-import matt.lang.require.requireStartsWith
+import matt.lang.assertions.require.requireContains
+import matt.lang.assertions.require.requireStartsWith
 import matt.model.code.idea.ModIdea
 import matt.prim.str.ensurePrefix
 import kotlin.jvm.JvmInline
@@ -33,7 +33,11 @@ interface GradlePath {
 }
 
 
-interface GradleProjectPath : GradlePath, ModType
+interface GradleProjectPath : GradlePath, ModType {
+    companion object {
+        val ROOT = matt.model.code.mod.GradleProjectPathImpl(":")
+    }
+}
 
 val GradleProjectPath.isRoot get() = path == ":"
 val GradleProjectPath.isSubRoot get() = path == ":${SubRoots.k.name}"
@@ -92,6 +96,10 @@ val RelativeToKMod.gradlePath get() = ":${SubRoots.k.name}:${relToKNames.joinToS
 val RelativeToKMod.jarBaseName get() = relToKNames.joinToString("-")
 val RelativeToKMod.jsFileName get() = "$jarBaseName.js"
 val RelativeToKMod.jsGzFileName get() = "$jarBaseName.js.gz"
+
+/*prefix with _ because \"lib\" will be appended to the file name*/
+/*replace - with _ because that replacement will happen automatically anyway (see KotlinNativeLink) so any code that uses this property should get the correct name fot what the file will actually be*/
+val RelativeToKMod.sharedLibBaseName get() = "_" + jarBaseName.replace("-","_")
 
 
 interface AbsoluteMod : RelativeMod {

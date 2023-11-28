@@ -74,6 +74,11 @@ data class Xyz(
     override val abs: Xyz
         get() = Xyz(x = x.absoluteValue, y = y.absoluteValue, z = z.absoluteValue)
 
+
+    override fun floatingPointDiv(m: Xyz): Double {
+        TODO("Not yet implemented")
+    }
+
 }
 
 
@@ -93,6 +98,8 @@ data class GenericXYZ<D>(
     override val z: D
 ) : XYZBase<D>
 
+
+fun <D, R> GenericXYZ<D>.map(op: (D) -> R) = GenericXYZ(x = op(x), y = op(y), z = op(z))
 
 interface XYZBase<D> {
     val x: D

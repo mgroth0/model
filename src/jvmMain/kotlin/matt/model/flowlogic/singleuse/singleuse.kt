@@ -1,6 +1,6 @@
 package matt.model.flowlogic.singleuse
 
-import matt.lang.require.requireNot
+import matt.lang.assertions.require.requireNot
 
 class SingleUse() {
 

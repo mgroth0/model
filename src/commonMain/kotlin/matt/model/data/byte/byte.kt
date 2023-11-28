@@ -168,6 +168,8 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
 
     override val isZero: Boolean
         get() = bytes == 0L
+    override val isPositive: Boolean
+        get() = bytes > 0
     override val isNaN: Boolean
         get() = false
     override val isInfinite: Boolean
@@ -181,6 +183,10 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
 
     override fun of(n: Int): ByteSize {
         return ByteSize(n)
+    }
+
+    override fun unaryMinus(): ByteSize {
+        return ByteSize(-bytes)
     }
 
     override fun div(m: ByteSize) = bytes / m.bytes

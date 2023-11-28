@@ -2,7 +2,7 @@ package matt.model.code.jvm.bytearg
 
 import matt.model.code.jvm.args.JvmArg
 import kotlinx.serialization.Serializable
-import matt.lang.require.requireNotIn
+import matt.lang.assertions.require.requireNotIn
 import matt.model.data.byte.ByteSize
 import kotlin.jvm.JvmInline
 

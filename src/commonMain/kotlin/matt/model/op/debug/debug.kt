@@ -1,8 +1,8 @@
 package matt.model.op.debug
 
 import matt.model.code.idea.DebuggerIdea
-import matt.model.op.prints.Prints
 import matt.model.code.report.Reporter
+import matt.model.op.prints.Prints
 
 class DebugLogger(val name: String): DebuggerIdea, Reporter, Prints {
   override fun local(prefix: String): Prints {
@@ -16,4 +16,6 @@ class DebugLogger(val name: String): DebuggerIdea, Reporter, Prints {
   override fun print(a: Any) {
 	kotlin.io.print("$name:\t$a")
   }
+
+
 }

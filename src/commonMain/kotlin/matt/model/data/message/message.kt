@@ -12,6 +12,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
 import matt.lang.anno.Duplicated
 import matt.lang.model.file.CaseInSensitiveFilePath
+import matt.lang.model.file.CaseSensitiveFilePath
 import matt.lang.model.file.FileSystem
 import matt.lang.model.file.FsFile
 import matt.lang.model.file.FsFilePath
@@ -19,6 +20,7 @@ import matt.lang.model.file.MacFileSystem
 import matt.lang.model.file.casefix.fixFilePath
 import matt.lang.model.file.constructFilePath
 import matt.lang.model.file.exts.contains
+import matt.model.code.sys.LinuxFileSystem
 import matt.model.ser.EncodedAsStringKSerializer
 import matt.prim.str.ensureSuffix
 import kotlin.jvm.JvmInline
@@ -143,6 +145,150 @@ class AbsMacFile(path: String) : FsFile {
         return MacFile(path.path)
     }
 }
+
+
+@Serializable(with = RelLinuxFile.Companion::class)
+class RelLinuxFile(path: String) : FsFile {
+
+    init {
+        check(!path.startsWith("/"))
+    }
+
+    override val isAbsolute = false
+
+    companion object : EncodedAsStringKSerializer<RelLinuxFile>() {
+
+        override fun String.decode(): RelLinuxFile {
+            return RelLinuxFile(this)
+        }
+
+        override fun RelLinuxFile.encodeToString(): String {
+            return path
+        }
+    }
+
+    val idPath = fixFilePath(path)
+
+
+    override fun withinFileSystem(newFileSystem: FileSystem): FsFile {
+        TODO("Not yet implemented")
+    }
+
+    override val fsFilePath: FsFilePath get() = CaseSensitiveFilePath(idPath, LinuxFileSystem)
+
+    override fun equals(other: Any?): Boolean {
+        return other is RelLinuxFile && other.idPath == idPath
+    }
+
+    override fun hashCode(): Int {
+        return idPath.hashCode()
+    }
+
+    override val partSep: String
+        get() = LinuxFileSystem.separatorChar.toString()
+
+    override fun get(item: String): FsFile {
+        require(!item.startsWith(partSep))
+        return RelLinuxFile(fsFilePath.path.ensureSuffix(partSep) + item)
+    }
+
+    override fun toString() = filePath
+    override val fileSystem: FileSystem
+        get() = LinuxFileSystem
+
+    override val parent: FsFile
+        get() {
+            val parentPath = path.substringBeforeLast(partSep)
+            check(parentPath.isNotEmpty())
+            check(parentPath != path)
+            return /*if (isRoot) null else*/ RelLinuxFile(parentPath)
+        }
+    override val isRoot: Boolean
+        get() = TODO("not sure this property makes sense in a relative file")
+
+    @Duplicated
+    override fun relativeTo(other: FsFile): FsFile {
+        require(this in other) {
+            "$this must be in $other in order to get the relative path"
+        }
+        @Suppress("UNUSED_VARIABLE")
+        val path = fileSystem.constructFilePath(
+            this.path.removePrefix(other.path).removePrefix(partSep)
+        )
+        TODO()
+        /*return MacFile(path.path)*/
+    }
+}
+
+
+@Serializable(with = AbsLinuxFile.Companion::class)
+class AbsLinuxFile(path: String) : FsFile {
+
+    init {
+        check(path.startsWith("/"))
+    }
+
+    override val isAbsolute = true
+
+    companion object : EncodedAsStringKSerializer<AbsLinuxFile>() {
+
+        override fun String.decode(): AbsLinuxFile {
+            return AbsLinuxFile(this)
+        }
+
+        override fun AbsLinuxFile.encodeToString(): String {
+            return path
+        }
+    }
+
+    val idPath = fixFilePath(path)
+
+
+    override fun withinFileSystem(newFileSystem: FileSystem): FsFile {
+        TODO("Not yet implemented")
+    }
+
+    override val fsFilePath: FsFilePath get() = CaseSensitiveFilePath(idPath, LinuxFileSystem)
+
+    override fun equals(other: Any?): Boolean {
+        return other is AbsLinuxFile && other.idPath == idPath
+    }
+
+    override fun hashCode(): Int {
+        return idPath.hashCode()
+    }
+
+    override val partSep: String
+        get() = LinuxFileSystem.separatorChar.toString()
+
+    override fun get(item: String): FsFile {
+        require(!item.startsWith(partSep))
+        return AbsLinuxFile(fsFilePath.path.ensureSuffix(partSep) + item)
+    }
+
+    override fun toString() = filePath
+    override val fileSystem: FileSystem
+        get() = LinuxFileSystem
+
+    override val parent: FsFile?
+        get() = if (isRoot) null else AbsLinuxFile(path.substringBeforeLast(partSep))
+    override val isRoot: Boolean
+        get() = fsFilePath.path == partSep
+
+    @Duplicated
+    override fun relativeTo(other: FsFile): FsFile {
+        require(this in other) {
+            "$this must be in $other in order to get the relative path"
+        }
+        @Suppress("UNUSED_VARIABLE")
+        val path = fileSystem.constructFilePath(
+            this.path.removePrefix(other.path).removePrefix(partSep)
+        )
+        TODO()
+        /*return MacFile(path.path)*/
+    }
+}
+
 
 /*only using this as a workaround for an internal kotlinx.serialization bug*/
 @OptIn(ExperimentalSerializationApi::class)

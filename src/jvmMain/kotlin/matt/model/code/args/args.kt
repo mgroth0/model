@@ -6,7 +6,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.CompositeDecoder.Companion.DECODE_DONE
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.serializer
-import matt.lang.require.requireNot
+import matt.lang.assertions.require.requireNot
 import matt.model.code.args.mydecoder.MyAbstractCompositeDecoder
 import matt.model.code.args.mydecoder.MyAbstractDecoder
 import kotlin.system.exitProcess

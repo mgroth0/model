@@ -1,7 +1,12 @@
 package matt.model.data.sensemod
 
 import kotlinx.serialization.Serializable
+import matt.model.code.jpy.ExcludeFromPython
 import matt.model.code.jpy.PyClass
+import matt.model.data.mathable.DoubleWrapper
+import matt.model.data.mathable.IntWrapper
+import matt.model.data.rad.Radians
+import matt.prim.double.verifyWholeToInt
 import kotlin.jvm.JvmInline
 import kotlin.math.roundToInt
 
@@ -29,27 +34,50 @@ data class Phase(val degrees: Degrees) {
 
 @Serializable
 @PyClass
-data class Degrees(val value: Int) {
+data class Degrees(val value: Int): IntWrapper<Degrees> {
     companion object {
         const val SYMBOL = "°"
         val ZERO = Degrees(0)
     }
 
+    override fun fromInt(d: Int): Degrees {
+        return Degrees(d)
+    }
+
+    override val asInt: Int
+        get() = value
+
     override fun toString() = "$value$SYMBOL"
+
+    @ExcludeFromPython
+    fun toRadians() = Radians.fromDegrees(value)
+
 }
+
+val Double.degrees get() = DegreesDouble(this)
 
 @PyClass
 @JvmInline
 @Serializable
-value class DegreesDouble(val value: Double) {
+value class DegreesDouble(override val asDouble: Double) : DoubleWrapper<DegreesDouble> {
     companion object {
         const val SYMBOL = "°"
         val ZERO = DegreesDouble(0.0)
     }
 
-    override fun toString() = "$value$SYMBOL"
+    override fun fromDouble(d: Double): DegreesDouble {
+        return DegreesDouble(d)
+    }
 
-    fun round() = Degrees(value.roundToInt())
 
-    fun normalized() = DegreesDouble(value % 360.0)
+    override fun toString() = "$asDouble$SYMBOL"
+
+    fun round() = Degrees(asDouble.roundToInt())
+
+    fun verifyToWholeDegrees() = Degrees(asDouble.verifyWholeToInt())
+
+    fun normalized() = DegreesDouble(asDouble % 360.0)
+
+    @ExcludeFromPython
+    fun toRadians() = Radians.fromDegrees(asDouble)
 }
