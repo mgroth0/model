@@ -21,11 +21,7 @@
       "cfg": "commonMainApi",
       "path": ":k:math:langg"
     },
-    {
-      "type": "Project",
-      "cfg": "commonMainApi",
-      "path": ":k:prim"
-    },
+
     {
       "type": "Project",
       "cfg": "commonMainApi",

@@ -48,6 +48,24 @@ class SimpleGetter<T, V>(private val o: V) : ReadOnlyProperty<T, V> {
     ) = o
 }
 
+class SimpleVar<T, V>(
+    private val getter: () -> V,
+    private val setter: (V) -> Unit
+) : ReadWriteProperty<T, V> {
+    override fun getValue(
+        thisRef: T,
+        property: KProperty<*>
+    ) = getter()
+
+    override fun setValue(
+        thisRef: T,
+        property: KProperty<*>,
+        value: V
+    ) {
+        setter(value)
+    }
+}
+
 
 class CanOnlySetOnce<V> : ReadWriteProperty<Any?, V?>, ReferenceMonitor {
     private var didSet = false

@@ -15,6 +15,7 @@ data class BinnedOrientation(
 ) : Comparable<BinnedOrientation> {
     companion object {
         private val comparator = compareBy<BinnedOrientation> { it.yawBin }.thenBy { it.pitchBin }
+        val C00C00 = BinnedOrientation(YawBin(0), PitchBin(0))
     }
 
     val label = "$yawBin$pitchBin"
@@ -29,7 +30,8 @@ data class BinnedOrientation(
 @JvmInline
 @Serializable
 value class YawBin(val angle: Int) : Comparable<YawBin> {
-    constructor(angle: Degrees): this(angle.value)
+    constructor(angle: Degrees) : this(angle.value)
+
     private val num get() = angle.absoluteValue.prependZeros(ORIENTATION_BIN_NUM_DIGITS)
     override fun toString(): String {
         return when {
@@ -47,7 +49,8 @@ value class YawBin(val angle: Int) : Comparable<YawBin> {
 @JvmInline
 @Serializable
 value class PitchBin(val angle: Int) : Comparable<PitchBin> {
-    constructor(angle: Degrees): this(angle.value)
+    constructor(angle: Degrees) : this(angle.value)
+
     private val num get() = angle.absoluteValue.prependZeros(ORIENTATION_BIN_NUM_DIGITS)
     override fun toString(): String {
         return when {
@@ -63,6 +66,5 @@ value class PitchBin(val angle: Int) : Comparable<PitchBin> {
 }
 
 
-
 interface MightBeNativeExtractFInterface
-object NoNativeExtractFInterface: MightBeNativeExtractFInterface
+object NoNativeExtractFInterface : MightBeNativeExtractFInterface

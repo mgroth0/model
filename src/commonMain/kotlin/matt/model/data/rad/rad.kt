@@ -1,5 +1,6 @@
 package matt.model.data.rad
 
+import kotlinx.serialization.Serializable
 import matt.model.data.mathable.DoubleWrapper
 import matt.model.data.sensemod.DegreesDouble
 import kotlin.jvm.JvmInline
@@ -7,6 +8,7 @@ import kotlin.math.PI
 
 val Double.radians get() = Radians(this)
 
+@Serializable
 @JvmInline
 value class Radians(val radians: Double): DoubleWrapper<Radians> {
     companion object {

@@ -7,7 +7,9 @@ import matt.lang.model.file.betterURLIGuess
 import matt.model.ctx.ShowContext
 
 
-object ShowInConsoleContext : ShowContext {
+/*TODO: do not make contexts objects, or else I might accidentally import their members statically!!! And that is a stupidly hard bug to fix*/
+class ShowInConsoleContext : ShowContext {
+
 
     override fun show(text: String) {
         println(text)
@@ -37,6 +39,8 @@ object ShowInConsoleContext : ShowContext {
     }
 
     override fun showStatus(status: String) {
+        println("showing status in ShowInConsoleContext...")
         println("status: $status")
     }
 }
+

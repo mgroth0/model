@@ -27,7 +27,13 @@ fun Throwable.thisAndAllCauses(): List<Throwable> {
 }
 
 
-fun Throwable.infoString(): String = string {
+fun Throwable.infoString(
+    depth: Int = 0
+): String = string {
+    if (depth >= 10) {
+        +"REACHED MAX DEPTH FOR INFO STRING. WITHOUT THIS CHECK, STACK OVERFLOWS CAN AND DO HAPPEN OCCASIONALLY"
+        return@string
+    }
     val throwable = this@infoString
     lineDelimited {
         +"Throwable=$throwable"
@@ -41,12 +47,12 @@ fun Throwable.infoString(): String = string {
             ) + "... THROTTLED STACK TRACE STRING TO EASE STACK OVERFLOW ERROR DETECTION"
             else it)
         }
-        +"CAUSE: ${cause?.infoString()}"
+        +"CAUSE: ${cause?.infoString(depth = depth + 1)}"
         if (suppressedExceptions.isEmpty()) {
             +"SUPPRESSED EXCEPTIONS: NONE"
         } else {
             +"SUPPRESSED EXCEPTIONS:"
-            +suppressedExceptions.joinToString("\n\n") { it.infoString() }
+            +suppressedExceptions.joinToString("\n\n") { it.infoString(depth = depth + 1) }
         }
     }
 }

@@ -14,7 +14,7 @@ fun ByteArray.toView(
 ) = BytesView(offset = offset, length = length, array = this)
 
 
-private object BytesViewSerializer : KSerializer<BytesView> {
+object BytesViewSerializer : KSerializer<BytesView> {
 
 
     private val byteArraySerializer by lazy {
@@ -41,7 +41,7 @@ private object BytesViewSerializer : KSerializer<BytesView> {
 
 }
 
-@Serializable
+@Serializable(with = BytesViewSerializer::class)
 class BytesView(
     val array: ByteArray,
     val offset: Int,

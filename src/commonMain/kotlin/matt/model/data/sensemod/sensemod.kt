@@ -1,8 +1,8 @@
 package matt.model.data.sensemod
 
 import kotlinx.serialization.Serializable
-import matt.model.code.jpy.ExcludeFromPython
-import matt.model.code.jpy.PyClass
+import matt.lang.jpy.ExcludeFromPython
+import matt.lang.jpy.PyClass
 import matt.model.data.mathable.DoubleWrapper
 import matt.model.data.mathable.IntWrapper
 import matt.model.data.rad.Radians

@@ -1,6 +1,6 @@
 package matt.model.data.mathable
 
-import matt.model.code.jpy.ExcludeFromPython
+import matt.lang.jpy.ExcludeFromPython
 import matt.model.data.interp.BasicInterpolatable
 import kotlin.jvm.JvmInline
 import kotlin.math.abs

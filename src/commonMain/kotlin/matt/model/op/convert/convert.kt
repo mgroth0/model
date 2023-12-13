@@ -6,6 +6,7 @@ import matt.prim.byte.toInt
 import matt.prim.converters.StringConverter
 import matt.prim.endian.MyByteOrder
 import matt.prim.int.toByteArray
+import kotlin.enums.EnumEntries
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -56,7 +57,6 @@ object NullToBlankStringConverter : StringConverter<String?> {
 }
 
 
-
 fun <A, B : Any> BiConverter<A, B>.asFailable() = object : FailableConverter<A, B> {
     override fun convertToB(a: A): B {
         return this@asFailable.convertToB(a)
@@ -74,9 +74,6 @@ interface FailableConverter<A, B : Any> {
     fun convertToA(b: B): A
     fun B.toA() = convertToA(this)
 }
-
-
-
 
 
 interface BytesConverter<T> : BiConverter<ByteArray, T> {
@@ -118,8 +115,6 @@ interface FailableStringConverter<T : Any> : FailableConverter<String, T> {
 }
 
 
-
-
 object StringStringConverter : StringConverter<String> {
     override fun toString(t: String) = t
     override fun fromString(s: String) = s
@@ -139,6 +134,8 @@ object DefiniteIntStringConverter : StringConverter<Int> {
     override fun toString(t: Int) = t.toString()
     override fun fromString(s: String) = s.toInt()
 }
+
+
 
 class IntBytesConverter(private val order: MyByteOrder) : BytesConverter<Int> {
     override fun toBytes(t: Int): ByteArray {
@@ -204,3 +201,8 @@ val RATIO_TO_PERCENT_FORMATTER_NO_DECIMAL = object : StringConverter<Number> {
 
 
 
+
+class EnumNameStringConverter<T : Enum<T>>(val entries: EnumEntries<T>) : StringConverter<T> {
+    override fun toString(t: T) = t.name
+    override fun fromString(s: String) = entries.first { it.name == s }
+}

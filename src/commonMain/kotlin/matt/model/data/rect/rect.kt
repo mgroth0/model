@@ -43,8 +43,9 @@ operator fun UniformRectangle<UInt>.contains(other: UniformRectangle<UInt>): Boo
 
 @JvmName("contains2")
 operator fun UniformRectangle<Int>.contains(other: UniformRectangle<Int>): Boolean {
-    checkAllNonNegative()
-    other.checkAllNonNegative()
+
+    checkSizeIsNonNegative()
+    other.checkSizeIsNonNegative()
     return other.x >= x && other.y >= y && other.endX <= endX && other.endY <= endY
 }
 
@@ -162,11 +163,22 @@ fun UniformRectangle<Int>.checkAllNonNegative() {
     check(height >= 0)
 }
 
+fun UniformRectangle<Int>.checkSizeIsPositive() {
+    check(width > 0)
+    check(height > 0)
+}
+
+fun UniformRectangle<Int>.checkSizeIsNonNegative() {
+    check(width >= 0)
+    check(height >= 0)
+}
+
 typealias IntRect = UniformRect<Int>
 typealias UIntRect = UniformRect<UInt>
 typealias DoubleRect = UniformRect<Double>
 
-fun <R: UniformRectangle<Double>> R.takeIfFinite() = takeIf { x.isFinite() && y.isFinite() && width.isFinite() && height.isFinite() }
+fun <R : UniformRectangle<Double>> R.takeIfFinite() =
+    takeIf { x.isFinite() && y.isFinite() && width.isFinite() && height.isFinite() }
 
 data class IntPoint(
     override val x: Int,
@@ -191,6 +203,13 @@ data class Box(
         }
     }
 }
+
+@get:JvmName("widthHeightRatio1")
+val UniformRectangle<Int>.widthHeightRatio get() = width.toDouble() / height
+
+@get:JvmName("widthHeightRatio2")
+val UniformRectangle<Double>.widthHeightRatio get() = width / height
+
 
 @Serializable
 data class DoubleBox(

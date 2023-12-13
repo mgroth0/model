@@ -27,13 +27,14 @@ object FailableDSL {
         throw CodeFailException(message = message)
     }
 
-    fun userFail(message: String) {
+    fun userError(message: String): Nothing = userFail(message)
+    fun userFail(message: String): Nothing {
         throw UserFailException(message = message)
     }
 
     fun fail(failure: FailedReturn) {
         when (failure) {
-            is CodeFailedReturn -> throw failure.exception
+            is CodeFailedReturn -> throw failure.throwable
             is UserFailedReturn -> throw UserFailException(failure)
         }
     }
@@ -82,7 +83,7 @@ fun <T, R> FailableReturn<T>.mapSuccess(op: (T) -> R) = when (this) {
 }
 
 sealed interface FailedReturn : FailableReturn<Nothing>
-class CodeFailedReturn(val exception: Exception) : FailedReturn {
+class CodeFailedReturn(val throwable: Throwable) : FailedReturn {
     constructor(message: String) : this(CodeFailException(message))
 }
 

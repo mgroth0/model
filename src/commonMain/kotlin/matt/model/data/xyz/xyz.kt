@@ -2,8 +2,8 @@ package matt.model.data.xyz
 
 import kotlinx.serialization.Serializable
 import matt.lang.NOT_IMPLEMENTED
-import matt.model.code.jpy.ExcludeFromPython
-import matt.model.code.jpy.PyClass
+import matt.lang.jpy.ExcludeFromPython
+import matt.lang.jpy.PyClass
 import matt.model.data.mathable.Mathable
 import matt.prim.str.joinWithCommas
 import kotlin.math.absoluteValue

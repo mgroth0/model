@@ -4,6 +4,7 @@ import matt.lang.go
 import matt.lang.model.value.Value
 import matt.lang.model.value.ValueWrapperIdea
 import matt.lang.assertions.require.requireEquals
+import matt.lang.atomic.AtomicInt
 import matt.lang.service.ThreadProvider
 import matt.lang.weak.lazyWeak
 import matt.model.flowlogic.await.ThreadAwaitable
@@ -11,7 +12,6 @@ import matt.model.flowlogic.latch.LatchCancelled
 import matt.model.flowlogic.latch.SimpleThreadLatch
 import java.lang.Thread.State
 import java.lang.Thread.State.NEW
-import java.util.concurrent.atomic.AtomicInteger
 
 class DaemonLoadedValueOp<T>(
     threadProvider: ThreadProvider,
@@ -21,7 +21,7 @@ class DaemonLoadedValueOp<T>(
 ) : Async<T>() {
 
     companion object {
-        val threadIndex = AtomicInteger(0)
+        val threadIndex = AtomicInt(0)
     }
 
     private val myThread by lazy {
