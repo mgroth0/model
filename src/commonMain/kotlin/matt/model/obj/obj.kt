@@ -53,7 +53,7 @@ open class Unique<I : Any>(
 }
 
 
-interface DSL
+interface Dsl
 
 
 abstract class SimpleData(private val identity: Any) {

@@ -2,6 +2,7 @@ package matt.model.code.successorfail
 
 import matt.lang.idea.FailableIdea
 import matt.model.code.successorfail.FailableDSL.CodeFailException
+import matt.prim.str.mybuild.api.string
 
 
 inline fun <R> mightFail(op: FailableDSL.() -> R): FailableReturn<R> {
@@ -105,6 +106,28 @@ sealed interface Failure : SuccessOrFail
 class Fail(override val message: String) : Failure {
     override fun toString() = "Fail[message=\"$message\"]"
 }
+
+class MultiFail(failures: List<Failure>) : Failure {
+    private val failures = failures.toList()
+    init {
+        check(failures.isNotEmpty()) {
+            "If there are 0 failures, then a Success should have been returned"
+        }
+    }
+    override val message by lazy {
+        string {
+            lineDelimited {
+                append("${failures.size} Failures:")
+                blankLine()
+                failures.forEach {
+                    append(it.message)
+                }
+            }
+        }
+
+    }
+}
+
 
 class FailWithException(val exception: Exception) : Failure, SucceedOrFailWithException {
     override val message = exception.message ?: "no exception message"
