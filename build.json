@@ -16,6 +16,7 @@
       "cfg": "commonMainApi",
       "path": ":k:image"
     },
+
     {
       "type": "Project",
       "cfg": "commonMainApi",

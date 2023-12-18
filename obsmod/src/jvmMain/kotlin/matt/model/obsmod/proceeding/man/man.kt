@@ -5,6 +5,7 @@ import matt.lang.go
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
 import matt.model.code.successorfail.Fail
+import matt.model.code.successorfail.FailWithException
 import matt.model.code.successorfail.Failure
 import matt.model.code.successorfail.Success
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
@@ -45,8 +46,9 @@ abstract class ManualProceeding(
                         messageProp v it
                     }
                     statusProp v when (realResult) {
-                        Success    -> RUNNING
+                        is Success    -> RUNNING
                         is Failure -> OFF
+                        is FailWithException -> error("this seems like a weird kotlin 2.0.0-Beta1 Switch Statement Compilation Internal Error...")
                     }
                 }
                 t
