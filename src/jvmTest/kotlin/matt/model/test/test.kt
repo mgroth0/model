@@ -41,7 +41,7 @@ class ModelTests {
     fun implementInterfaces() {
         object : Command {
             override fun run(arg: String) {
-                TODO("Not yet implemented")
+                TODO()
             }
         }
     }

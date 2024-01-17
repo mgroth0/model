@@ -33,7 +33,7 @@ data class Xyz(
 
     @ExcludeFromPython
     override fun div(n: Number): Xyz {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     @ExcludeFromPython
@@ -76,7 +76,7 @@ data class Xyz(
 
 
     override fun floatingPointDiv(m: Xyz): Double {
-        TODO("Not yet implemented")
+        TODO()
     }
 
 }

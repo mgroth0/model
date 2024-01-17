@@ -68,11 +68,11 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
 //            object : Set<Entry<TK, TV>> {
 //
 //                override fun containsAll(elements: Collection<MutableEntry<TK, TV>>): Boolean {
-//                    TODO("Not yet implemented")
+//                    TODO()
 //                }
 //
 //                override fun contains(element: MutableEntry<TK, TV>): Boolean {
-//                    TODO("Not yet implemented")
+//                    TODO()
 //                }
 //
 //                override fun iterator(): MutableIterator<MutableEntry<TK, TV>> {
@@ -87,7 +87,7 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
 //                        }
 //
 //                        override fun remove() {
-//                            TODO("Not yet implemented")
+//                            TODO()
 //                        }
 //
 //                    }
@@ -99,11 +99,11 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
 
 
     override val keys: Set<TK>
-        get() = TODO("Not yet implemented")
+        get() = TODO()
     override val size: Int
         get() = innerMap.size
     override val values: Collection<TV>
-        get() = TODO("Not yet implemented")
+        get() = TODO()
 
     override fun isEmpty() = innerMap.isEmpty()
 
@@ -134,31 +134,39 @@ class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     valueConverter
 ), MutableMap<TK, TV> {
 
-    init {
-        println("TODO: figure out where fake mutable set and fake mutable entry should be")
-    }
-
-
     override val entries: MutableSet<MutableEntry<TK, TV>>
-        get() = ProxyMutableSet(innerMap.entries, object : BiConverter<MutableEntry<SK, SV>, MutableEntry<TK, TV>> {
+        get() = ProxyMutableSet(
+            innerMap.entries,
+            object : BiConverter<MutableEntry<SK, SV>, MutableEntry<TK, TV>> {
 
-            override fun convertToB(a: MutableEntry<SK, SV>): MutableEntry<TK, TV> {
-                return FakeMutableEntry(EntryImpl(keyConverter.convertToB(a.key), valueConverter.convertToB(a.value)))
+                override fun convertToB(a: MutableEntry<SK, SV>): MutableEntry<TK, TV> {
+                    return FakeMutableEntry(
+                        EntryImpl(
+                            keyConverter.convertToB(a.key),
+                            valueConverter.convertToB(a.value)
+                        )
+                    )
+                }
+
+                override fun convertToA(b: MutableEntry<TK, TV>): MutableEntry<SK, SV> {
+                    return FakeMutableEntry(
+                        EntryImpl(
+                            keyConverter.convertToA(b.key),
+                            valueConverter.convertToA(b.value)
+                        )
+                    )
+                }
+
             }
+        )
 
-            override fun convertToA(b: MutableEntry<TK, TV>): MutableEntry<SK, SV> {
-                return FakeMutableEntry(EntryImpl(keyConverter.convertToA(b.key), valueConverter.convertToA(b.value)))
-            }
-
-        })
-
-            /*.map { it.toFakeMutableEntry() }.toSet().toFakeMutableSet()*/
+    /*.map { it.toFakeMutableEntry() }.toSet().toFakeMutableSet()*/
 
     override val keys: MutableSet<TK>
-        get() = TODO("Not yet implemented")
+        get() = TODO()
 
     override val values: MutableCollection<TV>
-        get() = TODO("Not yet implemented")
+        get() = TODO()
 
     override fun clear() = innerMap.clear()
 

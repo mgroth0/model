@@ -68,9 +68,10 @@ data class Version(
         }
     }
 
+    operator fun inc() = increment(PATCH)
+
 }
 
-@Serializable
 enum class UpdateLevel {
     PUBLISH, FEATURE, PATCH;
 
@@ -86,6 +87,10 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
         part3: Int,
         part4: Int
     ) : this(listOf(part1, part2, part3, part4).joinWithPeriods())
+
+    override fun toString(): String {
+        return version
+    }
 
     internal companion object : KSerializer<FourLevelVersion> {
 

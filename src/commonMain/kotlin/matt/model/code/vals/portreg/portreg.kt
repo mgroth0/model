@@ -37,7 +37,7 @@ object PortRegistry {
     val task by aPort
     val top by aPort
     val notify by aPort
-    val launch by aPort
+    val launch by portRange(3)
     val brainstorm by aPort
     val kjg by aPort
     val pdf by aPort

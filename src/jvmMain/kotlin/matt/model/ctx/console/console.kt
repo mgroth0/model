@@ -7,8 +7,7 @@ import matt.lang.model.file.betterURLIGuess
 import matt.model.ctx.ShowContext
 
 
-/*TODO: do not make contexts objects, or else I might accidentally import their members statically!!! And that is a stupidly hard bug to fix*/
-class ShowInConsoleContext : ShowContext {
+object ShowInConsoleContext : ShowContext {
 
 
     override fun show(text: String) {
@@ -31,7 +30,7 @@ class ShowInConsoleContext : ShowContext {
         text: String,
         action: SuspendOp
     ) {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override fun showRevealFileAction(file: FsFile) {

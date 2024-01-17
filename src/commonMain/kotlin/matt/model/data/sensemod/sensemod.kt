@@ -10,13 +10,11 @@ import matt.prim.double.verifyWholeToInt
 import kotlin.jvm.JvmInline
 import kotlin.math.roundToInt
 
-@Serializable
 enum class SensoryModality {
     Visual, Audio
 }
 
 
-@Serializable
 enum class WaveForm {
     Square, Sin
 }

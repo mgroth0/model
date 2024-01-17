@@ -1,33 +1,54 @@
 package matt.model.code.sys
 
+import matt.lang.anno.Duplicated
 import matt.lang.anno.SeeURL
+import matt.lang.assertions.require.requireEquals
 import matt.lang.model.file.BaseFileSystem
 import matt.lang.model.file.CaseSensitivity.CaseInSensitive
 import matt.lang.model.file.CaseSensitivity.CaseSensitive
 import matt.lang.model.file.FileSystem
+import matt.lang.model.file.FileSystemResolver
 import matt.lang.model.file.MacFileSystem
 import matt.lang.model.file.UnixFileSystem
 import matt.lang.platform.OSIdea
-import matt.lang.assertions.require.requireEquals
 import matt.model.code.sys.OsArchitecture.LinuxAarch64
 import matt.model.code.sys.OsArchitecture.MacIntel
 import matt.model.code.sys.OsArchitecture.MacSilicon
 import matt.model.code.sys.OsArchitecture.OtherLinux
+import matt.prim.str.lower
 
-sealed interface OS : OSIdea {
-    val fileSystem: FileSystem
+sealed interface OS : OSIdea, FileSystemResolver {
     val wrongPathSep: String
-    fun replaceFileSeparators(string: String) = string.replace(wrongPathSep, fileSystem.separatorChar.toString())
+    fun replaceFileSeparators(
+        string: String,
+        fileSystem: FileSystem
+    ) = string.replace(wrongPathSep, fileSystem.separatorChar.toString())
 }
 
 sealed interface Unix : OS {
-    override val fileSystem: UnixFileSystem
+    override fun fileSystemFor(path: String): UnixFileSystem
     override val wrongPathSep get() = "\\"
 }
 
 
 sealed interface Mac : Unix {
-    override val fileSystem get() = MacFileSystem
+
+    @Duplicated(2384723)
+    override fun fileSystemFor(path: String): UnixFileSystem {
+        return when {
+            path.startsWith("/") -> {
+                val pathLower = path.lower()
+                when {
+                    pathLower.startsWith("/users") -> MacFileSystem
+                    pathLower.startsWith("/var")   -> MacFileSystem
+                    else                           -> error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
+                }
+            }
+
+            else                 -> error("unsure of file system for relative path: $path")
+        }
+    }
+
 }
 
 sealed interface IntelMac : Mac
@@ -81,7 +102,20 @@ data object WindowsFileSystem : BaseFileSystem() {
 }
 
 sealed interface Windows : OS {
-    override val fileSystem get() = WindowsFileSystem
+    @Duplicated(2384723)
+    override fun fileSystemFor(path: String): FileSystem {
+        error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
+//        when {
+//            path.startsWith("/") -> when {
+//                path.lower().startsWith("/users") -> MacFileSystem
+//                else -> error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
+//            }
+//
+//            else                 -> error("unsure of file system for relative path: $path")
+//        }
+    }
+
+    //    override val fileSystem get() = WindowsFileSystem
     override val wrongPathSep get() = "/"
 }
 
@@ -121,7 +155,21 @@ data object LinuxFileSystem : UnixFileSystem() {
 }
 
 sealed interface Linux : Unix {
-    override val fileSystem get() = LinuxFileSystem
+
+    @Duplicated(2384723)
+    override fun fileSystemFor(path: String): UnixFileSystem {
+        return when {
+            path.startsWith("/") -> when {
+                path.lower().startsWith("/app") -> LinuxFileSystem /*HEROKU*/
+                else                            -> error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
+            }
+
+            else                 -> error("unsure of file system for relative path: $path")
+        }
+    }
+
+
+//    override val fileSystem get() = LinuxFileSystem
 }
 
 sealed class LinuxMachine(
@@ -189,6 +237,14 @@ class UnknownLinuxMachine(
     override val architecture by lazy {
         if (isAarch64.value) LinuxAarch64 else OtherLinux
     }
+}
+
+class AndroidLinuxMachine : LinuxMachine(
+    getHomeDir = { error("idk") },
+    getRegisteredDir = { error("idk") }
+) {
+    override val architecture: OsArchitecture
+        get() = TODO("idk")
 }
 
 

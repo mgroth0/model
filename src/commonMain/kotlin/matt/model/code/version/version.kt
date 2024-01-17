@@ -41,7 +41,6 @@ value class GradleVersion(val version: String)
 value class PythonVersion(val version: String)
 
 
-
 interface TomlVersionsInter {
     val python: PythonVersion
     fun tomlVersion(name: String): String

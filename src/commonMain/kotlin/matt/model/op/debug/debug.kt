@@ -6,7 +6,7 @@ import matt.model.op.prints.Prints
 
 class DebugLogger(val name: String): DebuggerIdea, Reporter, Prints {
   override fun local(prefix: String): Prints {
-	TODO("Not yet implemented")
+	TODO()
   }
 
   override fun println(a: Any) {

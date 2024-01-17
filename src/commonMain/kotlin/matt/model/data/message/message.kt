@@ -44,7 +44,7 @@ internal object MacFileDebugSerializer : EncodedAsStringKSerializer<MacFile>() {
 @Serializable(with = MacFileDebugSerializer::class)
 value class MacFile(private val fPath: String) : FsFile {
     override fun withinFileSystem(newFileSystem: FileSystem): FsFile {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override val fsFilePath: FsFilePath get() = CaseInSensitiveFilePath(fPath, MacFileSystem)
@@ -104,7 +104,7 @@ class AbsMacFile(path: String) : FsFile {
     })
 
     override fun withinFileSystem(newFileSystem: FileSystem): FsFile {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override val fsFilePath: FsFilePath get() = CaseInSensitiveFilePath(idFile, MacFileSystem)
@@ -171,7 +171,7 @@ class RelLinuxFile(path: String) : FsFile {
 
 
     override fun withinFileSystem(newFileSystem: FileSystem): FsFile {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override val fsFilePath: FsFilePath get() = CaseSensitiveFilePath(idPath, LinuxFileSystem)
@@ -245,7 +245,7 @@ class AbsLinuxFile(path: String) : FsFile {
 
 
     override fun withinFileSystem(newFileSystem: FileSystem): FsFile {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override val fsFilePath: FsFilePath get() = CaseSensitiveFilePath(idPath, LinuxFileSystem)

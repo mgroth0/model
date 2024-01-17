@@ -111,3 +111,13 @@ class FailWithException(val exception: Exception) : Failure, SucceedOrFailWithEx
     override val message = exception.message ?: "no exception message"
 }
 
+
+sealed interface FoundOrNot<T : Any>
+
+class Found<T : Any>(val value: T) : FoundOrNot<T> {
+    override fun toString() = "Found[value=\"$value\"]"
+}
+
+class NotFound(val message: String) : FoundOrNot<Nothing> {
+    override fun toString() = "NotFound[message=\"$message\"]"
+}

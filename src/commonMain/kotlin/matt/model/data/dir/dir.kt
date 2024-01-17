@@ -1,6 +1,5 @@
 package matt.model.data.dir
 
-import kotlinx.serialization.Serializable
 import matt.lang.function.Op
 
 enum class Direction() {
@@ -21,7 +20,6 @@ enum class LeftOrRight(
     LEFT("←", "<<"), RIGHT("→", ">>")
 }
 
-@Serializable
 enum class OffOrOn {
     OFF, ON
 }

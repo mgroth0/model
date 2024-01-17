@@ -92,17 +92,20 @@ data object CLOSE : InterAppAction
 class OpenRelative(val thing: String) : InterAppAction
 
 @Serializable
-sealed interface OpenSpecificInter: InterAppAction
+sealed interface OpenSpecificInter : InterAppAction
 
 @Serializable
-sealed interface OpenSpecificByIdentifier : OpenSpecificInter {
+sealed interface OpenSpecificPsiInter : OpenSpecificInter
+
+@Serializable
+sealed interface OpenSpecificByIdentifier : OpenSpecificPsiInter {
     val qualifiedName: String
 }
 
 @Serializable
 data class OpenMyBookmark(
     val bookmark: String,
-) : OpenSpecificInter
+) : OpenSpecificPsiInter
 
 @Serializable
 data class OpenSpecific(
@@ -110,11 +113,25 @@ data class OpenSpecific(
 ) : OpenSpecificByIdentifier
 
 @Serializable
+sealed interface OpenFileLoc {
+    val fileName: String
+    val lineIndex: Int
+}
+
+@Serializable
 data class OpenVerySpecific(
     override val qualifiedName: String,
-    val fileName: String,
-    val lineIndex: Int
-) : OpenSpecificByIdentifier
+    override val fileName: String,
+    override val lineIndex: Int
+) : OpenSpecificByIdentifier, OpenFileLoc
+
+@Serializable
+data class OpenFileLocation(
+    val filePath: AbsMacFile,
+    override val lineIndex: Int
+) : OpenSpecificInter, OpenFileLoc {
+    override val fileName = filePath.name
+}
 
 @Serializable
 data object OpenNearestGradleBuildscript : InterAppAction

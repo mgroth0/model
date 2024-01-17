@@ -1,6 +1,7 @@
 package matt.model.obj
 
 import kotlinx.serialization.Transient
+import matt.lang.ktversion.ifPastInitialK2
 
 /*
 Because an IDE warning is not strong enough for me
@@ -9,7 +10,7 @@ https://github.com/Kotlin/kotlinx.serialization/issues/470
 typealias KtSerializationTransient = Transient
 
 private val dummy = 1.apply {
-    if (KotlinVersion.CURRENT.major >= 2) {
+    ifPastInitialK2 {
         println(
             """
             

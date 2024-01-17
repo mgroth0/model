@@ -1,10 +1,10 @@
 package matt.model.flowlogic.latch.asyncloaded
 
+import matt.lang.assertions.require.requireEquals
+import matt.lang.atomic.AtomicInt
 import matt.lang.go
 import matt.lang.model.value.Value
 import matt.lang.model.value.ValueWrapperIdea
-import matt.lang.assertions.require.requireEquals
-import matt.lang.atomic.AtomicInt
 import matt.lang.service.ThreadProvider
 import matt.lang.weak.lazyWeak
 import matt.model.flowlogic.await.ThreadAwaitable

@@ -28,14 +28,14 @@ fun <T> toStringConverter(op: (T) -> String) = object : StringConverter<T> {
     }
 
     override fun fromString(s: String): T {
-        TODO("Not yet implemented")
+        TODO()
     }
 
 }
 
 fun <T> fromStringConverter(op: (String) -> T) = object : StringConverter<T> {
     override fun toString(t: T): String {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override fun fromString(s: String): T {

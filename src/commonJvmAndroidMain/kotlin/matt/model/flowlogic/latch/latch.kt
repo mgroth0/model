@@ -1,4 +1,4 @@
-@file:JvmName("LatchJvmKt")
+@file:JvmName("LatchJvmAndroidKt")
 
 package matt.model.flowlogic.latch
 

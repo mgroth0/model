@@ -1,4 +1,4 @@
-@file:JvmName("ErrReportJvmKt")
+@file:JvmName("ErrReportJvmAndroidKt")
 
 package matt.model.code.errreport
 
