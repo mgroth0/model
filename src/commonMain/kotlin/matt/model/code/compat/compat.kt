@@ -13,16 +13,16 @@ interface CompatibilityModel<T> {
 interface DefaultPluginSerializerIdea
 
 
-interface CompatSerializer<T, C : CompatibilityModel<T>> : KSerializer<T> {
-    override fun deserialize(decoder: Decoder): T {
+abstract class CompatSerializer<T, C : CompatibilityModel<T>> : KSerializer<T> {
+    final override fun deserialize(decoder: Decoder): T {
         val compat = decoder.decodeSerializableValue(pluginCompatSer)
         return compat.modernize()
     }
 
-    override val descriptor get() = pluginCompatSer.descriptor
-    val pluginCompatSer: KSerializer<C>
-    val pluginModernSer: KSerializer<T>
-    override fun serialize(
+    final override val descriptor get() = pluginCompatSer.descriptor
+    abstract val pluginCompatSer: KSerializer<C>
+    abstract val pluginModernSer: KSerializer<T>
+    final override fun serialize(
         encoder: Encoder,
         value: T
     ) {

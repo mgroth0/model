@@ -2,8 +2,8 @@ package matt.model.ctx
 
 import matt.lang.function.Produce
 import matt.lang.function.SuspendOp
-import matt.lang.model.file.FileOrURL
-import matt.lang.model.file.FsFile
+import matt.lang.model.file.AnyResolvableFileOrUrl
+import matt.lang.model.file.AnyFsFile
 
 @ShowDslMarker
 interface StatusContext {
@@ -35,9 +35,9 @@ annotation class ShowDslMarker
 @ShowDslMarker
 interface ShowContext : StatusContext {
     fun show(text: String)
-    fun showOpenFileAction(file: FsFile)
+    fun showOpenFileAction(file: AnyFsFile)
     fun showOpenUrlAction(
-        url: FileOrURL,
+        url: AnyResolvableFileOrUrl,
         label: String? = null
     )
 
@@ -46,5 +46,5 @@ interface ShowContext : StatusContext {
         action: SuspendOp
     )
 
-    fun showRevealFileAction(file: FsFile)
+    fun showRevealFileAction(file: AnyFsFile)
 }

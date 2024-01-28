@@ -1,6 +1,7 @@
 package matt.model.obsmod.proceeding.man.stop
 
 import matt.async.thread.namedThread
+import matt.lang.anno.Open
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
 import matt.model.code.successorfail.FailWithException
@@ -17,16 +18,15 @@ import matt.obs.bindings.bool.ObsB
 import matt.obs.prop.VarProp
 
 abstract class StoppableManualProceeding(
-    override val noun: String,
+    final override val noun: String,
     exceptionHandler: ExceptionHandler = defaultExceptionHandler
 ) : ManualProceeding(
-    startButtonLabel = "Start $noun",
-    exceptionHandler = exceptionHandler
+    startButtonLabel = "Start $noun", exceptionHandler = exceptionHandler
 ), StoppableProceeding {
 
-    override val name = noun
+    final override val name = noun
 
-    override val stopButtonLabel = "Stop $noun"
+    final override val stopButtonLabel = "Stop $noun"
 
     abstract fun stop()
 
@@ -67,5 +67,6 @@ abstract class StoppableManualProceeding(
         stopThread?.join()
     }
 
+    @Open
     override val canStop: ObsB = VarProp(true)
 }

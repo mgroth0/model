@@ -3,6 +3,8 @@ package matt.model.flowlogic.keypass
 import matt.lang.assertions.require.requireNot
 import matt.lang.sync.ReferenceMonitor
 import matt.lang.sync.inSync
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
+import kotlin.contracts.contract
 
 class KeyPass : ReferenceMonitor {
 
@@ -19,13 +21,23 @@ class KeyPass : ReferenceMonitor {
             }
         }
 
+    @PublishedApi
+    internal fun setTheHeld(value: Boolean) {
+        isHeld = value
+    }
+
     val isNotHeld get() = !isHeld
 
-    fun <R> with(op: () -> R): R = inSync {
-        isHeld = true
-        val r = op()
-        isHeld = false
-        return r
+    inline fun <R> with(op: () -> R): R {
+        contract {
+            callsInPlace(op, EXACTLY_ONCE)
+        }
+        inSync {
+            setTheHeld(true)
+            val r = op()
+            setTheHeld(false)
+            return r
+        }
     }
 
     fun hold() = inSync {

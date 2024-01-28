@@ -155,7 +155,7 @@ abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
 
     fun wrappedLoadedValueOrNull() = if (latch?.isOpen != false) Value(value) else null
 
-    override fun await(): T {
+    final override fun await(): T {
         latch?.await()
         @Suppress("UNCHECKED_CAST")
         return value as T

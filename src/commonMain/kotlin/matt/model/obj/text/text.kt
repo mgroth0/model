@@ -1,7 +1,8 @@
 package matt.model.obj.text
 
+import matt.lang.anno.Open
 import matt.lang.idea.ReferenceToSomethingExternal
-import matt.lang.model.file.FsFile
+import matt.lang.model.file.NewFsFile
 import matt.model.data.byte.ByteSize
 
 
@@ -24,6 +25,7 @@ interface WritableBytes : HasBytes {
 
 interface MightExist : ReferenceToSomethingExternal {
     fun exists(): Boolean
+    @Open
     val doesNotExist get() = !exists()
 }
 
@@ -32,22 +34,27 @@ fun <T : MightExist> T.takeIfExists() = takeIf { exists() }
 interface MightExistAndWritableText : MightExist, WritableText
 interface MightExistAndWritableBytes : MightExist, WritableBytes
 
-interface ReadableFile : HasBytes, HasText, MightExist, FsFile {
+interface ReadableFile<F: ReadableFile<F>> : HasBytes, HasText, MightExist, NewFsFile<F> {
+    @Open
     override fun exists(): Boolean
-    fun listFilesAsList(): List<ReadableFile>?
+    fun listFilesAsList(): List<F>?
+
     fun isDir(): Boolean
     fun size(): ByteSize
-    fun readText() = text
+    @Open fun readText() = text
+    @Open
     override val doesNotExist get() = !exists()
 }
 
-interface WritableFile : ReadableFile, WritableBytes, WritableText {
+interface WritableFile<F: WritableFile<F>> : ReadableFile<F>, WritableBytes, WritableText {
+    @Open
     override var text: String
+    @Open
     override var bytes: ByteArray
     fun mkdirs(): Boolean
     fun mkdir()
     fun deleteIfExists()
-    fun writeText(s: String) {
+    @Open fun writeText(s: String) {
         text = s
     }
 }

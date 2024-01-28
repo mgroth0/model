@@ -1,6 +1,7 @@
 package matt.model.code.sys
 
 import matt.lang.anno.Duplicated
+import matt.lang.anno.Open
 import matt.lang.anno.SeeURL
 import matt.lang.assertions.require.requireEquals
 import matt.lang.model.file.BaseFileSystem
@@ -19,6 +20,8 @@ import matt.prim.str.lower
 
 sealed interface OS : OSIdea, FileSystemResolver {
     val wrongPathSep: String
+
+    @Open
     fun replaceFileSeparators(
         string: String,
         fileSystem: FileSystem
@@ -27,12 +30,15 @@ sealed interface OS : OSIdea, FileSystemResolver {
 
 sealed interface Unix : OS {
     override fun fileSystemFor(path: String): UnixFileSystem
+
+    @Open
     override val wrongPathSep get() = "\\"
 }
 
 
 sealed interface Mac : Unix {
 
+    @Open
     @Duplicated(2384723)
     override fun fileSystemFor(path: String): UnixFileSystem {
         return when {
@@ -70,7 +76,7 @@ sealed class SiliconMacMachine(
     getHomeDir = { homeDir },
     getRegisteredDir = { registeredDir }
 ), SiliconMac {
-    override val architecture = MacSilicon
+    final override val architecture = MacSilicon
 }
 
 sealed class IntelMacMachine(
@@ -80,7 +86,7 @@ sealed class IntelMacMachine(
     getHomeDir = { homeDir },
     getRegisteredDir = { registeredDir }
 ), IntelMac {
-    override val architecture = MacIntel
+    final override val architecture = MacIntel
 }
 
 object OldMac : IntelMacMachine(
@@ -102,6 +108,7 @@ data object WindowsFileSystem : BaseFileSystem() {
 }
 
 sealed interface Windows : OS {
+    @Open
     @Duplicated(2384723)
     override fun fileSystemFor(path: String): FileSystem {
         error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
@@ -116,6 +123,7 @@ sealed interface Windows : OS {
     }
 
     //    override val fileSystem get() = WindowsFileSystem
+    @Open
     override val wrongPathSep get() = "/"
 }
 
@@ -126,7 +134,7 @@ sealed class WindowsMachine(
     getHomeDir = getHomeDir,
     getRegisteredDir = getRegisteredDir
 ), Windows {
-    override val architecture = OsArchitecture.Windows
+    final override val architecture = OsArchitecture.Windows
 }
 
 object WINDOWS_11_PAR_WORK : WindowsMachine(
@@ -156,12 +164,16 @@ data object LinuxFileSystem : UnixFileSystem() {
 
 sealed interface Linux : Unix {
 
+    @Open
     @Duplicated(2384723)
     override fun fileSystemFor(path: String): UnixFileSystem {
         return when {
             path.startsWith("/") -> when {
                 path.lower().startsWith("/app") -> LinuxFileSystem /*HEROKU*/
-                else                            -> error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
+                path.lower().startsWith("/data") -> LinuxFileSystem /*ANDROID*/
+                path.lower()
+                    .startsWith("/sdcard") -> error("/sdcard should be a case-insensitive Linux file system") /*ANDROID*/
+                else -> error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
             }
 
             else                 -> error("unsure of file system for relative path: $path")

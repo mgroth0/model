@@ -1,11 +1,14 @@
 package matt.model.data.prop
 
+import matt.lang.anno.Open
 import matt.lang.convert.BiConverter
 import kotlin.reflect.KProperty
 
 interface SimpleSuspendProperty<T : Any> {
     suspend fun get(): T?
     suspend fun set(value: T?)
+
+    @Open
     suspend fun getValue(
         thisRef: Any?,
         property: KProperty<*>
@@ -13,6 +16,7 @@ interface SimpleSuspendProperty<T : Any> {
         return get()
     }
 
+    @Open
     suspend fun setValue(
         thisRef: Any?,
         property: KProperty<*>,
@@ -41,10 +45,10 @@ suspend fun <T : Any> SimpleSuspendProperty<T>.nonSynchronizedGetOrPutIfNotNull(
 }
 
 
-class ConvertedSuspendProperty<S: Any, T: Any>(
+class ConvertedSuspendProperty<S : Any, T : Any>(
     private val prop: SimpleSuspendProperty<S>,
     private val converter: BiConverter<S, T>
-): SimpleSuspendProperty<T> {
+) : SimpleSuspendProperty<T> {
     override suspend fun get(): T? {
         return prop.get()?.let {
             converter.convertToB(it)

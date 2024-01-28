@@ -1,8 +1,9 @@
 package matt.model.code.jvm.bytearg
 
-import matt.model.code.jvm.args.JvmArg
 import kotlinx.serialization.Serializable
+import matt.lang.anno.Open
 import matt.lang.assertions.require.requireNotIn
+import matt.model.code.jvm.args.JvmArg
 import matt.model.data.byte.ByteSize
 import kotlin.jvm.JvmInline
 
@@ -11,6 +12,7 @@ interface JvmByteSizeArg : JvmArg {
     val key: String
     val size: ByteSize
 
+    @Open
     override fun toRawArg(): String {
         requireNotIn("-", key)
         return "-$key${size.formattedBinaryNoSpaceNoDecimalsAndSingleLetterUnit}"

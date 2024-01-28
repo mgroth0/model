@@ -2,13 +2,14 @@ package matt.model.code.jvm
 
 import kotlinx.serialization.Serializable
 import matt.lang.If
+import matt.lang.anno.Open
 import matt.lang.anno.SeeURL
+import matt.lang.assertions.require.requireEmpty
+import matt.lang.assertions.require.requireEquals
 import matt.lang.charset.DEFAULT_CHARSET_NAME_CAP
 import matt.lang.ifTrue
 import matt.lang.opt
 import matt.lang.optArray
-import matt.lang.assertions.require.requireEmpty
-import matt.lang.assertions.require.requireEquals
 import matt.lang.sysprop.props.JmxRemoteAuthenticate
 import matt.lang.sysprop.props.JmxRemotePort
 import matt.lang.sysprop.props.JmxRemoteSsl
@@ -42,10 +43,13 @@ interface CommonJvmArgs {
     @SeeURL("https://stackoverflow.com/a/42541096/6596010")
     val addExports: List<String>?
     val addOpens: List<String>?
+
+    @Open
     fun getExportArgs(exports: List<String>?) = optArray(addExports) {
         map { "--add-exports=$it" }.toTypedArray()
     }
 
+    @Open
     fun getOpenArgs(opens: List<String>?) = optArray(addOpens) {
         map { "--add-opens=$it" }.toTypedArray()
     }
@@ -183,35 +187,7 @@ data class JavaExecArgs(
             }
 
         )
-//
-//        arrayOf(
-//
-//            *If(prism).then("prism.maxvram=2G"),
-//
-//            /*
-//       "Overhead of this feature is negligible and it can be safely turned on by default to simplify logging and diagnostic." - kotlinx.coroutines
-//
-//       gives better stack traces with coroutines. Given the message above, I should have this enabled always.
-//
-//       I tested it, and this definitely works! And the correct format is in fact "-Dkotlinx.coroutines.debug". "-Dkotlinx.coroutines.debug=true" may work, I have not tested it. But  "-Dkotlinx.coroutines.debug" definitely works.
-//       * */
-//
-//            *If(kotlinxCoroutinesDebug).then(
-//                @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery") "kotlinx.coroutines.debug"
-//            ),
-//
-//
-//            *If(jmx).then(
-//                *listOf(
-//                    @SeeURL("https://kubos.cz/2016/01/13/visualvm-connecting-through-ssh.html")
-//                    "port=$HEROKU_FORWARDED_PORT", /*just the default for heroku port forwarding I think*/
-//                    "ssl=false",
-//                    "authenticate=false"
-//                ).map {
-//                    "com.sun.management.jmxremote.$it"
-//                }.toTypedArray()
-//            )
-//        )
+
     }
 
     private val jvmArgs by lazy {

@@ -16,12 +16,12 @@ open class ThrowingVetoable<V>(
         require(check(value))
     }
 
-    override fun getValue(
+    final override fun getValue(
         thisRef: Any?,
         property: KProperty<*>
     ) = value
 
-    override fun setValue(
+    final override fun setValue(
         thisRef: Any?,
         property: KProperty<*>,
         value: V

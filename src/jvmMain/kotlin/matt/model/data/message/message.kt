@@ -51,10 +51,10 @@ data object YES : InterAppMessage
 
 
 @Serializable
-class FileMessage(val file: MacFile) : InterAppMessage
+class FileMessage(val file: AbsMacFile) : InterAppMessage
 
 @Serializable
-class FilesMessage(val files: List<MacFile>) : InterAppMessage {
+class FilesMessage(val files: List<AbsMacFile>) : InterAppMessage {
     //  constructor(files: List<SFile>): this(*files.toTypedArray())
 }
 

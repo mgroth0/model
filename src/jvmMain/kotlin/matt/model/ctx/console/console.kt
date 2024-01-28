@@ -1,8 +1,8 @@
 package matt.model.ctx.console
 
 import matt.lang.function.SuspendOp
-import matt.lang.model.file.FileOrURL
-import matt.lang.model.file.FsFile
+import matt.lang.model.file.AnyResolvableFileOrUrl
+import matt.lang.model.file.AnyFsFile
 import matt.lang.model.file.betterURLIGuess
 import matt.model.ctx.ShowContext
 
@@ -14,12 +14,12 @@ object ShowInConsoleContext : ShowContext {
         println(text)
     }
 
-    override fun showOpenFileAction(file: FsFile) {
+    override fun showOpenFileAction(file: AnyFsFile) {
         println("open file: ${file.betterURLIGuess}")
     }
 
     override fun showOpenUrlAction(
-        url: FileOrURL,
+        url: AnyResolvableFileOrUrl,
         label: String?
     ) {
         val labelPart = if (label == null) "" else "[$label]"
@@ -33,7 +33,7 @@ object ShowInConsoleContext : ShowContext {
         TODO()
     }
 
-    override fun showRevealFileAction(file: FsFile) {
+    override fun showRevealFileAction(file: AnyFsFile) {
         println("open in finder: $file")
     }
 

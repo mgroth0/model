@@ -47,9 +47,9 @@ interface Named {
 
 open class Unique<I : Any>(
     open var name: String,
-    override var id: I
+    final override var id: I
 ) : Identified<I> {
-    override fun toString() =
+    final override fun toString() =
         "${this::class.simpleName} $id: $name"
 }
 
@@ -58,11 +58,11 @@ interface Dsl
 
 
 abstract class SimpleData(private val identity: Any) {
-    override fun equals(other: Any?): Boolean {
+    final override fun equals(other: Any?): Boolean {
         return other != null && other::class == this::class && (other as SimpleData).identity == identity
     }
 
-    override fun hashCode(): Int {
+    final override fun hashCode(): Int {
         return identity.hashCode()
     }
 }

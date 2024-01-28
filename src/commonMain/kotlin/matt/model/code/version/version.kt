@@ -1,6 +1,7 @@
 package matt.model.code.version
 
 import kotlinx.serialization.Serializable
+import matt.model.data.release.GeneralVersion
 import kotlin.jvm.JvmInline
 
 interface JavaVersion {
@@ -34,7 +35,17 @@ data class JavaPatchedVersion(
 
 @Serializable
 @JvmInline
-value class GradleVersion(val version: String)
+value class GradleVersion(val version: String) : Comparable<GradleVersion> {
+    private val asGeneralVersion get() = GeneralVersion(version)
+
+    init {
+        asGeneralVersion /*do general version checks*/
+    }
+
+    override fun compareTo(other: GradleVersion): Int {
+        return asGeneralVersion.compareTo(other.asGeneralVersion)
+    }
+}
 
 @Serializable
 @JvmInline

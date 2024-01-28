@@ -1,6 +1,7 @@
 package matt.model.obsmod.proceeding.man
 
 import matt.async.thread.namedThread
+import matt.lang.anno.Open
 import matt.lang.go
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
@@ -16,10 +17,9 @@ import matt.model.obsmod.proceeding.ProceedingImpl
 import matt.model.obsmod.proceeding.err.with
 import matt.obs.bindings.bool.ObsB
 import matt.obs.prop.VarProp
-import matt.reflect.tostring.toStringBuilder
 
 abstract class ManualProceeding(
-    override val startButtonLabel: String,
+    final override val startButtonLabel: String,
     protected val exceptionHandler: ExceptionHandler = defaultExceptionHandler
 ) : ProceedingImpl() {
 
@@ -36,8 +36,7 @@ abstract class ManualProceeding(
     private fun startSwitch(): Thread? {
         return when (status.value) {
             OFF                         -> {
-                statusProp v STARTING
-                /*messageProp v ""*/
+                statusProp v STARTING/*messageProp v ""*/
                 val t = namedThread(name = "OFF Thread") {
                     val startup = Startup()
                     val result = exceptionHandler.with { startup.startup() }
@@ -46,8 +45,8 @@ abstract class ManualProceeding(
                         messageProp v it
                     }
                     statusProp v when (realResult) {
-                        is Success    -> RUNNING
-                        is Failure -> OFF
+                        is Success           -> RUNNING
+                        is Failure           -> OFF
                         is FailWithException -> error("this seems like a weird kotlin 2.0.0-Beta1 Switch Statement Compilation Internal Error...")
                     }
                 }
@@ -68,6 +67,7 @@ abstract class ManualProceeding(
         startThread?.join()
     }
 
+    @Open
     override val canStart: ObsB = VarProp(true)
 
 
@@ -78,7 +78,7 @@ abstract class ManualProceeding(
         }
     }
 
-    override fun toString() = toStringBuilder(::name)
+    final override fun reflectingToStringProps() = setOf(::name)
 
 }
 

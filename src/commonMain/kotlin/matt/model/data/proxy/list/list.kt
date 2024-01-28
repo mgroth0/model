@@ -1,5 +1,6 @@
 package matt.model.data.proxy.list
 
+import matt.lang.anno.Open
 import matt.lang.convert.BiConverter
 import matt.model.data.proxy.collect.ProxyCollection
 
@@ -15,16 +16,18 @@ open class ImmutableProxyList<S, T>(
     protected fun T.toS() = converter.convertToA(this)
 
 
-
     final override fun get(index: Int): T {
         return innerList[index].toT()
     }
 
 
+    @Open
     override fun iterator() = listIterator()
 
+    @Open
     override fun listIterator() = listIterator(0)
 
+    @Open
     override fun listIterator(index: Int) = object : ListIterator<T> {
 
         private val itr = innerList.listIterator(index)
@@ -56,7 +59,7 @@ open class ImmutableProxyList<S, T>(
 
 
     }
-
+    @Open
     override fun subList(
         fromIndex: Int,
         toIndex: Int

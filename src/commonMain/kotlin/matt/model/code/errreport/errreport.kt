@@ -9,7 +9,7 @@ interface CommonThrowReport
 abstract class Report {
     abstract val text: String
     fun print() = println(text)
-    override fun toString(): String {
+    final override fun toString(): String {
         return text
     }
 }

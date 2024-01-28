@@ -69,7 +69,7 @@ abstract class MyAbstractDecoder : Decoder {
 
 
 abstract class MyAbstractCompositeDecoder(
-    override val serializersModule: SerializersModule,
+    final override val serializersModule: SerializersModule,
     private val decoder: Decoder
 ) : CompositeDecoder {
     private val abstractDecoderDelegate = object : AbstractDecoder() {

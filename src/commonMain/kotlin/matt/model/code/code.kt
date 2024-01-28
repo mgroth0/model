@@ -1,5 +1,7 @@
 package matt.model.code
 
+import matt.lang.anno.Open
+
 interface FormatterConfig {
     object None : FormatterConfig
 }
@@ -11,6 +13,7 @@ interface Code<C : Code<C, F>, F : FormatterConfig> {
 }
 
 interface SimpleFormatCode<C : SimpleFormatCode<C>> : Code<C, FormatterConfig.None> {
+    @Open
     override fun formatted(formatterConfig: FormatterConfig.None): C = formatted()
     fun formatted(): C
 }

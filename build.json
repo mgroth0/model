@@ -28,7 +28,7 @@
     },
     {
       "type": "Lib",
-      "cfg": "jvmMainImplementation",
+      "cfg": "commonJvmAndroidMainImplementation",
       "key": "kt-reflect"
     },
     {

@@ -1,5 +1,6 @@
 package matt.model.data.proxy.set
 
+import matt.lang.anno.Open
 import matt.lang.convert.BiConverter
 import matt.model.data.proxy.collect.ProxyCollection
 
@@ -8,16 +9,17 @@ open class ProxySet<S, T>(
     private val innerSet: Set<S>,
     private val converter: BiConverter<S, T>
 ) : ProxyCollection<S, T>(innerSet, converter), Set<T> {
-    override fun contains(element: T): Boolean {
+    final override fun contains(element: T): Boolean {
         return innerSet.contains(converter.convertToA(element))
     }
 
-    override fun containsAll(elements: Collection<T>): Boolean {
+    final override fun containsAll(elements: Collection<T>): Boolean {
         return elements.all {
             innerSet.contains(converter.convertToA(it))
         }
     }
 
+    @Open
     override fun iterator() = object : Iterator<T> {
         private val iter = innerSet.iterator()
         override fun hasNext(): Boolean {
@@ -46,7 +48,7 @@ class ProxyMutableSet<S, T>(
         innerSet.clear()
     }
 
-    override fun iterator() = object: MutableIterator<T> {
+    override fun iterator() = object : MutableIterator<T> {
         private val itr = innerSet.iterator()
         override fun hasNext(): Boolean {
             return itr.hasNext()

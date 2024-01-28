@@ -1,6 +1,7 @@
 package matt.model.data.point
 
 import kotlinx.serialization.Serializable
+import matt.lang.anno.Open
 import matt.lang.idea.PointIdea3
 import matt.math.langg.arithmetic.exp.sq
 import matt.model.data.xyz.Dim2D
@@ -36,20 +37,20 @@ data class BasicPoint(
 }
 
 
-
-
-
 interface Point : PointIdea3<Any> {
+    @Open
     fun getDim(dim: Dim2D) = when (dim) {
         X -> x
         Y -> y
     }
 
+    @Open
     fun getDimDouble(dim: Dim2D) = when (dim) {
         X -> xDouble
         Y -> yDouble
     }
 
+    @Open
     fun cloneWithNewDim(
         dim: Dim2D,
         newValue: Double

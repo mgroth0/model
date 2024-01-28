@@ -1,5 +1,6 @@
 package matt.model.op.convert
 
+import matt.lang.anno.Open
 import matt.lang.convert.BiConverter
 import matt.model.data.byte.ByteSize
 import matt.prim.byte.toInt
@@ -70,16 +71,25 @@ fun <A, B : Any> BiConverter<A, B>.asFailable() = object : FailableConverter<A, 
 
 interface FailableConverter<A, B : Any> {
     fun convertToB(a: A): B?
+
+    @Open
     fun A.toB() = convertToB(this)
     fun convertToA(b: B): A
+
+    @Open
     fun B.toA() = convertToA(this)
 }
 
 
 interface BytesConverter<T> : BiConverter<ByteArray, T> {
+
     fun toBytes(t: T): ByteArray
     fun fromBytes(s: ByteArray): T
+
+    @Open
     override fun convertToA(b: T): ByteArray = toBytes(b)
+
+    @Open
     override fun convertToB(a: ByteArray) = fromBytes(a)
 }
 
@@ -110,7 +120,9 @@ fun <X, Y, Z> BiConverter<X, Y>.then(converter: BiConverter<Y, Z>) = object : Bi
 interface FailableStringConverter<T : Any> : FailableConverter<String, T> {
     fun toString(t: T): String
     fun fromString(s: String): T?
+    @Open
     override fun convertToA(b: T): String = toString(b)
+    @Open
     override fun convertToB(a: String) = fromString(a)
 }
 
@@ -135,6 +147,10 @@ object DefiniteIntStringConverter : StringConverter<Int> {
     override fun fromString(s: String) = s.toInt()
 }
 
+object DefiniteLongStringConverter : StringConverter<Long> {
+    override fun toString(t: Long) = t.toString()
+    override fun fromString(s: String) = s.toLong()
+}
 
 
 class IntBytesConverter(private val order: MyByteOrder) : BytesConverter<Int> {
@@ -197,9 +213,6 @@ val RATIO_TO_PERCENT_FORMATTER_NO_DECIMAL = object : StringConverter<Number> {
 
     override fun fromString(s: String) = TODO()
 }
-
-
-
 
 
 class EnumNameStringConverter<T : Enum<T>>(val entries: EnumEntries<T>) : StringConverter<T> {

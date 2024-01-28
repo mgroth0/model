@@ -1,5 +1,6 @@
 package matt.model.data.proxy.map
 
+import matt.lang.anno.Open
 import matt.lang.convert.BiConverter
 import matt.model.data.proxy.set.ProxyMutableSet
 import kotlin.collections.Map.Entry
@@ -53,7 +54,7 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     protected fun TK.toSK() = keyConverter.convertToA(this)
     protected fun TV.toSV() = valueConverter.convertToA(this)
 
-
+    @Open
     override val entries: Set<Entry<TK, TV>>
         get() = run {
             val theSet = innerMap.entries.map { e ->
@@ -98,25 +99,29 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
         }
 
 
+    @Open
     override val keys: Set<TK>
         get() = TODO()
-    override val size: Int
+
+    final override val size: Int
         get() = innerMap.size
+
+    @Open
     override val values: Collection<TV>
         get() = TODO()
 
-    override fun isEmpty() = innerMap.isEmpty()
+    final override fun isEmpty() = innerMap.isEmpty()
 
 
-    override fun get(key: TK): TV? {
+    final override fun get(key: TK): TV? {
         return innerMap.get(key.toSK())?.toTV()
     }
 
-    override fun containsValue(value: TV): Boolean {
+    final override fun containsValue(value: TV): Boolean {
         return innerMap.containsValue(value.toSV())
     }
 
-    override fun containsKey(key: TK): Boolean {
+    final override fun containsKey(key: TK): Boolean {
         return innerMap.containsKey(key.toSK())
     }
 

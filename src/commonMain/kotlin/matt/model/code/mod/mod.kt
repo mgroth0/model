@@ -2,6 +2,7 @@ package matt.model.code.mod
 
 import kotlinx.serialization.Serializable
 import matt.lang.SubRoots
+import matt.lang.anno.Open
 import matt.lang.assertions.require.requireContains
 import matt.lang.assertions.require.requireStartsWith
 import matt.model.code.idea.ModIdea
@@ -35,13 +36,14 @@ interface GradlePath {
 
 interface GradleProjectPath : GradlePath, ModType {
     companion object {
-        val ROOT = matt.model.code.mod.GradleProjectPathImpl(":")
+        val ROOT = GradleProjectPathImpl(":")
     }
 }
 
-val GradleProjectPath.isRoot get() = path == ":"
+val GradleProjectPath.isRoot get() = path == GradleProjectPath.ROOT.path
 val GradleProjectPath.isSubRoot get() = path == ":${SubRoots.k.name}"
 fun GradleProjectPath.asKSubPath() = GradleKSubProjectPath(path)
+
 
 @JvmInline
 value class GradleProjectPathImpl(override val path: String) : GradleProjectPath {
@@ -93,13 +95,14 @@ value class GradleKSubProjectPath(override val path: String) : GradleProjectPath
 }
 
 val RelativeToKMod.gradlePath get() = ":${SubRoots.k.name}:${relToKNames.joinToString(":")}"
+val RelativeToKMod.gradleProjectPath get() = GradleProjectPathImpl(gradlePath)
 val RelativeToKMod.jarBaseName get() = relToKNames.joinToString("-")
 val RelativeToKMod.jsFileName get() = "$jarBaseName.js"
 val RelativeToKMod.jsGzFileName get() = "$jarBaseName.js.gz"
 
 /*prefix with _ because \"lib\" will be appended to the file name*/
 /*replace - with _ because that replacement will happen automatically anyway (see KotlinNativeLink) so any code that uses this property should get the correct name fot what the file will actually be*/
-val RelativeToKMod.sharedLibBaseName get() = "_" + jarBaseName.replace("-","_")
+val RelativeToKMod.sharedLibBaseName get() = "_" + jarBaseName.replace("-", "_")
 
 
 interface AbsoluteMod : RelativeMod {
@@ -108,6 +111,7 @@ interface AbsoluteMod : RelativeMod {
 }
 
 interface AbsoluteKMod : AbsoluteMod, RelativeToKMod {
+    @Open
     override val modName get() = relToKNames.last()
 }
 
@@ -145,7 +149,12 @@ value class GradleTaskPath(val path: String) : GradleTask, GradleTaskSelector {
         }
     }
 
-    val gradleProjectPath get() = GradleProjectPathImpl(path.substringBeforeLast(":"))
+    val gradleProjectPath
+        get() = when {
+            isTaskOfRootProject() -> GradleProjectPath.ROOT
+            else                  -> GradleProjectPathImpl(path.substringBeforeLast(":"))
+        }
+
     override fun toString(): String {
         return path
     }

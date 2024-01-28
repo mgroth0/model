@@ -2,13 +2,42 @@ package matt.model.data.release
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.serialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import matt.lang.anno.SeeURL
 import matt.model.data.release.UpdateLevel.FEATURE
 import matt.model.data.release.UpdateLevel.PATCH
 import matt.model.data.release.UpdateLevel.PUBLISH
 import matt.prim.str.joinWithPeriods
+import kotlin.jvm.JvmInline
+
+
+@JvmInline
+value class GeneralVersion(val version: String) : Comparable<GeneralVersion> {
+    val parts get() = version.split(".").map { it.toInt() }
+
+    init {
+        check(version.isNotEmpty())
+        check(parts.isNotEmpty())
+    }
+
+    override fun compareTo(other: GeneralVersion): Int {
+        val parts1 = parts
+        val parts2 = other.parts
+        check(parts1.size == parts2.size)
+        parts1.zip(parts2).forEach { (one, two) ->
+            val r = one.compareTo(2)
+            if (r != 0) return r
+        }
+        return 0
+    }
+}
 
 
 @Serializable
@@ -37,7 +66,13 @@ data class VersionInfo(
     val downloadURL: String
 )
 
-@Serializable
+@Serializer(forClass = Version::class)
+object DefaultVersionSerializer
+
+@Serializer(forClass = FourLevelVersion::class)
+object DefaultVersionFourSerializer
+
+@Serializable(with = Version.Companion::class)
 data class Version(
     val first: Int,
     val second: Int,
@@ -56,8 +91,12 @@ data class Version(
             ?: (third.compareTo(other.third)))
     }
 
+    private val asString by lazy {
+        listOf(first, second, third).joinToString(".")
+    }
+
     override fun toString(): String {
-        return listOf(first, second, third).joinToString(".")
+        return asString
     }
 
     fun increment(level: UpdateLevel): Version {
@@ -69,6 +108,37 @@ data class Version(
     }
 
     operator fun inc() = increment(PATCH)
+
+
+    internal companion object : KSerializer<Version> {
+
+        override val descriptor by lazy { serialDescriptor<String>() }
+
+        @SeeURL("https://github.com/Kotlin/kotlinx.serialization/issues/1512")
+        private val secondaryJson = Json {
+            useAlternativeNames = false
+        }
+
+        override fun deserialize(decoder: Decoder): Version {
+            val e = (decoder as JsonDecoder).decodeJsonElement()
+            if (e is JsonObject) {
+                @SeeURL("https://github.com/Kotlin/kotlinx.serialization/issues/1512")
+                return secondaryJson.decodeFromJsonElement(DefaultVersionSerializer, e)
+            }
+            check((e as JsonPrimitive).isString)
+            return Version(e.content)
+        }
+
+
+        override fun serialize(
+            encoder: Encoder,
+            value: Version
+        ) {
+            encoder.encodeSerializableValue(DefaultVersionSerializer, value)
+//            encoder.encodeString(value.asString)
+        }
+
+    }
 
 }
 
@@ -92,12 +162,24 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
         return version
     }
 
+
     internal companion object : KSerializer<FourLevelVersion> {
 
         override val descriptor by lazy { serialDescriptor<String>() }
 
+        @SeeURL("https://github.com/Kotlin/kotlinx.serialization/issues/1512")
+        private val secondaryJson = Json {
+            useAlternativeNames = false
+        }
+
         override fun deserialize(decoder: Decoder): FourLevelVersion {
-            return FourLevelVersion(decoder.decodeString())
+            val e = (decoder as JsonDecoder).decodeJsonElement()
+            if (e is JsonObject) {
+                @SeeURL("https://github.com/Kotlin/kotlinx.serialization/issues/1512")
+                return secondaryJson.decodeFromJsonElement(DefaultVersionFourSerializer, e)
+            }
+            check((e as JsonPrimitive).isString)
+            return FourLevelVersion(e.content)
         }
 
 
@@ -105,7 +187,8 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
             encoder: Encoder,
             value: FourLevelVersion
         ) {
-            encoder.encodeString(value.version)
+            encoder.encodeSerializableValue(DefaultVersionFourSerializer, value)
+//            encoder.encodeString(value.version)
         }
 
         private val COMPARATOR = Comparator<FourLevelVersion> { a, b -> a[0].compareTo(b[0]) }
@@ -134,4 +217,9 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
     override fun compareTo(other: FourLevelVersion) = COMPARATOR.compare(this, other)
 
 
+}
+
+
+interface OnlineVersionsLoader {
+    suspend fun loadOnlineVersions(): List<Version>?
 }

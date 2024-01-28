@@ -31,7 +31,7 @@ open class CommitmentMaker : Commitment, ReferenceMonitor {
         var nextID = 0
     }
 
-    override val debugID = nextID++
+    final override val debugID = nextID++
 
     final override var isFulfilled = false
         private set
@@ -48,7 +48,7 @@ open class CommitmentMaker : Commitment, ReferenceMonitor {
 
     private val thens = mutableListOf<Op>()
 
-    override fun then(op: Op): Commitment = inSync {
+    final override fun then(op: Op): Commitment = inSync {
         val c = CommitmentMaker()
         if (isFulfilled) {
             op()
@@ -63,7 +63,7 @@ open class CommitmentMaker : Commitment, ReferenceMonitor {
     }
 
 
-    override fun thenAsync(op: Produce<Commitment>): Commitment = inSync {
+    final override fun thenAsync(op: Produce<Commitment>): Commitment = inSync {
         val c = CommitmentMaker()
         if (isFulfilled) {
             op().then {
