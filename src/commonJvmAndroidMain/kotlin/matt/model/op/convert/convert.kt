@@ -16,9 +16,7 @@ import kotlin.reflect.jvm.isAccessible
 
 @Suppress("unused")
 val RATIO_TO_PERCENT_FORMATTER = object : StringConverter<Number> {
-    override fun toString(t: Number): String {
-        return "%.3f".format(t.toDouble() * 100) + "%"
-    }
+    override fun toString(t: Number): String = "%.3f".format(t.toDouble() * 100) + "%"
 
     override fun fromString(s: String) = TODO()
 }
@@ -50,12 +48,8 @@ class StringValueObjectConverter<T : Any>(private val cls: KClass<T>) : StringCo
         }
     }
 
-    override fun toString(t: T): String {
-        return theProp.getter.call(t) as String
-    }
+    override fun toString(t: T): String = theProp.getter.call(t) as String
 
-    override fun fromString(s: String): T {
-        return constructor.call(s)
-    }
+    override fun fromString(s: String): T = constructor.call(s)
 
 }

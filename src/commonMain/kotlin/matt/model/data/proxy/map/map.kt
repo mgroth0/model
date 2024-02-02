@@ -113,17 +113,11 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     final override fun isEmpty() = innerMap.isEmpty()
 
 
-    final override fun get(key: TK): TV? {
-        return innerMap.get(key.toSK())?.toTV()
-    }
+    final override fun get(key: TK): TV? = innerMap.get(key.toSK())?.toTV()
 
-    final override fun containsValue(value: TV): Boolean {
-        return innerMap.containsValue(value.toSV())
-    }
+    final override fun containsValue(value: TV): Boolean = innerMap.containsValue(value.toSV())
 
-    final override fun containsKey(key: TK): Boolean {
-        return innerMap.containsKey(key.toSK())
-    }
+    final override fun containsKey(key: TK): Boolean = innerMap.containsKey(key.toSK())
 
 
 }
@@ -134,33 +128,29 @@ class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     private val keyConverter: BiConverter<SK, TK>,
     private val valueConverter: BiConverter<SV, TV>
 ) : ImmutableProxyMap<SK, SV, TK, TV>(
-    innerMap,
-    keyConverter,
-    valueConverter
-), MutableMap<TK, TV> {
+        innerMap,
+        keyConverter,
+        valueConverter
+    ), MutableMap<TK, TV> {
 
     override val entries: MutableSet<MutableEntry<TK, TV>>
         get() = ProxyMutableSet(
             innerMap.entries,
             object : BiConverter<MutableEntry<SK, SV>, MutableEntry<TK, TV>> {
 
-                override fun convertToB(a: MutableEntry<SK, SV>): MutableEntry<TK, TV> {
-                    return FakeMutableEntry(
-                        EntryImpl(
-                            keyConverter.convertToB(a.key),
-                            valueConverter.convertToB(a.value)
-                        )
+                override fun convertToB(a: MutableEntry<SK, SV>): MutableEntry<TK, TV> = FakeMutableEntry(
+                    EntryImpl(
+                        keyConverter.convertToB(a.key),
+                        valueConverter.convertToB(a.value)
                     )
-                }
+                )
 
-                override fun convertToA(b: MutableEntry<TK, TV>): MutableEntry<SK, SV> {
-                    return FakeMutableEntry(
-                        EntryImpl(
-                            keyConverter.convertToA(b.key),
-                            valueConverter.convertToA(b.value)
-                        )
+                override fun convertToA(b: MutableEntry<TK, TV>): MutableEntry<SK, SV> = FakeMutableEntry(
+                    EntryImpl(
+                        keyConverter.convertToA(b.key),
+                        valueConverter.convertToA(b.value)
                     )
-                }
+                )
 
             }
         )
@@ -185,12 +175,10 @@ class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     override fun put(
         key: TK,
         value: TV
-    ): TV? {
-        return innerMap.put(
-            key.toSK(),
-            value.toSV()
-        )?.toTV()
-    }
+    ): TV? = innerMap.put(
+        key.toSK(),
+        value.toSV()
+    )?.toTV()
 
 
 }

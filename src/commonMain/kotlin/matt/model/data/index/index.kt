@@ -16,9 +16,7 @@ class MyIndexedValue<T, I : AbstractIndex>(
     val element: T,
     val index: I
 ) {
-    override fun toString(): String {
-        return "MyIndexedValue[e=$element,i=$index]"
-    }
+    override fun toString(): String = "MyIndexedValue[e=$element,i=$index]"
 }
 
 sealed interface AbstractIndex
@@ -56,24 +54,16 @@ data class Index(val i: Int) : IntWrapper<Index>, RemovalIndex, AdditionIndex, I
 
 
 object IndexWrapperConverter : BiConverter<Index, Double> {
-    override fun convertToB(a: Index): Double {
-        return a.asInt.toDouble()
-    }
+    override fun convertToB(a: Index): Double = a.asInt.toDouble()
 
-    override fun convertToA(b: Double): Index {
-        return Index(b.toInt())
-    }
+    override fun convertToA(b: Double): Index = Index(b.toInt())
 
 }
 
 object IndexWrapperIntConverter : BiConverter<Index, Int> {
-    override fun convertToB(a: Index): Int {
-        return a.asInt
-    }
+    override fun convertToB(a: Index): Int = a.asInt
 
-    override fun convertToA(b: Int): Index {
-        return Index(b)
-    }
+    override fun convertToA(b: Int): Index = Index(b)
 
 }
 

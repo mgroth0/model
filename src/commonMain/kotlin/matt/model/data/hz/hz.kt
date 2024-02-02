@@ -21,9 +21,7 @@ object HzSerializer : KSerializer<Hz> {
     override val descriptor: SerialDescriptor
         get() = PrimitiveSerialDescriptor("Hz", PrimitiveKind.DOUBLE)
 
-    override fun deserialize(decoder: Decoder): Hz {
-        return Hz(decoder.decodeDouble())
-    }
+    override fun deserialize(decoder: Decoder): Hz = Hz(decoder.decodeDouble())
 
     override fun serialize(
         encoder: Encoder,
@@ -44,13 +42,9 @@ data class Hz(override val asNumber: Double) : DoubleWrapper<Hz> {
     constructor(interval: Duration) : this(1.seconds / interval)
 
     override val asDouble get() = asNumber
-    override fun fromDouble(d: Double): Hz {
-        return Hz(d)
-    }
+    override fun fromDouble(d: Double): Hz = Hz(d)
 
-    override fun toString(): String {
-        return "${asNumber}Hz"
-    }
+    override fun toString(): String = "${asNumber}Hz"
 
 
     val interval get() = (1.seconds / asNumber)

@@ -55,7 +55,7 @@ internal class ArgumentReader(
         if (!itr.hasNext()) {
             val argIndex = itr.nextIndex()
             val elementName = descriptor.getElementName(argIndex)
-            val message = "please give value for $elementName (arg index = ${argIndex})"
+            val message = "please give value for $elementName (arg index = $argIndex)"
             if (DEBUG) {
                 println("DEBUG is true, so throwing an exception! If this was a user-error and DEBUG was false, this would just print the message and exit.")
                 throw Exception(message)
@@ -85,9 +85,7 @@ internal class ArgumentDecoder(
     private val argReader: ArgumentReader,
     private val descriptor: SerialDescriptor
 ) : MyAbstractDecoder() {
-    override fun beginStructure(descriptor: SerialDescriptor): MyAbstractCompositeDecoder {
-        return ArgumentCompositeDecoder(this, argReader, descriptor)
-    }
+    override fun beginStructure(descriptor: SerialDescriptor): MyAbstractCompositeDecoder = ArgumentCompositeDecoder(this, argReader, descriptor)
 
     override val serializersModule = ArgsSerializerModule
 
@@ -117,9 +115,9 @@ internal class ArgumentCompositeDecoder(
     private val argReader: ArgumentReader,
     private val descriptor: SerialDescriptor
 ) : MyAbstractCompositeDecoder(
-    serializersModule = decoder.serializersModule,
-    decoder = decoder
-) {
+        serializersModule = decoder.serializersModule,
+        decoder = decoder
+    ) {
 
     private val originalSize = argReader.numberOfRemainingArguments()
 
@@ -135,13 +133,9 @@ internal class ArgumentCompositeDecoder(
         return r
     }
 
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        return argReader.nextIndexOrNull() ?: DECODE_DONE
-    }
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int = argReader.nextIndexOrNull() ?: DECODE_DONE
 
-    override fun decodeSequentially(): Boolean {
-        return originalSize == descriptor.elementsCount
-    }
+    override fun decodeSequentially(): Boolean = originalSize == descriptor.elementsCount
 
 }
 

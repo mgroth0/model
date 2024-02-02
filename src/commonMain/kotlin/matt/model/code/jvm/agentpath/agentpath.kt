@@ -70,7 +70,7 @@ data class YourKitAgentPathArg(
 ) : AgentPathArg {
     override fun argValue(): String {
         val resFolder = yourKitAppFolder.path.removeSuffix("/") + "/Contents/Resources"
-        var r = resFolder + "/bin/mac/libyjpagent.dylib" + "=profiler_dir=${resFolder}"
+        var r = resFolder + "/bin/mac/libyjpagent.dylib" + "=profiler_dir=$resFolder"
         if (samplingMode) {
             r += ",sampling"
         }

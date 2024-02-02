@@ -69,22 +69,18 @@ class IndicatorController() : Indicator {
         isOn = false
     }
 
-    fun <R> with(op: () -> R): R {
-        return try {
-            on()
-            op()
-        } finally {
-            off()
-        }
+    fun <R> with(op: () -> R): R = try {
+        on()
+        op()
+    } finally {
+        off()
     }
 
-    suspend fun <R> suspendWith(op: suspend () -> R): R {
-        return try {
-            on()
-            op()
-        } finally {
-            off()
-        }
+    suspend fun <R> suspendWith(op: suspend () -> R): R = try {
+        on()
+        op()
+    } finally {
+        off()
     }
 }
 

@@ -2,14 +2,14 @@ package matt.model.flowlogic.startstop
 
 import matt.lang.idea.ProceedingIdea
 
+interface Startable : ProceedingIdea {
+    fun sendStartSignal()
 
-interface Startable: ProceedingIdea {
-  fun sendStartSignal()
-  fun startAndJoin()
-
+    fun startAndJoin()
 }
 
-interface Stoppable: ProceedingIdea {
-  fun sendStopSignal()
-  fun stopAndJoin()
+interface Stoppable : ProceedingIdea {
+    fun sendStopSignal()
+
+    fun stopAndJoin()
 }

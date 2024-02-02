@@ -1,6 +1,5 @@
 package matt.model.crypto
 
-
 interface EncryptionCipher<P : Any, C : Any> {
     fun encrypt(plaintext: P): C
 }

@@ -40,19 +40,17 @@ sealed interface Mac : Unix {
 
     @Open
     @Duplicated(2384723)
-    override fun fileSystemFor(path: String): UnixFileSystem {
-        return when {
-            path.startsWith("/") -> {
-                val pathLower = path.lower()
-                when {
-                    pathLower.startsWith("/users") -> MacFileSystem
-                    pathLower.startsWith("/var")   -> MacFileSystem
-                    else                           -> error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
-                }
+    override fun fileSystemFor(path: String): UnixFileSystem = when {
+        path.startsWith("/") -> {
+            val pathLower = path.lower()
+            when {
+                pathLower.startsWith("/users") -> MacFileSystem
+                pathLower.startsWith("/var")   -> MacFileSystem
+                else                           -> error("What is the file system for $path? (careful, the volume might be case-sensitive)")
             }
-
-            else                 -> error("unsure of file system for relative path: $path")
         }
+
+        else                 -> error("unsure of file system for relative path: $path")
     }
 
 }
@@ -73,9 +71,9 @@ sealed class SiliconMacMachine(
     homeDir: String,
     registeredDir: String?,
 ) : Machine(
-    getHomeDir = { homeDir },
-    getRegisteredDir = { registeredDir }
-), SiliconMac {
+        getHomeDir = { homeDir },
+        getRegisteredDir = { registeredDir }
+    ), SiliconMac {
     final override val architecture = MacSilicon
 }
 
@@ -83,9 +81,9 @@ sealed class IntelMacMachine(
     homeDir: String,
     registeredDir: String?,
 ) : Machine(
-    getHomeDir = { homeDir },
-    getRegisteredDir = { registeredDir }
-), IntelMac {
+        getHomeDir = { homeDir },
+        getRegisteredDir = { registeredDir }
+    ), IntelMac {
     final override val architecture = MacIntel
 }
 
@@ -111,7 +109,7 @@ sealed interface Windows : OS {
     @Open
     @Duplicated(2384723)
     override fun fileSystemFor(path: String): FileSystem {
-        error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
+        error("What is the file system for $path? (careful, the volume might be case-sensitive)")
 //        when {
 //            path.startsWith("/") -> when {
 //                path.lower().startsWith("/users") -> MacFileSystem
@@ -131,9 +129,9 @@ sealed class WindowsMachine(
     getHomeDir: Machine.() -> String,
     getRegisteredDir: Machine.() -> String,
 ) : Machine(
-    getHomeDir = getHomeDir,
-    getRegisteredDir = getRegisteredDir
-), Windows {
+        getHomeDir = getHomeDir,
+        getRegisteredDir = getRegisteredDir
+    ), Windows {
     final override val architecture = OsArchitecture.Windows
 }
 
@@ -166,18 +164,16 @@ sealed interface Linux : Unix {
 
     @Open
     @Duplicated(2384723)
-    override fun fileSystemFor(path: String): UnixFileSystem {
-        return when {
-            path.startsWith("/") -> when {
-                path.lower().startsWith("/app") -> LinuxFileSystem /*HEROKU*/
-                path.lower().startsWith("/data") -> LinuxFileSystem /*ANDROID*/
-                path.lower()
-                    .startsWith("/sdcard") -> error("/sdcard should be a case-insensitive Linux file system") /*ANDROID*/
-                else -> error("What is the file system for ${path}? (careful, the volume might be case-sensitive)")
-            }
-
-            else                 -> error("unsure of file system for relative path: $path")
+    override fun fileSystemFor(path: String): UnixFileSystem = when {
+        path.startsWith("/") -> when {
+            path.lower().startsWith("/app") -> LinuxFileSystem /*HEROKU*/
+            path.lower().startsWith("/data") -> LinuxFileSystem /*ANDROID*/
+            path.lower()
+                .startsWith("/sdcard") -> error("/sdcard should be a case-insensitive Linux file system") /*ANDROID*/
+            else -> error("What is the file system for $path? (careful, the volume might be case-sensitive)")
         }
+
+        else                 -> error("unsure of file system for relative path: $path")
     }
 
 
@@ -188,9 +184,9 @@ sealed class LinuxMachine(
     getHomeDir: Machine.() -> String,
     getRegisteredDir: Machine.() -> String?,
 ) : Machine(
-    getHomeDir = getHomeDir,
-    getRegisteredDir = getRegisteredDir
-), Linux
+        getHomeDir = getHomeDir,
+        getRegisteredDir = getRegisteredDir
+    ), Linux
 
 @SeeURL("https://github.mit.edu/MGHPCC/OpenMind/issues/4435")
 class OpenMind(
@@ -198,9 +194,9 @@ class OpenMind(
     val sImgLoc: String?,
     slurmJobID: String?
 ) : LinuxMachine(
-    getHomeDir = { "/om2/vast/user/mjgroth" },
-    getRegisteredDir = { "registered" },
-) {
+        getHomeDir = { "/om2/vast/user/mjgroth" },
+        getRegisteredDir = { "registered" },
+    ) {
     val inSingularity = sImgLoc != null
     val slurmJobID = slurmJobID?.toInt()
     val inSlurmJob = slurmJobID != null
@@ -242,9 +238,9 @@ class UnknownLinuxMachine(
     homeDir: String,
     isAarch64: Lazy<Boolean>
 ) : LinuxMachine(
-    getHomeDir = { homeDir },
-    getRegisteredDir = { null },
-) {
+        getHomeDir = { homeDir },
+        getRegisteredDir = { null },
+    ) {
     override fun toString() = "[${UnknownLinuxMachine::class.simpleName} with hostname=$hostname]"
     override val architecture by lazy {
         if (isAarch64.value) LinuxAarch64 else OtherLinux

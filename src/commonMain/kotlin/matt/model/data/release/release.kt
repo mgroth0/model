@@ -85,26 +85,20 @@ data class Version(
     )
 
 
-    override operator fun compareTo(other: Version): Int {
-        return (first.compareTo(other.first))
-            .takeIf { it != 0 } ?: ((second.compareTo(other.second)).takeIf { it != 0 }
-            ?: (third.compareTo(other.third)))
-    }
+    override operator fun compareTo(other: Version): Int = (first.compareTo(other.first))
+        .takeIf { it != 0 } ?: ((second.compareTo(other.second)).takeIf { it != 0 }
+        ?: (third.compareTo(other.third)))
 
     private val asString by lazy {
         listOf(first, second, third).joinToString(".")
     }
 
-    override fun toString(): String {
-        return asString
-    }
+    override fun toString(): String = asString
 
-    fun increment(level: UpdateLevel): Version {
-        return when (level) {
-            PUBLISH -> Version(first + 1, 0, 0)
-            FEATURE -> Version(first, second + 1, 0)
-            PATCH   -> Version(first, second, third + 1)
-        }
+    fun increment(level: UpdateLevel): Version = when (level) {
+        PUBLISH -> Version(first + 1, 0, 0)
+        FEATURE -> Version(first, second + 1, 0)
+        PATCH   -> Version(first, second, third + 1)
     }
 
     operator fun inc() = increment(PATCH)
@@ -158,9 +152,7 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
         part4: Int
     ) : this(listOf(part1, part2, part3, part4).joinWithPeriods())
 
-    override fun toString(): String {
-        return version
-    }
+    override fun toString(): String = version
 
 
     internal companion object : KSerializer<FourLevelVersion> {
@@ -210,9 +202,7 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
 
     private val theSplitInts = theSplit.map { it.toInt() }
 
-    operator fun get(index: Int): Int {
-        return theSplitInts[index]
-    }
+    operator fun get(index: Int): Int = theSplitInts[index]
 
     override fun compareTo(other: FourLevelVersion) = COMPARATOR.compare(this, other)
 

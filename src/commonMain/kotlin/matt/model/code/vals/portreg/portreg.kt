@@ -48,6 +48,7 @@ object PortRegistry {
     val seleniumService by aPort
     val omniFxGui by aPort
     val localKtorServers by portRange(100)
+    val formatd by aPort
     val unRegisteredPortPool = num..65_500 /*max port possible is 65_535*/
 }
 

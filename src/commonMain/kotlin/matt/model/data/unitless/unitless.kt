@@ -30,9 +30,7 @@ sections: "mangling" and "calling from java code"
 private object TempUnitlessSerializerToMakeItCompatibleWithFutureInlineVersion : KSerializer<UnitLess> {
     override val descriptor by lazy { serialDescriptor<Double>() }
 
-    override fun deserialize(decoder: Decoder): UnitLess {
-        return UnitLess(decoder.decodeDouble())
-    }
+    override fun deserialize(decoder: Decoder): UnitLess = UnitLess(decoder.decodeDouble())
 
     override fun serialize(
         encoder: Encoder,
@@ -54,11 +52,7 @@ data class UnitLess(override val asNumber: Double) : DoubleWrapper<UnitLess> {
     }
 
     override val asDouble get() = asNumber
-    override fun fromDouble(d: Double): UnitLess {
-        return UnitLess(d)
-    }
+    override fun fromDouble(d: Double): UnitLess = UnitLess(d)
 
-    override fun toString(): String {
-        return "$asNumber"
-    }
+    override fun toString(): String = "$asNumber"
 }

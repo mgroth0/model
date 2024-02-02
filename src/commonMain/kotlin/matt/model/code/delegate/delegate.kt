@@ -36,9 +36,9 @@ class LimitedInt(
     private val min: Int = Int.MIN_VALUE,
     private val max: Int = Int.MAX_VALUE
 ) : ThrowingVetoable<Int>(
-    value,
-    { it in min..max }
-)
+        value,
+        { it in min..max }
+    )
 
 
 class SimpleGetter<T, V>(private val o: V) : ReadOnlyProperty<T, V> {

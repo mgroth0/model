@@ -181,13 +181,9 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
     override val asNumber: Number
         get() = bytes
 
-    override fun of(n: Int): ByteSize {
-        return ByteSize(n)
-    }
+    override fun of(n: Int): ByteSize = ByteSize(n)
 
-    override fun unaryMinus(): ByteSize {
-        return ByteSize(-bytes)
-    }
+    override fun unaryMinus(): ByteSize = ByteSize(-bytes)
 
     override fun div(m: ByteSize) = bytes / m.bytes
     override operator fun plus(m: ByteSize) = ByteSize(bytes + m.bytes)
@@ -225,20 +221,14 @@ class FormattedByteSize(
 ) {
     private val unitName = if (singleLetterUnit) unit.name.first() else unit.name
     private val space = if (includeSpace) ' '.toString() else ""
-    override fun toString(): String {
-        return if (unit == DecimalByteUnit.B) "$num$space$unitName"
-        else "${(num * 1000).roundToLong() / 1000}$space$unitName"
-    }
+    override fun toString(): String = if (unit == DecimalByteUnit.B) "$num$space$unitName"
+    else "${(num * 1000).roundToLong() / 1000}$space$unitName"
 }
 
 
 object BinaryByteSizeDoubleConverter : BiConverter<ByteSize, Double> {
-    override fun convertToB(a: ByteSize): Double {
-        return a.bytes.toDouble()
-    }
+    override fun convertToB(a: ByteSize): Double = a.bytes.toDouble()
 
-    override fun convertToA(b: Double): ByteSize {
-        return ByteSize(b.toLong())
-    }
+    override fun convertToA(b: Double): ByteSize = ByteSize(b.toLong())
 
 }

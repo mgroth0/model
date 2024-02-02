@@ -37,9 +37,7 @@ interface NumberWrapper<N : NumberWrapper<N>> : MathAndComparable<N> {
 //  val maximumPossibleValue: NumberWrapper<N>
 
     @Open
-    override fun floatingPointDiv(m: N): Double {
-        return (this.asNumber.toDouble() / m.asNumber.toDouble())
-    }
+    override fun floatingPointDiv(m: N): Double = (this.asNumber.toDouble() / m.asNumber.toDouble())
 
     operator fun unaryMinus(): N
 
@@ -64,9 +62,7 @@ interface DoubleWrapper<M : DoubleWrapper<M>> : MathAndComparable<M>, BasicInter
     }
 
     @Open
-    override fun compareTo(other: M): Int {
-        return asDouble.compareTo(other.asDouble)
-    }
+    override fun compareTo(other: M): Int = asDouble.compareTo(other.asDouble)
 
     fun fromDouble(d: Double): M
     val asDouble: Double
@@ -76,32 +72,22 @@ interface DoubleWrapper<M : DoubleWrapper<M>> : MathAndComparable<M>, BasicInter
         get() = asDouble
 
     @Open
-    override fun plus(m: M): M {
-        return fromDouble(asDouble + m.asDouble)
-    }
+    override fun plus(m: M): M = fromDouble(asDouble + m.asDouble)
 
     @Open
-    override fun minus(m: M): M {
-        return fromDouble(asDouble - m.asDouble)
-    }
+    override fun minus(m: M): M = fromDouble(asDouble - m.asDouble)
 
     @Open
     @ExcludeFromPython
-    override fun div(n: Number): M {
-        return fromDouble(asDouble / n.toDouble())
-    }
+    override fun div(n: Number): M = fromDouble(asDouble / n.toDouble())
 
     @Open
     @ExcludeFromPython
-    override fun times(n: Number): M {
-        return fromDouble(asDouble * n.toDouble())
-    }
+    override fun times(n: Number): M = fromDouble(asDouble * n.toDouble())
 
     @Open
     @ExcludeFromPython
-    override fun div(m: M): Double {
-        return asDouble / m.asDouble
-    }
+    override fun div(m: M): Double = asDouble / m.asDouble
 
     @Open
     override val isInfinite: Boolean
@@ -124,9 +110,7 @@ interface DoubleWrapper<M : DoubleWrapper<M>> : MathAndComparable<M>, BasicInter
         get() = fromDouble(abs(asDouble))
 
     @Open
-    override fun of(n: Int): M {
-        return fromDouble(n.toDouble())
-    }
+    override fun of(n: Int): M = fromDouble(n.toDouble())
 
     @Open
     override operator fun unaryMinus() = fromDouble(-asDouble)
@@ -135,20 +119,14 @@ interface DoubleWrapper<M : DoubleWrapper<M>> : MathAndComparable<M>, BasicInter
 }
 
 @ExcludeFromPython
-infix fun <M : DoubleWrapper<M>> M.minusFix(m: M): M {
-    return fromDouble(asDouble - m.asDouble)
-}
+infix fun <M : DoubleWrapper<M>> M.minusFix(m: M): M = fromDouble(asDouble - m.asDouble)
 
 @ExcludeFromPython
-infix fun <M : DoubleWrapper<M>> M.plusFix(m: M): M {
-    return fromDouble(asDouble + m.asDouble)
-}
+infix fun <M : DoubleWrapper<M>> M.plusFix(m: M): M = fromDouble(asDouble + m.asDouble)
 
 @JvmInline
 value class BasicDoubleWrapper(override val asDouble: Double) : DoubleWrapper<BasicDoubleWrapper> {
-    override fun fromDouble(d: Double): BasicDoubleWrapper {
-        return BasicDoubleWrapper(d)
-    }
+    override fun fromDouble(d: Double): BasicDoubleWrapper = BasicDoubleWrapper(d)
 
 
 }
@@ -156,9 +134,7 @@ value class BasicDoubleWrapper(override val asDouble: Double) : DoubleWrapper<Ba
 
 interface FloatWrapper<M : FloatWrapper<M>> : MathAndComparable<M>, NumberWrapper<M> {
     @Open
-    override fun compareTo(other: M): Int {
-        return asFloat.compareTo(other.asFloat)
-    }
+    override fun compareTo(other: M): Int = asFloat.compareTo(other.asFloat)
 
     fun fromFloat(d: Float): M
     val asFloat: Float
@@ -168,29 +144,19 @@ interface FloatWrapper<M : FloatWrapper<M>> : MathAndComparable<M>, NumberWrappe
         get() = asFloat
 
     @Open
-    override fun plus(m: M): M {
-        return fromFloat(asFloat + m.asFloat)
-    }
+    override fun plus(m: M): M = fromFloat(asFloat + m.asFloat)
 
     @Open
-    override fun minus(m: M): M {
-        return fromFloat(asFloat - m.asFloat)
-    }
+    override fun minus(m: M): M = fromFloat(asFloat - m.asFloat)
 
     @Open
-    override fun div(m: M): Float {
-        return asFloat / m.asFloat
-    }
+    override fun div(m: M): Float = asFloat / m.asFloat
 
     @Open
-    override fun div(n: Number): M {
-        return fromFloat(asFloat / n.toFloat())
-    }
+    override fun div(n: Number): M = fromFloat(asFloat / n.toFloat())
 
     @Open
-    override fun times(n: Number): M {
-        return fromFloat(asFloat * n.toFloat())
-    }
+    override fun times(n: Number): M = fromFloat(asFloat * n.toFloat())
 
     @Open
     override val isNaN: Boolean
@@ -213,9 +179,7 @@ interface FloatWrapper<M : FloatWrapper<M>> : MathAndComparable<M>, NumberWrappe
         get() = asFloat.isInfinite()
 
     @Open
-    override fun of(n: Int): M {
-        return fromFloat(n.toFloat())
-    }
+    override fun of(n: Int): M = fromFloat(n.toFloat())
 
     @Open
     override operator fun unaryMinus() = fromFloat(-asFloat)
@@ -224,9 +188,7 @@ interface FloatWrapper<M : FloatWrapper<M>> : MathAndComparable<M>, NumberWrappe
 
 @JvmInline
 value class BasicFloatWrapper(override val asFloat: Float) : FloatWrapper<BasicFloatWrapper> {
-    override fun fromFloat(d: Float): BasicFloatWrapper {
-        return BasicFloatWrapper(d)
-    }
+    override fun fromFloat(d: Float): BasicFloatWrapper = BasicFloatWrapper(d)
 
 
 }
@@ -243,42 +205,30 @@ operator fun <M : Mathable<M>, D : Mathable<D>> M.div(d: D) = Fraction(n = this,
 interface IntWrapper<M : IntWrapper<M>> : NumberWrapper<M> {
 
     @Open
-    override fun compareTo(other: M): Int {
-        return asInt.compareTo(other.asInt)
-    }
+    override fun compareTo(other: M): Int = asInt.compareTo(other.asInt)
 
     fun fromInt(d: Int): M
     val asInt: Int
 
     @Open
     @ExcludeFromPython
-    override fun plus(m: M): M {
-        return fromInt(asInt + m.asInt)
-    }
+    override fun plus(m: M): M = fromInt(asInt + m.asInt)
 
     @Open
     @ExcludeFromPython
-    override fun minus(m: M): M {
-        return fromInt(asInt - m.asInt)
-    }
+    override fun minus(m: M): M = fromInt(asInt - m.asInt)
 
     @Open
     @ExcludeFromPython
-    override fun div(n: Number): M {
-        return fromInt(asInt / n.toInt())
-    }
+    override fun div(n: Number): M = fromInt(asInt / n.toInt())
 
     @Open
     @ExcludeFromPython
-    override fun times(n: Number): M {
-        return fromInt(asInt * n.toInt())
-    }
+    override fun times(n: Number): M = fromInt(asInt * n.toInt())
 
     @Open
     @ExcludeFromPython
-    override fun div(m: M): Number {
-        return asInt / m.asInt
-    }
+    override fun div(m: M): Number = asInt / m.asInt
 
     @Open
     @ExcludeFromPython
@@ -307,9 +257,7 @@ interface IntWrapper<M : IntWrapper<M>> : NumberWrapper<M> {
         get() = asInt > 0
 
     @Open
-    override fun of(n: Int): M {
-        return fromInt(n)
-    }
+    override fun of(n: Int): M = fromInt(n)
 
     @Open
     override operator fun unaryMinus() = fromInt(-asInt)

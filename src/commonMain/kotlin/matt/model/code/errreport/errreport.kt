@@ -9,9 +9,7 @@ interface CommonThrowReport
 abstract class Report {
     abstract val text: String
     fun print() = println(text)
-    final override fun toString(): String {
-        return text
-    }
+    final override fun toString(): String = text
 }
 
 fun Throwable.thisAndAllCauses(): List<Throwable> {
@@ -39,7 +37,7 @@ fun Throwable.infoString(
         +"Throwable=$throwable"
         +"Class=${throwable::class.mostInformativeClassName}"
         +"String=$throwable"
-        +"Message=${message}"
+        +"Message=$message"
         +"STACK TRACE:"
         stackTraceToString().let {
             +(if (it.length > 100_000) it.take(

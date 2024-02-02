@@ -21,8 +21,8 @@ abstract class StoppableManualProceeding(
     final override val noun: String,
     exceptionHandler: ExceptionHandler = defaultExceptionHandler
 ) : ManualProceeding(
-    startButtonLabel = "Start $noun", exceptionHandler = exceptionHandler
-), StoppableProceeding {
+        startButtonLabel = "Start $noun", exceptionHandler = exceptionHandler
+    ), StoppableProceeding {
 
     final override val name = noun
 
@@ -39,24 +39,22 @@ abstract class StoppableManualProceeding(
         stopSwitch()
     }
 
-    private fun stopSwitch(): Thread? {
-        return when (status.value) {
-            RUNNING                 -> {
-                statusProp v STOPPING
-                messageProp v ""
-                namedThread(name = "Stop $name") {
-                    val result = exceptionHandler.with { stop() }
-                    messageProp v result.message
-                    statusProp v when (result) {
-                        Success              -> OFF
-                        is Failure           -> RUNNING
-                        is FailWithException -> error("this seems like a weird kotlin 2.0.0-Beta1 Switch Statement Compilation Internal Error...")
-                    }
+    private fun stopSwitch(): Thread? = when (status.value) {
+        RUNNING                 -> {
+            statusProp v STOPPING
+            messageProp v ""
+            namedThread(name = "Stop $name") {
+                val result = exceptionHandler.with { stop() }
+                messageProp v result.message
+                statusProp v when (result) {
+                    Success              -> OFF
+                    is Failure           -> RUNNING
+                    is FailWithException -> error("this seems like a weird kotlin 2.0.0-Beta1 Switch Statement Compilation Internal Error...")
                 }
             }
-
-            STARTING, STOPPING, OFF -> null
         }
+
+        STARTING, STOPPING, OFF -> null
     }
 
     final override fun stopAndJoin() {

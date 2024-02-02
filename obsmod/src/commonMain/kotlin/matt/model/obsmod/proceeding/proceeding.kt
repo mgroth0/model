@@ -9,32 +9,32 @@ import matt.obs.prop.ObsVal
 
 
 interface Proceeding: ProceedingIdea, Startable {
-  val name: String
-  val startButtonLabel: String
-  val canStart: ObsB
-  val status: ObsVal<Status>
-  val message: ObsVal<String>
-  val isOff: ObsB
+    val name: String
+    val startButtonLabel: String
+    val canStart: ObsB
+    val status: ObsVal<Status>
+    val message: ObsVal<String>
+    val isOff: ObsB
 
-  enum class Status {
-	OFF,
-	STARTING,
-	RUNNING,
-	STOPPING
-  }
+    enum class Status {
+        OFF,
+        STARTING,
+        RUNNING,
+        STOPPING
+    }
 }
 val Proceeding.isRunning get() = status.value == RUNNING
 
 fun Proceeding.afterStarted(op: ()->Unit) {
-  status.onChange {
-	if (it == RUNNING) op()
-  }
+    status.onChange {
+        if (it == RUNNING) op()
+    }
 }
 
 fun Proceeding.afterStopped(op: ()->Unit) {
-  status.onChange {
-	if (it == OFF) op()
-  }
+    status.onChange {
+        if (it == OFF) op()
+    }
 }
 
 

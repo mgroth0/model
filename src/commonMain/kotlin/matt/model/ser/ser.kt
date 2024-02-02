@@ -41,9 +41,7 @@ abstract class EncodedAsStringKSerializer<T> : KSerializer<T> {
     }
 
     final override val descriptor = DESCRIPTOR
-    final override fun deserialize(decoder: Decoder): T {
-        return decoder.decodeString().decode()
-    }
+    final override fun deserialize(decoder: Decoder): T = decoder.decodeString().decode()
 
     final override fun serialize(
         encoder: Encoder,
@@ -69,9 +67,7 @@ val ExternalSerializersModule by lazy {
 data object NullableIntSerializer : KSerializer<Int?> {
     override val descriptor = serialDescriptor<Int?>()
 
-    override fun deserialize(decoder: Decoder): Int? {
-        return decoder.decodeString().takeIf { it.isNotEmpty() }?.toInt()
-    }
+    override fun deserialize(decoder: Decoder): Int? = decoder.decodeString().takeIf { it.isNotEmpty() }?.toInt()
 
     override fun serialize(
         encoder: Encoder,
@@ -85,9 +81,7 @@ data object NullableIntSerializer : KSerializer<Int?> {
 data object NullableDoubleSerializer : KSerializer<Double?> {
     override val descriptor = serialDescriptor<Double?>()
 
-    override fun deserialize(decoder: Decoder): Double? {
-        return decoder.decodeString().takeIf { it.isNotEmpty() }?.toDouble()
-    }
+    override fun deserialize(decoder: Decoder): Double? = decoder.decodeString().takeIf { it.isNotEmpty() }?.toDouble()
 
     override fun serialize(
         encoder: Encoder,
@@ -102,9 +96,7 @@ data object NullableDoubleSerializer : KSerializer<Double?> {
 data object NullableStrictBooleanSerializer : KSerializer<Boolean?> {
     override val descriptor = serialDescriptor<Boolean?>()
 
-    override fun deserialize(decoder: Decoder): Boolean? {
-        return decoder.decodeString().takeIf { it.isNotEmpty() }?.toBooleanStrict()
-    }
+    override fun deserialize(decoder: Decoder): Boolean? = decoder.decodeString().takeIf { it.isNotEmpty() }?.toBooleanStrict()
 
     override fun serialize(
         encoder: Encoder,

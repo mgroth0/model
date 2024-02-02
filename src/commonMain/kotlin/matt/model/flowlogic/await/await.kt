@@ -8,16 +8,16 @@ import matt.model.code.successorfail.SuccessOrFail
 interface Awaitable<T>: ValueWrapperIdea
 
 interface ThreadAwaitable<T>: Awaitable<T> {
-  fun await(): T
+    fun await(): T
 }
 
 interface SuspendAwaitable<T>: Awaitable<T> {
-  suspend fun await(): T
+    suspend fun await(): T
 }
 
 
 interface Donable<T>: ValueWrapperIdea {
-  fun whenDone(c: Consume<T>)
+    fun whenDone(c: Consume<T>)
 }
 
 

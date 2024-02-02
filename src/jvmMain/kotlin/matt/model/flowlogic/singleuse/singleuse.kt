@@ -3,11 +3,11 @@ package matt.model.flowlogic.singleuse
 import matt.lang.assertions.require.requireNot
 
 class SingleUse() {
-
     private var used = false
 
     @Synchronized
     fun wasNotUsed() = !used
+
     @Synchronized
     fun wasUsed() = used
 
@@ -18,5 +18,4 @@ class SingleUse() {
         }
         used = true
     }
-
 }

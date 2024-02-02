@@ -107,9 +107,7 @@ class AbsMacFile(path: String) : AbsoluteSerializableFileBase(
 
     internal companion object Serializer : SerializableFileSerializer<AbsMacFile>() {
 
-        override fun String.decode(): AbsMacFile {
-            return AbsMacFile(this)
-        }
+        override fun String.decode(): AbsMacFile = AbsMacFile(this)
     }
 
     override fun fileInSameFs(path: String): SerializableFile = AbsMacFile(path)
@@ -155,9 +153,7 @@ class RelLinuxFile(path: String) : RelativeSerializableFileBase(
 
     internal companion object Serializer : SerializableFileSerializer<RelLinuxFile>() {
 
-        override fun String.decode(): RelLinuxFile {
-            return RelLinuxFile(this)
-        }
+        override fun String.decode(): RelLinuxFile = RelLinuxFile(this)
     }
 
     /*bad!!!!*/
@@ -206,9 +202,7 @@ class AbsLinuxFile(path: String) : AbsoluteSerializableFileBase(
 
 
     internal companion object Serializer : SerializableFileSerializer<AbsLinuxFile>() {
-        override fun String.decode(): AbsLinuxFile {
-            return AbsLinuxFile(this)
-        }
+        override fun String.decode(): AbsLinuxFile = AbsLinuxFile(this)
     }
 
     override fun fileInSameFs(path: String): SerializableFile = AbsLinuxFile(path)

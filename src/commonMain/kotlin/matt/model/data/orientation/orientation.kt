@@ -21,9 +21,7 @@ data class BinnedOrientation(
     val label = "$yawBin$pitchBin"
 
     override fun toString() = label
-    override fun compareTo(other: BinnedOrientation): Int {
-        return comparator.compare(this, other)
-    }
+    override fun compareTo(other: BinnedOrientation): Int = comparator.compare(this, other)
 }
 
 
@@ -33,17 +31,13 @@ value class YawBin(val angle: Int) : Comparable<YawBin> {
     constructor(angle: Degrees) : this(angle.value)
 
     private val num get() = angle.absoluteValue.prependZeros(ORIENTATION_BIN_NUM_DIGITS)
-    override fun toString(): String {
-        return when {
-            angle == 0 -> "C$num"
-            angle > 0  -> "R$num"
-            else       -> "L$num"
-        }
+    override fun toString(): String = when {
+        angle == 0 -> "C$num"
+        angle > 0  -> "R$num"
+        else       -> "L$num"
     }
 
-    override fun compareTo(other: YawBin): Int {
-        return angle.compareTo(other.angle)
-    }
+    override fun compareTo(other: YawBin): Int = angle.compareTo(other.angle)
 }
 
 @JvmInline
@@ -52,17 +46,13 @@ value class PitchBin(val angle: Int) : Comparable<PitchBin> {
     constructor(angle: Degrees) : this(angle.value)
 
     private val num get() = angle.absoluteValue.prependZeros(ORIENTATION_BIN_NUM_DIGITS)
-    override fun toString(): String {
-        return when {
-            angle == 0 -> "C$num"
-            angle > 0  -> "U$num"
-            else       -> "D$num"
-        }
+    override fun toString(): String = when {
+        angle == 0 -> "C$num"
+        angle > 0  -> "U$num"
+        else       -> "D$num"
     }
 
-    override fun compareTo(other: PitchBin): Int {
-        return angle.compareTo(other.angle)
-    }
+    override fun compareTo(other: PitchBin): Int = angle.compareTo(other.angle)
 }
 
 

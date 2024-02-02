@@ -20,12 +20,8 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
 
-
 class SimpleThreadLatch : SimpleLatch, ThreadAwaitable<Unit> {
-
-
     private var failure: LatchCancelled? = null
-
 
     fun cancel(e: Throwable? = null) {
         if (failure != null) {
@@ -43,24 +39,24 @@ class SimpleThreadLatch : SimpleLatch, ThreadAwaitable<Unit> {
         open()
     }
 
-
     private val latch = CountDownLatch(1)
+
     override fun await() {
         latch.await()
         failure?.go { throw it }
     }
 
-    fun await(timeout: Duration): LatchAwaitResult {
-        return if (latch.await(timeout.inWholeMilliseconds, MILLISECONDS)) {
-            failure?.go { throw it }
-            LATCH_OPENED
-        } else TIMEOUT
+    fun await(timeout: Duration): LatchAwaitResult = if (latch.await(timeout.inWholeMilliseconds, MILLISECONDS)) {
+        failure?.go { throw it }
+        LATCH_OPENED
+    } else {
+        TIMEOUT
     }
 
     fun awaitOrThrow(timeout: Duration) {
         when (await(timeout)) {
             LATCH_OPENED -> Unit
-            TIMEOUT      -> throw TimeoutException("timeout after waiting $timeout for $this")
+            TIMEOUT -> throw TimeoutException("timeout after waiting $timeout for $this")
         }
     }
 
@@ -71,11 +67,12 @@ class SimpleThreadLatch : SimpleLatch, ThreadAwaitable<Unit> {
 
     val isOpen get() = latch.count == 0L
     val isClosed get() = !isOpen
-    fun opened() = apply {
-        open()
-    }
-}
 
+    fun opened() =
+        apply {
+            open()
+        }
+}
 
 class OpResultHandler(private val failMessage: String) : ThreadAwaitable<SuccessOrFail> {
     private val result = LoadedValueSlot<SuccessOrFail>()
@@ -91,9 +88,7 @@ class OpResultHandler(private val failMessage: String) : ThreadAwaitable<Success
     }
 
     override fun await() = result.await()
-
 }
-
 
 class OpResultWithReturnValueHandler<R>(private val failMessage: String) : ThreadAwaitable<FailableReturn<R>> {
     private val result = LoadedValueSlot<FailableReturn<R>>()
@@ -108,8 +103,4 @@ class OpResultWithReturnValueHandler<R>(private val failMessage: String) : Threa
     }
 
     override fun await() = result.await()
-
 }
-
-
-

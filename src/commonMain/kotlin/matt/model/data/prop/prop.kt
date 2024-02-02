@@ -12,9 +12,7 @@ interface SimpleSuspendProperty<T : Any> {
     suspend fun getValue(
         thisRef: Any?,
         property: KProperty<*>
-    ): T? {
-        return get()
-    }
+    ): T? = get()
 
     @Open
     suspend fun setValue(
@@ -49,10 +47,8 @@ class ConvertedSuspendProperty<S : Any, T : Any>(
     private val prop: SimpleSuspendProperty<S>,
     private val converter: BiConverter<S, T>
 ) : SimpleSuspendProperty<T> {
-    override suspend fun get(): T? {
-        return prop.get()?.let {
-            converter.convertToB(it)
-        }
+    override suspend fun get(): T? = prop.get()?.let {
+        converter.convertToB(it)
     }
 
     override suspend fun set(value: T?) {

@@ -60,12 +60,10 @@ class BytesView(
     val size get() = length
 
 
-    fun extractByteArray(): ByteArray {
-        return if (offset == 0 && length == array.size) {
-            asByteArray()
-        } else {
-            array.copyOfRange(offset, offset + length)
-        }
+    fun extractByteArray(): ByteArray = if (offset == 0 && length == array.size) {
+        asByteArray()
+    } else {
+        array.copyOfRange(offset, offset + length)
     }
 
 }

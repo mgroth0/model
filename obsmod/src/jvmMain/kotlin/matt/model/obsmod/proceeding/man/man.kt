@@ -33,28 +33,26 @@ abstract class ManualProceeding(
     }
 
 
-    private fun startSwitch(): Thread? {
-        return when (status.value) {
-            OFF                         -> {
-                statusProp v STARTING/*messageProp v ""*/
-                val t = namedThread(name = "OFF Thread") {
-                    val startup = Startup()
-                    val result = exceptionHandler.with { startup.startup() }
-                    val realResult = startup.failure.takeIf { it is Fail } ?: result
-                    realResult.message.takeIf { it.isNotBlank() }?.go {
-                        messageProp v it
-                    }
-                    statusProp v when (realResult) {
-                        is Success           -> RUNNING
-                        is Failure           -> OFF
-                        is FailWithException -> error("this seems like a weird kotlin 2.0.0-Beta1 Switch Statement Compilation Internal Error...")
-                    }
+    private fun startSwitch(): Thread? = when (status.value) {
+        OFF                         -> {
+            statusProp v STARTING/*messageProp v ""*/
+            val t = namedThread(name = "OFF Thread") {
+                val startup = Startup()
+                val result = exceptionHandler.with { startup.startup() }
+                val realResult = startup.failure.takeIf { it is Fail } ?: result
+                realResult.message.takeIf { it.isNotBlank() }?.go {
+                    messageProp v it
                 }
-                t
+                statusProp v when (realResult) {
+                    is Success           -> RUNNING
+                    is Failure           -> OFF
+                    is FailWithException -> error("this seems like a weird kotlin 2.0.0-Beta1 Switch Statement Compilation Internal Error...")
+                }
             }
-
-            STARTING, STOPPING, RUNNING -> null
+            t
         }
+
+        STARTING, STOPPING, RUNNING -> null
     }
 
     final override fun startAndJoin() {

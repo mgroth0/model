@@ -1,6 +1,5 @@
 package matt.model.test
 
-
 import matt.model.code.delegate.ThrowingVetoable
 import matt.model.data.range.IntRangeSerializer
 import matt.model.data.xyz.Dim2D
@@ -23,19 +22,21 @@ class ModelTests {
     }
 
     @Test
-    fun instantiateClasses() = assertRunsInOneMinute {
-        ThrowingVetoable(1.0) { true }
-        Singleton()
-        SingleCall {}
-        SingleCallWithArg<Int> {}
-    }
+    fun instantiateClasses() =
+        assertRunsInOneMinute {
+            ThrowingVetoable(1.0) { true }
+            Singleton()
+            SingleCall {}
+            SingleCallWithArg<Int> {}
+        }
 
     @Test
-    fun initEnums() = assertRunsInOneMinute {
-        enumEntries<ControlFlow>()
-        enumEntries<ExitStatus>()
-        enumEntries<Dim2D>()
-    }
+    fun initEnums() =
+        assertRunsInOneMinute {
+            enumEntries<ControlFlow>()
+            enumEntries<ExitStatus>()
+            enumEntries<Dim2D>()
+        }
 
     @Test
     fun implementInterfaces() {

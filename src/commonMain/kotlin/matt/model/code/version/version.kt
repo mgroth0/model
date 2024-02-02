@@ -11,9 +11,7 @@ interface JavaVersion {
 @Serializable
 @JvmInline
 value class JavaMajorVersion(override val major: Int) : JavaVersion {
-    override fun toString(): String {
-        return major.toString()
-    }
+    override fun toString(): String = major.toString()
 }
 
 @Serializable
@@ -28,9 +26,7 @@ data class JavaPatchedVersion(
         patch = input.substringAfterLast(".").toInt()
     )
 
-    override fun toString(): String {
-        return "$major.$minor.$patch"
-    }
+    override fun toString(): String = "$major.$minor.$patch"
 }
 
 @Serializable
@@ -42,9 +38,7 @@ value class GradleVersion(val version: String) : Comparable<GradleVersion> {
         asGeneralVersion /*do general version checks*/
     }
 
-    override fun compareTo(other: GradleVersion): Int {
-        return asGeneralVersion.compareTo(other.asGeneralVersion)
-    }
+    override fun compareTo(other: GradleVersion): Int = asGeneralVersion.compareTo(other.asGeneralVersion)
 }
 
 @Serializable

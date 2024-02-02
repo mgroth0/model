@@ -89,9 +89,7 @@ value class GradleKSubProjectPath(override val path: String) : GradleProjectPath
 
     override val relToKNames get() = path.split(":").filter { it.isNotBlank() }.drop(1)
 
-    override fun toString(): String {
-        return path
-    }
+    override fun toString(): String = path
 }
 
 val RelativeToKMod.gradlePath get() = ":${SubRoots.k.name}:${relToKNames.joinToString(":")}"
@@ -155,9 +153,7 @@ value class GradleTaskPath(val path: String) : GradleTask, GradleTaskSelector {
             else                  -> GradleProjectPathImpl(path.substringBeforeLast(":"))
         }
 
-    override fun toString(): String {
-        return path
-    }
+    override fun toString(): String = path
 
     fun isTaskOfRootProject() = path.substringBeforeLast(":").isBlank()
 

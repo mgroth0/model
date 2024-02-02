@@ -38,9 +38,7 @@ data class Degrees(val value: Int): IntWrapper<Degrees> {
         val ZERO = Degrees(0)
     }
 
-    override fun fromInt(d: Int): Degrees {
-        return Degrees(d)
-    }
+    override fun fromInt(d: Int): Degrees = Degrees(d)
 
     override val asInt: Int
         get() = value
@@ -63,9 +61,7 @@ value class DegreesDouble(override val asDouble: Double) : DoubleWrapper<Degrees
         val ZERO = DegreesDouble(0.0)
     }
 
-    override fun fromDouble(d: Double): DegreesDouble {
-        return DegreesDouble(d)
-    }
+    override fun fromDouble(d: Double): DegreesDouble = DegreesDouble(d)
 
 
     override fun toString() = "$asDouble$SYMBOL"

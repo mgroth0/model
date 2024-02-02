@@ -12,13 +12,9 @@ value class MD5(val value: String) {
 }
 
 object MD5Converter : StringConverter<MD5> {
-    override fun toString(t: MD5): String {
-        return t.value
-    }
+    override fun toString(t: MD5): String = t.value
 
-    override fun fromString(s: String): MD5 {
-        return MD5(s)
-    }
+    override fun fromString(s: String): MD5 = MD5(s)
 
 }
 

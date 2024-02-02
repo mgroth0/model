@@ -109,7 +109,7 @@ data class JavaExecArgs(
     val otherArgs: List<JvmArg> = listOf(),
 
 
-    ) : CommonJvmArgs {
+) : CommonJvmArgs {
 
     companion object {
         val EMPTY by lazy {
@@ -160,7 +160,7 @@ data class JavaExecArgs(
        gives better stack traces with coroutines. Given the message above, I should have this enabled always.
 
        I tested it, and this definitely works! And the correct format is in fact "-Dkotlinx.coroutines.debug". "-Dkotlinx.coroutines.debug=true" may work, I have not tested it. But  "-Dkotlinx.coroutines.debug" definitely works.
-       * */
+             * */
 
             *If(kotlinxCoroutinesDebug).then(
                 @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
@@ -252,7 +252,7 @@ data class JavaExecArgs(
 
             *otherArgs.map { it.toRawArg() }.toTypedArray(),
 
-            )
+        )
     }
     val argsList by lazy {
         JvmArgsList(args)

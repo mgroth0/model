@@ -37,9 +37,7 @@ fun UniformRectSize<Int>.toUnitRectangle(): IntRect {
 
 
 @JvmName("contains1")
-operator fun UniformRectangle<UInt>.contains(other: UniformRectangle<UInt>): Boolean {
-    return other.x >= x && other.y >= y && other.endX <= endX && other.endY <= endY
-}
+operator fun UniformRectangle<UInt>.contains(other: UniformRectangle<UInt>): Boolean = other.x >= x && other.y >= y && other.endX <= endX && other.endY <= endY
 
 @JvmName("contains2")
 operator fun UniformRectangle<Int>.contains(other: UniformRectangle<Int>): Boolean {
@@ -199,7 +197,7 @@ data class Box(
 ) : UniformRectangle<Int> {
     init {
         check(height > 0 && width > 0) {
-            "width and height must be positive: x=${x},y=${y},width=${width},height=${height}"
+            "width and height must be positive: x=$x,y=$y,width=$width,height=$height"
         }
     }
 }
@@ -220,7 +218,7 @@ data class DoubleBox(
 ) : UniformRectangle<Double> {
     init {
         check(height > 0 && width > 0) {
-            "width and height must be positive: x=${x},y=${y},width=${width},height=${height}"
+            "width and height must be positive: x=$x,y=$y,width=$width,height=$height"
         }
     }
 }

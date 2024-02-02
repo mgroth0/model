@@ -19,16 +19,12 @@ value class Radians(val radians: Double): DoubleWrapper<Radians> {
     }
 
     fun roundToWholeDegrees() = toDegrees().round()
-    fun toDegrees(): DegreesDouble {
-        return DegreesDouble(radians * PI_UNDER_180)
-    }
+    fun toDegrees(): DegreesDouble = DegreesDouble(radians * PI_UNDER_180)
 
     fun cos() = kotlin.math.cos(radians)
     fun sin() = kotlin.math.sin(radians)
     fun tan() = kotlin.math.tan(radians)
-    override fun fromDouble(d: Double): Radians {
-        return Radians(d)
-    }
+    override fun fromDouble(d: Double): Radians = Radians(d)
 
     override val asDouble: Double
         get() = radians

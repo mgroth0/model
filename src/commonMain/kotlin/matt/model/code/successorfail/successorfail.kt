@@ -4,33 +4,33 @@ import matt.lang.idea.FailableIdea
 import matt.model.code.successorfail.FailableDSL.CodeFailException
 
 
-inline fun <R> mightFail(op: FailableDSL.() -> R): FailableReturn<R> {
-    return FailableDSL.runOrFail(op)
-}
+
+/*
+
+I should take inspiration from kotlin.Result. However, I can't completely rely on it. kotlin.Result, while idiomatic, is fundamentally based on carrying a reference to an exception. The nice thing about FailableReturn is that the Failure instances need not carry a reference to an exception, making them more lightweight. I should, however, take inspiration from the syntax/semantics/dsl/api of kotlin.Result as it is nice and concise.
+
+*/
+
+
+inline fun <R> mightFail(op: FailableDSL.() -> R): FailableReturn<R> = FailableDSL.runOrFail(op)
 
 
 object FailableDSL {
 
-    inline fun <R> runOrFail(op: FailableDSL.() -> R): FailableReturn<R> {
-        return try {
-            val r = op.invoke(this)
-            SuccessfulReturn(r)
-        } catch (f: FailException) {
-            when (f) {
-                is CodeFailException -> CodeFailedReturn(f)
-                is UserFailException -> f.userFailure
-            }
+    inline fun <R> runOrFail(op: FailableDSL.() -> R): FailableReturn<R> = try {
+        val r = op.invoke(this)
+        SuccessfulReturn(r)
+    } catch (f: FailException) {
+        when (f) {
+            is CodeFailException -> CodeFailedReturn(f)
+            is UserFailException -> f.userFailure
         }
     }
 
-    fun codeFail(message: String) {
-        throw CodeFailException(message = message)
-    }
+    fun codeFail(message: String): Unit = throw CodeFailException(message = message)
 
     fun userError(message: String): Nothing = userFail(message)
-    fun userFail(message: String): Nothing {
-        throw UserFailException(message = message)
-    }
+    fun userFail(message: String): Nothing = throw UserFailException(message = message)
 
     fun fail(failure: FailedReturn) {
         when (failure) {
@@ -89,7 +89,11 @@ class CodeFailedReturn(val throwable: Throwable) : FailedReturn {
 
 class UserFailedReturn(val message: String) : FailedReturn
 
+/*
 
+... Or you could just use kotlin.Result
+
+*/
 sealed interface SuccessOrFail : FailableIdea {
     val message: String
 }
@@ -121,3 +125,9 @@ class Found<T : Any>(val value: T) : FoundOrNot<T> {
 class NotFound(val message: String) : FoundOrNot<Nothing> {
     override fun toString() = "NotFound[message=\"$message\"]"
 }
+
+
+
+fun <T: Any> T?.failIfNull() = runCatching { this!! }
+
+

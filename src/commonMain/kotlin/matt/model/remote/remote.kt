@@ -1,7 +1,5 @@
 package matt.model.remote
 
-
-
 interface HostAndUser {
     val host: String
     val user: String
@@ -9,5 +7,5 @@ interface HostAndUser {
 
 data class SimpleHostAndUser(
     override val host: String,
-    override val user: String
+    override val user: String,
 ) : HostAndUser

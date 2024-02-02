@@ -23,7 +23,7 @@ private val dummy = 1.apply {
     
     AS OF KOTLIN 1.9.20 I cannot because of "Unsupported [This reflection API is not supported yet in JavaScript]"
             
-        """.trimIndent()
+            """.trimIndent()
         )
     }
 
@@ -58,13 +58,9 @@ interface Dsl
 
 
 abstract class SimpleData(private val identity: Any) {
-    final override fun equals(other: Any?): Boolean {
-        return other != null && other::class == this::class && (other as SimpleData).identity == identity
-    }
+    final override fun equals(other: Any?): Boolean = other != null && other::class == this::class && (other as SimpleData).identity == identity
 
-    final override fun hashCode(): Int {
-        return identity.hashCode()
-    }
+    final override fun hashCode(): Int = identity.hashCode()
 }
 
 

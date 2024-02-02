@@ -27,13 +27,9 @@ data class BasicPoint(
     override fun clone(
         newX: Number?,
         newY: Number?
-    ): Point {
-        return copy(x = newX?.toDouble() ?: x, y = newY?.toDouble() ?: y)
-    }
+    ): Point = copy(x = newX?.toDouble() ?: x, y = newY?.toDouble() ?: y)
 
-    override fun toBasicPoint(): BasicPoint {
-        return this
-    }
+    override fun toBasicPoint(): BasicPoint = this
 }
 
 
@@ -54,11 +50,9 @@ interface Point : PointIdea3<Any> {
     fun cloneWithNewDim(
         dim: Dim2D,
         newValue: Double
-    ): Point {
-        return when (dim) {
-            X -> clone(newX = newValue)
-            Y -> clone(newY = newValue)
-        }
+    ): Point = when (dim) {
+        X -> clone(newX = newValue)
+        Y -> clone(newY = newValue)
     }
 
 

@@ -3,8 +3,8 @@ package matt.model.redis
 import kotlinx.serialization.Serializable
 import kotlin.reflect.full.declaredMemberProperties
 
-/*FOR REDIS VERSION 7*/
-/*fields acquired by using `config get *` on my local redis 7 server*/
+// FOR REDIS VERSION 7
+// fields acquired by using `config get *` on my local redis 7 server
 @Serializable
 data class RedisConfigurationPatch(
     val `min-replicas-max-lag`: Int? = null,
@@ -203,18 +203,23 @@ data class RedisConfigurationPatch(
     fun nonNullProperties(): Map<String, String> {
         val props = RedisConfigurationPatch::class.declaredMemberProperties
 
-        val toRewrite = props.mapNotNull {
-            val v = it.get(this)
-            if (v != null) {
-                val k = it.name
-                val s = if (v is Boolean) {
-                    if (v) "yes" else "no"
-                } else v.toString()
-                k to s
-            } else null
-        }.toMap()
+        val toRewrite =
+            props.mapNotNull {
+                val v = it.get(this)
+                if (v != null) {
+                    val k = it.name
+                    val s =
+                        if (v is Boolean) {
+                            if (v) "yes" else "no"
+                        } else {
+                            v.toString()
+                        }
+                    k to s
+                } else {
+                    null
+                }
+            }.toMap()
 
         return toRewrite
     }
 }
-

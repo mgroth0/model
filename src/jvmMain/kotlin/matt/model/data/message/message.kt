@@ -175,3 +175,40 @@ class JsonMessage(val json: JsonElement) : InterAppMessage
 
 @Serializable
 class Freecomp(val path: String) : InterAppMessage
+
+@Serializable
+sealed interface FormatRequest {
+    val text: String
+}
+
+@Serializable
+class FormatKotlinRequest(
+    override val text: String,
+    val script: Boolean
+): FormatRequest
+
+
+@Serializable
+sealed interface FormatResult
+
+@Serializable
+sealed interface FormatSuccess: FormatResult
+
+@Serializable
+class FormatChange(
+    val text: String
+): FormatSuccess
+
+@Serializable
+data object NoChange: FormatSuccess
+
+@Serializable
+class FormatFailure(
+    val message: String,
+    val reportToPrintAndThrow: String?,
+): FormatResult
+
+
+
+
+
