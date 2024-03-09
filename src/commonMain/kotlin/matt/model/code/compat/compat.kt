@@ -4,7 +4,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-// I have at least 1 of these somewhere else. It's the perfect solution for quick serialization compatibility!!!
+/* I have at least 1 of these somewhere else. It's the perfect solution for quick serialization compatibility!!! */
 interface CompatibilityModel<T> {
     fun modernize(): T
 }
@@ -23,7 +23,7 @@ abstract class CompatSerializer<T, C : CompatibilityModel<T>> : KSerializer<T> {
 
     final override fun serialize(
         encoder: Encoder,
-        value: T,
+        value: T
     ) {
         encoder.encodeSerializableValue(pluginModernSer, value)
     }

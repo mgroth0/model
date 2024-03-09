@@ -44,13 +44,14 @@ class LazyGitHubKeys(
     override val apiOrgKey: String get() = apiOrgKeyProv.value
     override val ghaUsageAuditKey: String get() = ghaUsageAuditKeyProv.value
 
-    fun actualize() = ActualGitHubKeys(
-        readPackagesForever = readPackagesForever,
-        pushReleasesForever = pushReleasesForever,
-        apiKey = apiKey,
-        apiOrgKey = apiOrgKey,
-        ghaUsageAuditKey = ghaUsageAuditKey
-    )
+    fun actualize() =
+        ActualGitHubKeys(
+            readPackagesForever = readPackagesForever,
+            pushReleasesForever = pushReleasesForever,
+            apiKey = apiKey,
+            apiOrgKey = apiOrgKey,
+            ghaUsageAuditKey = ghaUsageAuditKey
+        )
 }
 
 data class EverNoteKeys(

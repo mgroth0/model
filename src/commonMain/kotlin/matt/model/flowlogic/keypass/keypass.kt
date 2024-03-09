@@ -1,8 +1,8 @@
 package matt.model.flowlogic.keypass
 
 import matt.lang.assertions.require.requireNot
-import matt.lang.sync.ReferenceMonitor
-import matt.lang.sync.inSync
+import matt.lang.sync.common.ReferenceMonitor
+import matt.lang.sync.common.inSync
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 
@@ -13,7 +13,6 @@ class KeyPass : ReferenceMonitor {
             inSync {
                 field = value
             }
-
         }
         get() {
             inSync {
@@ -40,15 +39,17 @@ class KeyPass : ReferenceMonitor {
         }
     }
 
-    fun hold() = inSync {
-        requireNot(isHeld)
-        isHeld = true
-    }
+    fun hold() =
+        inSync {
+            requireNot(isHeld)
+            isHeld = true
+        }
 
-    fun release() = inSync {
-        require(isHeld)
-        isHeld = false
-    }
+    fun release() =
+        inSync {
+            require(isHeld)
+            isHeld = false
+        }
 }
 
 interface Indicator {
@@ -69,19 +70,21 @@ class IndicatorController() : Indicator {
         isOn = false
     }
 
-    fun <R> with(op: () -> R): R = try {
-        on()
-        op()
-    } finally {
-        off()
-    }
+    fun <R> with(op: () -> R): R =
+        try {
+            on()
+            op()
+        } finally {
+            off()
+        }
 
-    suspend fun <R> suspendWith(op: suspend () -> R): R = try {
-        on()
-        op()
-    } finally {
-        off()
-    }
+    suspend fun <R> suspendWith(op: suspend () -> R): R =
+        try {
+            on()
+            op()
+        } finally {
+            off()
+        }
 }
 
 class Monitor

@@ -1,6 +1,9 @@
 package matt.model.code.version
 
 import kotlinx.serialization.Serializable
+import matt.lang.common.substringAfterFirst
+import matt.lang.common.substringBeforeFirst
+import matt.lang.common.substringBeforeSingular
 import matt.model.data.release.GeneralVersion
 import kotlin.jvm.JvmInline
 
@@ -21,8 +24,8 @@ data class JavaPatchedVersion(
     val patch: Int
 ) : JavaVersion {
     constructor(input: String) : this(
-        major = input.substringBefore(".").toInt(),
-        minor = input.substringAfter(".").substringBefore(".").toInt(),
+        major = input.substringBeforeFirst(".").toInt(),
+        minor = input.substringAfterFirst(".").substringBeforeSingular(".").toInt(),
         patch = input.substringAfterLast(".").toInt()
     )
 

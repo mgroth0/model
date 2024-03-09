@@ -2,7 +2,7 @@ package matt.model.obsmod.proceeding.man.thread
 
 import matt.async.thread.namedThread
 import matt.lang.assertions.require.requireEquals
-import matt.lang.go
+import matt.lang.common.go
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
@@ -17,17 +17,19 @@ abstract class ThreadProceeding(
     abstract fun run()
     private var thr: Thread? = null
     final override fun Startup.startup() {
-        thr = namedThread(name = "ThreadProceeding ($startButtonLabel)") {
-            val result = exceptionHandler.with(InterruptedException::class) {
-                run()
+        thr =
+            namedThread(name = "ThreadProceeding ($startButtonLabel)") {
+                val result =
+                    exceptionHandler.with(InterruptedException::class) {
+                        run()
+                    }
+                requireEquals(status.value, RUNNING)
+                result.message.takeIf { it.isNotBlank() }?.go {
+                    messageProp v it
+                }
+                statusProp.value = OFF
+                thr = null
             }
-            requireEquals(status.value, RUNNING)
-            result.message.takeIf { it.isNotBlank() }?.go {
-                messageProp v it
-            }
-            statusProp.value = OFF
-            thr = null
-        }
     }
 
     @Synchronized
@@ -37,5 +39,4 @@ abstract class ThreadProceeding(
             join()
         }
     }
-
 }

@@ -9,7 +9,6 @@ import matt.prim.byte.toLong
 import matt.prim.endian.MyByteOrder
 import matt.prim.int.toByteArray
 import matt.prim.long.toByteArray
-import matt.prim.pw.endian.java
 
 
 object IntRangeSerializer : KSerializer<IntRange> {
@@ -21,8 +20,8 @@ object IntRangeSerializer : KSerializer<IntRange> {
     override fun deserialize(decoder: Decoder): IntRange {
         val l = decoder.decodeLong()
         return IntRange(
-            (l shr 32).toByteArray(BYTE_ORDER.java).toList().subList(4, 8).toByteArray().toInt(BYTE_ORDER),
-            l.toByteArray(BYTE_ORDER.java).toList().subList(4, 8).toByteArray().toInt(BYTE_ORDER)
+            (l shr 32).toByteArray(BYTE_ORDER).toList().subList(4, 8).toByteArray().toInt(BYTE_ORDER),
+            l.toByteArray(BYTE_ORDER).toList().subList(4, 8).toByteArray().toInt(BYTE_ORDER)
         )
     }
 

@@ -21,7 +21,7 @@ class AbsolutePythonRequirement(
 @Serializable
 class ProjectPythonRequirement(
     val kSub: GradleKSubProjectPath,
-    override val modName: String,
+    override val modName: String
 ) : PythonRequirement
 
 

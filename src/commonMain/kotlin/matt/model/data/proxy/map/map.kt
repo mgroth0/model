@@ -1,8 +1,9 @@
 package matt.model.data.proxy.map
 
+import matt.lang.anno.JetBrainsYouTrackProject.KT
 import matt.lang.anno.Open
+import matt.lang.anno.YouTrackIssue
 import matt.lang.convert.BiConverter
-import matt.model.data.proxy.set.ProxyMutableSet
 import kotlin.collections.Map.Entry
 import kotlin.collections.MutableMap.MutableEntry
 
@@ -15,6 +16,12 @@ fun <SK : Any, SV : Any, TK : Any, TV : Any> Map<SK, SV>.proxy(
     valueConverter
 )
 
+@YouTrackIssue(KT, 65555)
+object ToUnCommentInK2Beta52
+/*
+
+// I ACTUALLY WANT TO KEEP THIS. IT IS JUST BROKEN IN K2-BETA4. See https://youtrack.jetbrains.com/issue/KT-65555/K2-must-override-spliterator-because-it-inherits-multiple-implementations-for-it. Should be fixed in Beta5.
+
 fun <SK : Any, SV : Any, TK : Any, TV : Any> MutableMap<SK, SV>.proxy(
     keyConverter: BiConverter<SK, TK>,
     valueConverter: BiConverter<SV, TV>
@@ -22,7 +29,7 @@ fun <SK : Any, SV : Any, TK : Any, TV : Any> MutableMap<SK, SV>.proxy(
     this,
     keyConverter,
     valueConverter
-)
+)*/
 
 class EntryImpl<K, V>(
     override val key: K,
@@ -56,47 +63,18 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
 
     @Open
     override val entries: Set<Entry<TK, TV>>
-        get() = run {
-            val theSet = innerMap.entries.map { e ->
-                object : Entry<TK, TV> {
-                    override val key = e.key.toTK()
-                    override val value = e.value.toTV()
-                }
-            }.toSet()
+        get() =
+            run {
+                val theSet =
+                    innerMap.entries.map { e ->
+                        object : Entry<TK, TV> {
+                            override val key = e.key.toTK()
+                            override val value = e.value.toTV()
+                        }
+                    }.toSet()
 
-            theSet
-
-//            object : Set<Entry<TK, TV>> {
-//
-//                override fun containsAll(elements: Collection<MutableEntry<TK, TV>>): Boolean {
-//                    TODO()
-//                }
-//
-//                override fun contains(element: MutableEntry<TK, TV>): Boolean {
-//                    TODO()
-//                }
-//
-//                override fun iterator(): MutableIterator<MutableEntry<TK, TV>> {
-//                    val itr = theSet.iterator()
-//                    return object : MutableIterator<MutableEntry<TK, TV>> {
-//                        override fun hasNext(): Boolean {
-//                            return itr.hasNext()
-//                        }
-//
-//                        override fun next(): MutableEntry<TK, TV> {
-//                            return itr.next()
-//                        }
-//
-//                        override fun remove() {
-//                            TODO()
-//                        }
-//
-//                    }
-//                }
-//
-//
-//            }
-        }
+                theSet
+            }
 
 
     @Open
@@ -118,10 +96,13 @@ open class ImmutableProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     final override fun containsValue(value: TV): Boolean = innerMap.containsValue(value.toSV())
 
     final override fun containsKey(key: TK): Boolean = innerMap.containsKey(key.toSK())
-
-
 }
 
+@YouTrackIssue(KT, 65555)
+object ToUnCommentInK2Beta5
+/*
+
+// I ACTUALLY WANT TO KEEP THIS. IT IS JUST BROKEN IN K2-BETA4. See https://youtrack.jetbrains.com/issue/KT-65555/K2-must-override-spliterator-because-it-inherits-multiple-implementations-for-it. Should be fixed in Beta5.
 
 class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     private val innerMap: MutableMap<SK, SV>,
@@ -131,31 +112,43 @@ class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
         innerMap,
         keyConverter,
         valueConverter
-    ), MutableMap<TK, TV> {
+    ),
+    MutableMap<TK, TV> {
 
     override val entries: MutableSet<MutableEntry<TK, TV>>
-        get() = ProxyMutableSet(
-            innerMap.entries,
-            object : BiConverter<MutableEntry<SK, SV>, MutableEntry<TK, TV>> {
+        get() =
+            ProxyMutableSet(
+                innerMap.entries,
+                object : BiConverter<MutableEntry<SK, SV>, MutableEntry<TK, TV>> {
 
-                override fun convertToB(a: MutableEntry<SK, SV>): MutableEntry<TK, TV> = FakeMutableEntry(
-                    EntryImpl(
-                        keyConverter.convertToB(a.key),
-                        valueConverter.convertToB(a.value)
-                    )
-                )
+                    override fun convertToB(a: MutableEntry<SK, SV>): MutableEntry<TK, TV> =
+                        FakeMutableEntry(
+                            EntryImpl(
+                                keyConverter.convertToB(a.key),
+                                valueConverter.convertToB(a.value)
+                            )
+                        )
 
-                override fun convertToA(b: MutableEntry<TK, TV>): MutableEntry<SK, SV> = FakeMutableEntry(
-                    EntryImpl(
-                        keyConverter.convertToA(b.key),
-                        valueConverter.convertToA(b.value)
-                    )
-                )
+                    override fun convertToA(b: MutableEntry<TK, TV>): MutableEntry<SK, SV> =
+                        FakeMutableEntry(
+                            EntryImpl(
+                                keyConverter.convertToA(b.key),
+                                valueConverter.convertToA(b.value)
+                            )
+                        )
+                }
+            )
 
-            }
-        )
 
-    /*.map { it.toFakeMutableEntry() }.toSet().toFakeMutableSet()*/
+
+
+
+
+// .map { it.toFakeMutableEntry() }.toSet().toFakeMutableSet()
+
+
+
+
 
     override val keys: MutableSet<TK>
         get() = TODO()
@@ -175,13 +168,12 @@ class ProxyMap<SK : Any, SV : Any, TK : Any, TV : Any>(
     override fun put(
         key: TK,
         value: TV
-    ): TV? = innerMap.put(
-        key.toSK(),
-        value.toSV()
-    )?.toTV()
-
-
-}
+    ): TV? =
+        innerMap.put(
+            key.toSK(),
+            value.toSV()
+        )?.toTV()
+}*/
 
 
 

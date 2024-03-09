@@ -8,7 +8,7 @@ class Retryable<V : Any>(private val op: () -> V?) : ReadOnlyProperty<Any?, V?> 
 
     override fun getValue(
         thisRef: Any?,
-        property: KProperty<*>,
+        property: KProperty<*>
     ): V? {
         if (value == null) {
             value = op()

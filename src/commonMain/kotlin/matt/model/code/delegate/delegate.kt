@@ -2,8 +2,8 @@ package matt.model.code.delegate
 
 import matt.lang.assertions.require.requireEquals
 import matt.lang.assertions.require.requireNot
-import matt.lang.sync.ReferenceMonitor
-import matt.lang.sync.inSync
+import matt.lang.sync.common.ReferenceMonitor
+import matt.lang.sync.common.inSync
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

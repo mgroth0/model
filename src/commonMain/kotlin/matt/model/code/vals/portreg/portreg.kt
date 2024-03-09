@@ -9,29 +9,31 @@ import matt.lang.delegation.valProp
 * - Not robustly portable to other machines
 * - Issues arise when running multiple applications using different versions of this library
 *
-* */
+*
 
 
-/*Relocate these to VariablePortRegistry*/
+Relocate these to VariablePortRegistry*/
 object PortRegistry {
     private var num = 65000 /*max port possible is 65_535*/
     private val aPort
-        get() = provider {
-            val i = num++
+        get() =
+            provider {
+                val i = num++
+                valProp {
+                    i
+                }
+            }
+
+    private fun portRange(size: Int) =
+        provider {
+            val startInclusive = num
+            num += size
+            val endExclusive = num
+            val range = startInclusive until endExclusive
             valProp {
-                i
+                range
             }
         }
-
-    private fun portRange(size: Int) = provider {
-        val startInclusive = num
-        num += size
-        val endExclusive = num
-        val range = startInclusive until endExclusive
-        valProp {
-            range
-        }
-    }
 
     val ide by aPort
     val task by aPort

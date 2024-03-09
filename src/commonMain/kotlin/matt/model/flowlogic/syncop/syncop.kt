@@ -2,8 +2,8 @@ package matt.model.flowlogic.syncop
 
 import matt.lang.anno.NullToReduceObjects
 import matt.lang.function.Op
-import matt.lang.sync.ReferenceMonitor
-import matt.lang.sync.inSync
+import matt.lang.sync.common.ReferenceMonitor
+import matt.lang.sync.common.inSync
 
 
 class AntiDeadlockSynchronizer : ReferenceMonitor {
@@ -29,12 +29,14 @@ class AntiDeadlockSynchronizer : ReferenceMonitor {
         }
     }
 
-    fun operateOnInternalDataNowOrLater(op: Op) = inSync {
-        if (currentWorkerCount > 0) {
-            (opQueue ?: mutableListOf<Op>().also {
-                opQueue = it
-            }) += op
-        } else op()
-    }
-
+    fun operateOnInternalDataNowOrLater(op: Op) =
+        inSync {
+            if (currentWorkerCount > 0) {
+                (
+                    opQueue ?: mutableListOf<Op>().also {
+                        opQueue = it
+                    }
+                ) += op
+            } else op()
+        }
 }

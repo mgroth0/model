@@ -19,39 +19,38 @@ class NotAConverter<T> : BiConverter<T, T> {
 }
 typealias IdentityConverter<T> = NotAConverter<T>
 
-fun <T> toStringConverter(op: (T) -> String) = object : StringConverter<T> {
-    override fun toString(t: T): String = op(t)
+fun <T> toStringConverter(op: (T) -> String) =
+    object : StringConverter<T> {
+        override fun toString(t: T): String = op(t)
 
-    override fun fromString(s: String): T {
-        TODO()
+        override fun fromString(s: String): T {
+            TODO()
+        }
     }
 
-}
+fun <T> fromStringConverter(op: (String) -> T) =
+    object : StringConverter<T> {
+        override fun toString(t: T): String {
+            TODO()
+        }
 
-fun <T> fromStringConverter(op: (String) -> T) = object : StringConverter<T> {
-    override fun toString(t: T): String {
-        TODO()
+        override fun fromString(s: String): T = op(s)
     }
-
-    override fun fromString(s: String): T = op(s)
-
-}
 
 
 object NullToBlankStringConverter : StringConverter<String?> {
     override fun toString(t: String?): String = t ?: ""
 
     override fun fromString(s: String): String = s
-
 }
 
 
-fun <A, B : Any> BiConverter<A, B>.asFailable() = object : FailableConverter<A, B> {
-    override fun convertToB(a: A): B = this@asFailable.convertToB(a)
+fun <A, B : Any> BiConverter<A, B>.asFailable() =
+    object : FailableConverter<A, B> {
+        override fun convertToB(a: A): B = this@asFailable.convertToB(a)
 
-    override fun convertToA(b: B): A = this@asFailable.convertToA(b)
-
-}
+        override fun convertToA(b: B): A = this@asFailable.convertToA(b)
+    }
 
 interface FailableConverter<A, B : Any> {
     fun convertToB(a: A): B?
@@ -77,23 +76,14 @@ interface BytesConverter<T> : BiConverter<ByteArray, T> {
     override fun convertToB(a: ByteArray) = fromBytes(a)
 }
 
-fun <X, Y, Z> BiConverter<X, Y>.then(converter: BiConverter<Y, Z>) = object : BiConverter<X, Z> {
-    override fun convertToB(a: X): Z = converter.convertToB(this@then.convertToB(a))
+fun <X, Y, Z> BiConverter<X, Y>.then(converter: BiConverter<Y, Z>) =
+    object : BiConverter<X, Z> {
+        override fun convertToB(a: X): Z = converter.convertToB(this@then.convertToB(a))
 
-    override fun convertToA(b: Z): X = this@then.convertToA(converter.convertToA(b))
-}
+        override fun convertToA(b: Z): X = this@then.convertToA(converter.convertToA(b))
+    }
 
 
-//fun <X, Y, Z> Converter<X, Y?>.thenIfNotNull(converter: Converter<Y, Z>) = object : Converter<X, Z?> {
-//    override fun convertToB(a: X): Z {
-//        return converter.convertToB(this@then.convertToB(a))
-//
-//    }
-//
-//    override fun convertToA(b: Z): X {
-//        return this@then.convertToA(converter.convertToA(b))
-//    }
-//}
 
 
 interface FailableStringConverter<T : Any> : FailableConverter<String, T> {
@@ -136,7 +126,6 @@ class IntBytesConverter(private val order: MyByteOrder) : BytesConverter<Int> {
     override fun toBytes(t: Int): ByteArray = t.toByteArray(order)
 
     override fun fromBytes(s: ByteArray): Int = s.toInt(order)
-
 }
 
 object MyNumberStringConverter : StringConverter<Number> {
@@ -156,22 +145,23 @@ object DoubleLongConverter : BiConverter<Double, Long> {
     override fun convertToB(a: Double): Long = a.toLong()
 
     override fun convertToA(b: Long): Double = b.toDouble()
-
 }
 
 
-val BYTE_SIZE_FORMATTER = object : StringConverter<Number> {
-    override fun toString(t: Number): String = ByteSize(t.toLong()).toString()
+val BYTE_SIZE_FORMATTER =
+    object : StringConverter<Number> {
+        override fun toString(t: Number): String = ByteSize(t.toLong()).toString()
 
-    override fun fromString(s: String) = TODO()
-}
+        override fun fromString(s: String) = TODO()
+    }
 
 
-val RATIO_TO_PERCENT_FORMATTER_NO_DECIMAL = object : StringConverter<Number> {
-    override fun toString(t: Number): String = (t.toDouble() * 100).toInt().toString() + "%"
+val RATIO_TO_PERCENT_FORMATTER_NO_DECIMAL =
+    object : StringConverter<Number> {
+        override fun toString(t: Number): String = (t.toDouble() * 100).toInt().toString() + "%"
 
-    override fun fromString(s: String) = TODO()
-}
+        override fun fromString(s: String) = TODO()
+    }
 
 
 class EnumNameStringConverter<T : Enum<T>>(val entries: EnumEntries<T>) : StringConverter<T> {

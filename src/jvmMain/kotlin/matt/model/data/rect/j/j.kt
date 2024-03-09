@@ -1,8 +1,9 @@
-@file:JvmName("RectJvmKt")
 
-package matt.model.data.rect
+package matt.model.data.rect.j
 
 
+import matt.model.data.rect.DoubleRectSize
+import matt.model.data.rect.UniformRect
 import java.awt.Rectangle
 import java.awt.geom.Dimension2D
 import java.awt.geom.Rectangle2D

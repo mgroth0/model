@@ -4,7 +4,7 @@ import matt.lang.function.SuspendOp
 import matt.lang.model.file.AnyFsFile
 import matt.lang.model.file.AnyResolvableFileOrUrl
 import matt.lang.model.file.betterURLIGuess
-import matt.model.ctx.ShowContext
+import matt.model.code.ctx.ShowContext
 
 
 object ShowInConsoleContext : ShowContext {

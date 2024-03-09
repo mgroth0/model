@@ -6,5 +6,5 @@ interface Command {
 
 enum class ExitStatus {
     CONTINUE,
-    EXIT,
+    EXIT
 }

@@ -30,14 +30,15 @@ class QuadSerializer<A, B, C, D>(
 
     override val descriptor: SerialDescriptor = serialDescriptor<JsonArray>()
 
-    override fun deserialize(decoder: Decoder): Quad<A, B, C, D> = decoder.decodeStructure(descriptor) {
-        Quad(
-            decodeSerializableElement(aSerializer.descriptor, 0, aSerializer),
-            decodeSerializableElement(bSerializer.descriptor, 1, bSerializer),
-            decodeSerializableElement(cSerializer.descriptor, 2, cSerializer),
-            decodeSerializableElement(dSerializer.descriptor, 3, dSerializer)
-        )
-    }
+    override fun deserialize(decoder: Decoder): Quad<A, B, C, D> =
+        decoder.decodeStructure(descriptor) {
+            Quad(
+                decodeSerializableElement(aSerializer.descriptor, 0, aSerializer),
+                decodeSerializableElement(bSerializer.descriptor, 1, bSerializer),
+                decodeSerializableElement(cSerializer.descriptor, 2, cSerializer),
+                decodeSerializableElement(dSerializer.descriptor, 3, dSerializer)
+            )
+        }
 
 
     override fun serialize(
@@ -63,7 +64,6 @@ data class Quad<out A, out B, out C, out D>(
 ) {
 
     override fun toString(): String = "($first, $second, $third, $fourth)"
-
 }
 
 
@@ -100,15 +100,16 @@ class QuintSerializer<A, B, C, D, E>(
 
     override val descriptor: SerialDescriptor = serialDescriptor<JsonArray>()
 
-    override fun deserialize(decoder: Decoder): Quint<A, B, C, D, E> = decoder.decodeStructure(descriptor) {
-        Quint(
-            decodeSerializableElement(aSerializer.descriptor, 0, aSerializer),
-            decodeSerializableElement(bSerializer.descriptor, 1, bSerializer),
-            decodeSerializableElement(cSerializer.descriptor, 2, cSerializer),
-            decodeSerializableElement(dSerializer.descriptor, 3, dSerializer),
-            decodeSerializableElement(eSerializer.descriptor, 4, eSerializer)
-        )
-    }
+    override fun deserialize(decoder: Decoder): Quint<A, B, C, D, E> =
+        decoder.decodeStructure(descriptor) {
+            Quint(
+                decodeSerializableElement(aSerializer.descriptor, 0, aSerializer),
+                decodeSerializableElement(bSerializer.descriptor, 1, bSerializer),
+                decodeSerializableElement(cSerializer.descriptor, 2, cSerializer),
+                decodeSerializableElement(dSerializer.descriptor, 3, dSerializer),
+                decodeSerializableElement(eSerializer.descriptor, 4, eSerializer)
+            )
+        }
 
 
     override fun serialize(
@@ -135,7 +136,6 @@ data class Quint<out A, out B, out C, out D, out E>(
 ) {
 
     override fun toString(): String = "($first, $second, $third, $fourth, $fifth)"
-
 }
 
 

@@ -16,7 +16,7 @@ class StackTraceDebugger() : DebuggerIdea {
                 
                 ${it.value.joinToString("\n") { it.toString() }}
                 ==================================================
-                """.trimMargin(),
+                """.trimMargin()
             )
         }
     }
@@ -24,7 +24,7 @@ class StackTraceDebugger() : DebuggerIdea {
 
 class ReportNothingDoneDebugger(
     private val threadProvider: ThreadProvider,
-    private val enable: Boolean = true,
+    private val enable: Boolean = true
 ) : DebuggerIdea {
     private var lastThingDoneTime = System.currentTimeMillis()
     var lastThingDone = "${ReportNothingDoneDebugger::class.simpleName} created"
@@ -39,7 +39,7 @@ class ReportNothingDoneDebugger(
         val refreshRate = d / 10.0
         start(
             refreshMillis = refreshRate.inWholeMilliseconds,
-            thresholdMillis = d.inWholeMilliseconds,
+            thresholdMillis = d.inWholeMilliseconds
         )
     }
 
@@ -48,10 +48,11 @@ class ReportNothingDoneDebugger(
 
     private fun start(
         refreshMillis: Long,
-        thresholdMillis: Long,
+        thresholdMillis: Long
     ) {
+        started = true
         if (enable) {
-            threadProvider.namedThread(isDaemon = true, name = "ReportNothingDoneDebugger start Thread") {
+            threadProvider.newThread(isDaemon = true, name = "ReportNothingDoneDebugger start Thread") {
                 while (true) {
                     if (System.currentTimeMillis() - lastThingDoneTime > thresholdMillis) {
                         freezeDetected = true

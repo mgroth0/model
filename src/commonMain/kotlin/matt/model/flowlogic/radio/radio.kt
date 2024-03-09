@@ -1,7 +1,8 @@
 package matt.model.flowlogic.radio
 
 import matt.lang.function.Consume
-import matt.lang.sync.ReferenceMonitor
+import matt.lang.sync.common.ReferenceMonitor
+import matt.lang.sync.common.inSync
 import matt.lang.sync.inSync
 
 
@@ -25,12 +26,13 @@ class Poster<T>: ReferenceMonitor {
 
     private val board = mutableListOf<T>()
 
-    fun post(t: T) = inSync {
-        board += t
-        listeners.forEach {
-            it(t)
+    fun post(t: T) =
+        inSync {
+            board += t
+            listeners.forEach {
+                it(t)
+            }
         }
-    }
 
     inner class PostBoard {
         fun onEach(op: (T) -> Unit) {
@@ -42,5 +44,4 @@ class Poster<T>: ReferenceMonitor {
     }
 
     fun onEach(op: (T) -> Unit) = PostBoard().onEach(op)
-
 }

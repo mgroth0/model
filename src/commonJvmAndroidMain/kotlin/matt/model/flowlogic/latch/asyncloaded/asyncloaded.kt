@@ -2,14 +2,14 @@ package matt.model.flowlogic.latch.asyncloaded
 
 import matt.lang.assertions.require.requireEquals
 import matt.lang.atomic.AtomicInt
-import matt.lang.go
+import matt.lang.common.go
 import matt.lang.model.value.Value
 import matt.lang.model.value.ValueWrapperIdea
 import matt.lang.service.ThreadProvider
-import matt.lang.weak.lazyWeak
+import matt.lang.weak.common.lazyWeak
 import matt.model.flowlogic.await.ThreadAwaitable
 import matt.model.flowlogic.latch.LatchCancelled
-import matt.model.flowlogic.latch.SimpleThreadLatch
+import matt.model.flowlogic.latch.j.SimpleThreadLatch
 import java.lang.Thread.State
 import java.lang.Thread.State.NEW
 
@@ -25,7 +25,7 @@ class DaemonLoadedValueOp<T>(
     }
 
     private val myThread by lazy {
-        threadProvider.namedThread(
+        threadProvider.newThread(
             name = "DaemonLoadedValue Thread ${threadIndex.getAndIncrement()}",
             start = false,
             isDaemon = true
@@ -47,7 +47,6 @@ class DaemonLoadedValueOp<T>(
     fun startLoadingIfNotStarted() {
         if (myThread.state == State.NEW) myThread.start()
     }
-
 }
 
 open class SyncLoadedValueOp<T>(private val op: () -> T) : Async<T>() {
@@ -129,7 +128,6 @@ abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
     protected var value: T? = null
         @Synchronized
         get() {
-//            println("getting value from ${this}, failure=${failure}, field=${field}")
             failure?.go { throw it }
             return field
         }
@@ -171,7 +169,6 @@ abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
             }
         }
     }
-
 }
 
 /*is this just a future? or a modified lazy?*/
@@ -191,5 +188,4 @@ abstract class AsyncBase<T> : ThreadAwaitable<T> {
 
     protected var latch: SimpleThreadLatch? = SimpleThreadLatch()
         private set
-
 }

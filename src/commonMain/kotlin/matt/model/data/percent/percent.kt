@@ -16,8 +16,6 @@ value class Percent(val percent: Double) : PercentIdea, DoubleWrapper<Percent> {
 
     override val asDouble: Double
         get() = percent
-
-
 }
 
 
@@ -27,5 +25,4 @@ object PercentDoubleConverter : BiConverter<Percent, Double> {
     override fun convertToB(a: Percent): Double = a.asDouble
 
     override fun convertToA(b: Double): Percent = Percent(b)
-
 }

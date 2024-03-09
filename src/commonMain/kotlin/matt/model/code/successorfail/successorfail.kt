@@ -1,5 +1,6 @@
 package matt.model.code.successorfail
 
+import kotlinx.serialization.Serializable
 import matt.lang.idea.FailableIdea
 import matt.model.code.successorfail.FailableDSL.CodeFailException
 
@@ -17,15 +18,16 @@ inline fun <R> mightFail(op: FailableDSL.() -> R): FailableReturn<R> = FailableD
 
 object FailableDSL {
 
-    inline fun <R> runOrFail(op: FailableDSL.() -> R): FailableReturn<R> = try {
-        val r = op.invoke(this)
-        SuccessfulReturn(r)
-    } catch (f: FailException) {
-        when (f) {
-            is CodeFailException -> CodeFailedReturn(f)
-            is UserFailException -> f.userFailure
+    inline fun <R> runOrFail(op: FailableDSL.() -> R): FailableReturn<R> =
+        try {
+            val r = op.invoke(this)
+            SuccessfulReturn(r)
+        } catch (f: FailException) {
+            when (f) {
+                is CodeFailException -> CodeFailedReturn(f)
+                is UserFailException -> f.userFailure
+            }
         }
-    }
 
     fun codeFail(message: String): Unit = throw CodeFailException(message = message)
 
@@ -54,10 +56,9 @@ object FailableDSL {
         cause: Throwable? = null
     ) : FailException(message, cause) {
         constructor(
-            message: String,
+            message: String
         ) : this(message = message, cause = null)
     }
-
 }
 
 sealed interface FailableReturn<out T> : FailableIdea
@@ -66,7 +67,7 @@ fun <T> FailableReturn<T>.requireSuccess() = (this as SuccessfulReturn<T>).value
 
 inline fun <T> FailableReturn<T>.resultOr(op: (FailedReturn) -> Unit): T {
     when (this) {
-        is SuccessfulReturn -> return this.value
+        is SuccessfulReturn -> return value
         is FailedReturn     -> {
             op(this)
             error("was supposed to return above")
@@ -77,10 +78,11 @@ inline fun <T> FailableReturn<T>.resultOr(op: (FailedReturn) -> Unit): T {
 
 class SuccessfulReturn<T>(val value: T) : FailableReturn<T>
 
-fun <T, R> FailableReturn<T>.mapSuccess(op: (T) -> R) = when (this) {
-    is FailedReturn     -> this
-    is SuccessfulReturn -> SuccessfulReturn(op(value))
-}
+fun <T, R> FailableReturn<T>.mapSuccess(op: (T) -> R) =
+    when (this) {
+        is FailedReturn     -> this
+        is SuccessfulReturn -> SuccessfulReturn(op(value))
+    }
 
 sealed interface FailedReturn : FailableReturn<Nothing>
 class CodeFailedReturn(val throwable: Throwable) : FailedReturn {
@@ -94,19 +96,27 @@ class UserFailedReturn(val message: String) : FailedReturn
 ... Or you could just use kotlin.Result
 
 */
+
 sealed interface SuccessOrFail : FailableIdea {
     val message: String
 }
 
 sealed interface SucceedOrFailWithException : SuccessOrFail
 
-data object Success : SucceedOrFailWithException {
+@Serializable
+sealed interface SimpleSuccessOrFail: FailableIdea {
+    val message: String
+}
+
+@Serializable
+data object Success : SucceedOrFailWithException, SimpleSuccessOrFail {
     override val message = ""
 }
 
 interface Failure : SuccessOrFail
 
-class Fail(override val message: String) : Failure {
+@Serializable
+class Fail(override val message: String) : Failure, SimpleSuccessOrFail {
     override fun toString() = "Fail[message=\"$message\"]"
 }
 

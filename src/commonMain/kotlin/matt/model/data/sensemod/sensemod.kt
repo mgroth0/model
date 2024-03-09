@@ -47,7 +47,6 @@ data class Degrees(val value: Int): IntWrapper<Degrees> {
 
     @ExcludeFromPython
     fun toRadians() = Radians.fromDegrees(value)
-
 }
 
 val Double.degrees get() = DegreesDouble(this)

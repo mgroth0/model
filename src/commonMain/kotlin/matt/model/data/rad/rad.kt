@@ -5,6 +5,9 @@ import matt.model.data.mathable.DoubleWrapper
 import matt.model.data.sensemod.DegreesDouble
 import kotlin.jvm.JvmInline
 import kotlin.math.PI
+import kotlin.math.cos as kotlinCos
+import kotlin.math.sin as kotlinSin
+import kotlin.math.tan as kotlinTan
 
 val Double.radians get() = Radians(this)
 
@@ -21,9 +24,9 @@ value class Radians(val radians: Double): DoubleWrapper<Radians> {
     fun roundToWholeDegrees() = toDegrees().round()
     fun toDegrees(): DegreesDouble = DegreesDouble(radians * PI_UNDER_180)
 
-    fun cos() = kotlin.math.cos(radians)
-    fun sin() = kotlin.math.sin(radians)
-    fun tan() = kotlin.math.tan(radians)
+    fun cos() = kotlinCos(radians)
+    fun sin() = kotlinSin(radians)
+    fun tan() = kotlinTan(radians)
     override fun fromDouble(d: Double): Radians = Radians(d)
 
     override val asDouble: Double
@@ -31,5 +34,5 @@ value class Radians(val radians: Double): DoubleWrapper<Radians> {
 }
 
 
-fun degreesToRadians(degrees: Double) = degrees * kotlin.math.PI / 180
-fun degreesToRadians(degrees: Int) = degrees.toDouble() * kotlin.math.PI / 180
+fun degreesToRadians(degrees: Double) = degrees * PI / 180
+fun degreesToRadians(degrees: Int) = degrees.toDouble() * PI / 180

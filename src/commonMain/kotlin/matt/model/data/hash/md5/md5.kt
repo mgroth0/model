@@ -15,7 +15,6 @@ object MD5Converter : StringConverter<MD5> {
     override fun toString(t: MD5): String = t.value
 
     override fun fromString(s: String): MD5 = MD5(s)
-
 }
 
 

@@ -1,7 +1,7 @@
 package matt.model.data.xyz
 
 import kotlinx.serialization.Serializable
-import matt.lang.NOT_IMPLEMENTED
+import matt.lang.common.NOT_IMPLEMENTED
 import matt.lang.jpy.ExcludeFromPython
 import matt.lang.jpy.PyClass
 import matt.model.data.mathable.Mathable
@@ -11,7 +11,7 @@ import kotlin.math.absoluteValue
 fun xyz(
     x: Number = 0,
     y: Number = 0,
-    z: Number = 0,
+    z: Number = 0
 ) = Xyz(x = x.toDouble(), y = y.toDouble(), z = z.toDouble())
 
 @Serializable
@@ -19,11 +19,8 @@ fun xyz(
 data class Xyz(
     override val x: Double,
     override val y: Double,
-    override val z: Double,
+    override val z: Double
 ) : Mathable<Xyz>, XYZBase<Double> {
-    //    init {
-//        println("created Xyz: $this")
-//    }
 
     companion object {
         val ZERO = Xyz(0.0, 0.0, 0.0)
@@ -70,13 +67,13 @@ enum class Dim3D { X, Y, Z }
 fun <D> genericXyz(
     x: D? = null,
     y: D? = null,
-    z: D? = null,
+    z: D? = null
 ) = GenericXYZ(x = x, y = y, z = z)
 
 data class GenericXYZ<D>(
     override val x: D,
     override val y: D,
-    override val z: D,
+    override val z: D
 ) : XYZBase<D>
 
 fun <D, R> GenericXYZ<D>.map(op: (D) -> R) = GenericXYZ(x = op(x), y = op(y), z = op(z))
@@ -97,22 +94,23 @@ fun <D> XYZBase<D>.toList() = listOf(x, y, z)
 
 private const val DEFAULT_TRIM_NULL_END = false
 
-fun <D> XYZBase<D>.withCommas(trimNullEnd: Boolean = DEFAULT_TRIM_NULL_END): String = when {
-    trimNullEnd && z == null ->
-        when {
-            y == null ->
-                when {
-                    x == null -> error("all are null. Is this really valid?")
-                    else -> listOf(x)
-                }
+fun <D> XYZBase<D>.withCommas(trimNullEnd: Boolean = DEFAULT_TRIM_NULL_END): String =
+    when {
+        trimNullEnd && z == null ->
+            when {
+                y == null ->
+                    when {
+                        x == null -> error("all are null. Is this really valid?")
+                        else -> listOf(x)
+                    }
 
-            else -> listOf(x, y)
-        }
+                else -> listOf(x, y)
+            }
 
-    else -> toList()
-}.joinWithCommas()
+        else -> toList()
+    }.joinWithCommas()
 
 fun <D> XYZBase<D>.asTuple(
     trimNullEnd: Boolean = DEFAULT_TRIM_NULL_END,
-    trailingComma: Boolean = true,
+    trailingComma: Boolean = true
 ): String = "(${withCommas(trimNullEnd = trimNullEnd)}${if (trailingComma) "," else ""})"

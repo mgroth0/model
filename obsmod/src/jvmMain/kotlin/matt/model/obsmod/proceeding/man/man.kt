@@ -2,7 +2,7 @@ package matt.model.obsmod.proceeding.man
 
 import matt.async.thread.namedThread
 import matt.lang.anno.Open
-import matt.lang.go
+import matt.lang.common.go
 import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
 import matt.model.code.successorfail.Fail
@@ -16,7 +16,7 @@ import matt.model.obsmod.proceeding.Proceeding.Status.STOPPING
 import matt.model.obsmod.proceeding.ProceedingImpl
 import matt.model.obsmod.proceeding.err.with
 import matt.obs.bindings.bool.ObsB
-import matt.obs.prop.VarProp
+import matt.obs.prop.writable.VarProp
 
 abstract class ManualProceeding(
     final override val startButtonLabel: String,
@@ -33,35 +33,39 @@ abstract class ManualProceeding(
     }
 
 
-    private fun startSwitch(): Thread? = when (status.value) {
-        OFF                         -> {
-            statusProp v STARTING/*messageProp v ""*/
-            val t = namedThread(name = "OFF Thread") {
-                val startup = Startup()
-                val result = exceptionHandler.with { startup.startup() }
-                val realResult = startup.failure.takeIf { it is Fail } ?: result
-                realResult.message.takeIf { it.isNotBlank() }?.go {
-                    messageProp v it
-                }
-                statusProp v when (realResult) {
-                    is Success           -> RUNNING
-                    is Failure           -> OFF
-                    is FailWithException -> error("this seems like a weird kotlin 2.0.0-Beta1 Switch Statement Compilation Internal Error...")
-                }
+    private fun startSwitch(): Thread? =
+        when (status.value) {
+            OFF                         -> {
+                statusProp v STARTING/*messageProp v ""*/
+                val t =
+                    namedThread(name = "OFF Thread") {
+                        val startup = Startup()
+                        val result = exceptionHandler.with { startup.startup() }
+                        val realResult = startup.failure.takeIf { it is Fail } ?: result
+                        realResult.message.takeIf { it.isNotBlank() }?.go {
+                            messageProp v it
+                        }
+                        statusProp v
+                            when (realResult) {
+                                is Success           -> RUNNING
+                                is Failure           -> OFF
+                                is FailWithException -> error("this seems like a weird kotlin 2.0.0-Beta1 Switch Statement Compilation Internal Error...")
+                            }
+                    }
+                t
             }
-            t
-        }
 
-        STARTING, STOPPING, RUNNING -> null
-    }
+            STARTING, STOPPING, RUNNING -> null
+        }
 
     final override fun startAndJoin() {
-        val startThread = synchronized(this) {
-            require(canStart.value) {
-                "$this cannot start"
+        val startThread =
+            synchronized(this) {
+                require(canStart.value) {
+                    "$this cannot start"
+                }
+                startSwitch()
             }
-            startSwitch()
-        }
         startThread?.join()
     }
 
@@ -77,7 +81,6 @@ abstract class ManualProceeding(
     }
 
     final override fun reflectingToStringProps() = setOf(::name)
-
 }
 
 

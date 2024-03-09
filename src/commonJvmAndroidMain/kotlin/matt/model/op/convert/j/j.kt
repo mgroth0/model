@@ -1,6 +1,5 @@
-@file:JvmName("ConvertJvmKt")
 /*if I use classes only, don't need JvmName?*/
-package matt.model.op.convert
+package matt.model.op.convert.j
 
 import matt.prim.base64.decodeFromBase64
 import matt.prim.base64.decodeFromURLBase64
@@ -15,11 +14,12 @@ import kotlin.reflect.jvm.isAccessible
 
 
 @Suppress("unused")
-val RATIO_TO_PERCENT_FORMATTER = object : StringConverter<Number> {
-    override fun toString(t: Number): String = "%.3f".format(t.toDouble() * 100) + "%"
+val RATIO_TO_PERCENT_FORMATTER =
+    object : StringConverter<Number> {
+        override fun toString(t: Number): String = "%.3f".format(t.toDouble() * 100) + "%"
 
-    override fun fromString(s: String) = TODO()
-}
+        override fun fromString(s: String) = TODO()
+    }
 
 
 object Base64StringConverter : StringConverter<ByteArray> {
@@ -51,5 +51,4 @@ class StringValueObjectConverter<T : Any>(private val cls: KClass<T>) : StringCo
     override fun toString(t: T): String = theProp.getter.call(t) as String
 
     override fun fromString(s: String): T = constructor.call(s)
-
 }

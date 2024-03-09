@@ -1,7 +1,7 @@
 package matt.model.obj.raster
 
-import matt.image.ImmutableRaster
-import matt.image.Png
+import matt.image.common.ImmutableRaster
+import matt.image.common.Png
 import matt.model.data.rect.IntRectSize
 
 interface Rasterizable {

@@ -35,25 +35,28 @@ data class BasicPoint(
 
 interface Point : PointIdea3<Any> {
     @Open
-    fun getDim(dim: Dim2D) = when (dim) {
-        X -> x
-        Y -> y
-    }
+    fun getDim(dim: Dim2D) =
+        when (dim) {
+            X -> x
+            Y -> y
+        }
 
     @Open
-    fun getDimDouble(dim: Dim2D) = when (dim) {
-        X -> xDouble
-        Y -> yDouble
-    }
+    fun getDimDouble(dim: Dim2D) =
+        when (dim) {
+            X -> xDouble
+            Y -> yDouble
+        }
 
     @Open
     fun cloneWithNewDim(
         dim: Dim2D,
         newValue: Double
-    ): Point = when (dim) {
-        X -> clone(newX = newValue)
-        Y -> clone(newY = newValue)
-    }
+    ): Point =
+        when (dim) {
+            X -> clone(newX = newValue)
+            Y -> clone(newY = newValue)
+        }
 
 
     override val x: Any
@@ -62,17 +65,6 @@ interface Point : PointIdea3<Any> {
     val xDouble: Double
     val yDouble: Double
 
-    //  val xDouble
-    //	get() = when (this) {
-    //
-    //	}
-    //
-    //  val yDouble
-    //	get() = when (this) {
-    //	  is JsonPoint  -> y
-    //	  is matt.math.point.matt.math.point.BasicPoint -> y
-    //	  is matt.math.point.APoint     -> y.toDouble()
-    //	}
 
 
     fun clone(

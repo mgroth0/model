@@ -1,6 +1,9 @@
-package matt.model.flowlogic.promise
+package matt.model.flowlogic.promise.j
 
-import matt.model.flowlogic.latch.SimpleThreadLatch
+import matt.model.flowlogic.latch.j.SimpleThreadLatch
+import matt.model.flowlogic.promise.AwaitableCommitment
+import matt.model.flowlogic.promise.CommitmentMaker
+import matt.model.flowlogic.promise.MadeAwaitableCommitment
 
 fun commit(make: AwaitableCommitmentMakerImpl.() -> Unit): AwaitableCommitment {
     val commitment = AwaitableCommitmentMakerImpl()

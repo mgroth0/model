@@ -8,10 +8,16 @@ import kotlinx.serialization.encoding.Encoder
 import matt.model.data.mathable.DoubleWrapper
 
 
-/*I CANT USE VALUE CLASSES*/
-/*https://youtrack.jetbrains.com/issue/KT-54513/java.lang.NoSuchMethodError-with-value-class-implementing-an-interface*/
-/*10 months later... changing this back from data to value... does it work now?*/
-/*
+/*I CANT USE VALUE CLASSES
+
+
+https://youtrack.jetbrains.com/issue/KT-54513/java.lang.NoSuchMethodError-with-value-class-implementing-an-interface
+
+
+10 months later... changing this back from data to value... does it work now?
+
+
+
 
 11 months after creating of original issue... This exact issue came up again in compnet (of course) with a NoSuchMethodError
 Original I thought it was a classloader/plugin issue. But of course it was just this again.
@@ -38,7 +44,6 @@ private object TempUnitlessSerializerToMakeItCompatibleWithFutureInlineVersion :
     ) {
         encoder.encodeDouble(value.asDouble)
     }
-
 }
 
 val Double.unitless get() = UnitLess(this)

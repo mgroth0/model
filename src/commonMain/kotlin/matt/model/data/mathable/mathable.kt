@@ -19,7 +19,6 @@ interface Mathable<M : Mathable<M>> {
 
     @ExcludeFromPython
     infix fun floatingPointDiv(m: M): Double
-
 }
 
 
@@ -33,14 +32,11 @@ interface NumberWrapper<N : NumberWrapper<N>> : MathAndComparable<N> {
     val isNaN: Boolean
     val isInfinite: Boolean
     fun of(n: Int): N
-//  val minimumPossibleValue: NumberWrapper<N>
-//  val maximumPossibleValue: NumberWrapper<N>
 
     @Open
-    override fun floatingPointDiv(m: N): Double = (this.asNumber.toDouble() / m.asNumber.toDouble())
+    override fun floatingPointDiv(m: N): Double = (asNumber.toDouble() / m.asNumber.toDouble())
 
     operator fun unaryMinus(): N
-
 }
 
 val NumberWrapper<*>.isNegative get() = !(isPositive || isZero || isNaN)
@@ -57,7 +53,7 @@ interface DoubleWrapper<M : DoubleWrapper<M>> : MathAndComparable<M>, BasicInter
 
         @Suppress("UNCHECKED_CAST") if (t <= 0.0) return this as M
         @Suppress("UNCHECKED_CAST") return if (t >= 1.0) (endValue as M) else fromDouble(
-            asDouble + ((endValue as DoubleWrapper<M>).asDouble - asDouble) * t,
+            asDouble + ((endValue as DoubleWrapper<M>).asDouble - asDouble) * t
         )
     }
 
@@ -114,8 +110,6 @@ interface DoubleWrapper<M : DoubleWrapper<M>> : MathAndComparable<M>, BasicInter
 
     @Open
     override operator fun unaryMinus() = fromDouble(-asDouble)
-
-
 }
 
 @ExcludeFromPython
@@ -127,8 +121,6 @@ infix fun <M : DoubleWrapper<M>> M.plusFix(m: M): M = fromDouble(asDouble + m.as
 @JvmInline
 value class BasicDoubleWrapper(override val asDouble: Double) : DoubleWrapper<BasicDoubleWrapper> {
     override fun fromDouble(d: Double): BasicDoubleWrapper = BasicDoubleWrapper(d)
-
-
 }
 
 
@@ -183,14 +175,11 @@ interface FloatWrapper<M : FloatWrapper<M>> : MathAndComparable<M>, NumberWrappe
 
     @Open
     override operator fun unaryMinus() = fromFloat(-asFloat)
-
 }
 
 @JvmInline
 value class BasicFloatWrapper(override val asFloat: Float) : FloatWrapper<BasicFloatWrapper> {
     override fun fromFloat(d: Float): BasicFloatWrapper = BasicFloatWrapper(d)
-
-
 }
 
 
@@ -261,5 +250,4 @@ interface IntWrapper<M : IntWrapper<M>> : NumberWrapper<M> {
 
     @Open
     override operator fun unaryMinus() = fromInt(-asInt)
-
 }

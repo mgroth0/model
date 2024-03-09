@@ -23,14 +23,14 @@ abstract class MyAbstractDecoder : Decoder {
             override fun decodeElementIndex(descriptor: SerialDescriptor) = error("the outer implementation should be used")
         }
 
-    // Note: AbstractDecoder implementation is to return itself
+    /* Note: AbstractDecoder implementation is to return itself */
     abstract override fun beginStructure(descriptor: SerialDescriptor): MyAbstractCompositeDecoder
 
     final override fun decodeByte(): Byte = abstractDecoderDelegate.decodeByte()
 
     final override fun decodeEnum(enumDescriptor: SerialDescriptor): Int = abstractDecoderDelegate.decodeEnum(enumDescriptor)
 
-    // this is the exact AbstractDecoder implementation
+    /* this is the exact AbstractDecoder implementation */
     final override fun decodeInline(descriptor: SerialDescriptor): Decoder = this
 
     @ExperimentalSerializationApi
@@ -39,10 +39,10 @@ abstract class MyAbstractDecoder : Decoder {
     @ExperimentalSerializationApi
     final override fun decodeNull(): Nothing? = abstractDecoderDelegate.decodeNull()
 
-    // this is the exact implementation in Decoder and AbstractDecoder
+    /* this is the exact implementation in Decoder and AbstractDecoder */
     final override fun <T : Any?> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T = deserializer.deserialize(this)
 
-    // this is the exact implementation in Decoder and AbstractDecoder
+    /* this is the exact implementation in Decoder and AbstractDecoder */
     @ExperimentalSerializationApi
     final override fun <T : Any> decodeNullableSerializableValue(deserializer: DeserializationStrategy<T?>): T? {
         val isNullabilitySupported = deserializer.descriptor.isNullable
@@ -52,7 +52,7 @@ abstract class MyAbstractDecoder : Decoder {
 
 abstract class MyAbstractCompositeDecoder(
     final override val serializersModule: SerializersModule,
-    private val decoder: Decoder,
+    private val decoder: Decoder
 ) : CompositeDecoder {
     private val abstractDecoderDelegate =
         object : AbstractDecoder() {
@@ -61,68 +61,68 @@ abstract class MyAbstractCompositeDecoder(
             override fun decodeElementIndex(descriptor: SerialDescriptor) = error("the outer implementation should be used")
         }
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun decodeBooleanElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Boolean = decoder.decodeBoolean()
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun decodeByteElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Byte = decoder.decodeByte()
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun decodeCharElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Char = decoder.decodeChar()
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun decodeDoubleElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Double = decoder.decodeDouble()
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun decodeFloatElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Float = decoder.decodeFloat()
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun decodeInlineElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Decoder = decoder.decodeInline(descriptor.getElementDescriptor(index))
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun decodeIntElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Int = decoder.decodeInt()
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun decodeLongElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Long = decoder.decodeLong()
 
     final override fun decodeShortElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): Short = decoder.decodeShort()
 
     final override fun decodeStringElement(
         descriptor: SerialDescriptor,
-        index: Int,
+        index: Int
     ): String = decoder.decodeString()
 
-    // new open function not in Decoder, defined in AbstractDecoder. This is the default implementation, but it is open in AbstractDecoder. It is final here, which is better for now as it enforces more consistency.
+    /* new open function not in Decoder, defined in AbstractDecoder. This is the default implementation, but it is open in AbstractDecoder. It is final here, which is better for now as it enforces more consistency. */
     private fun <T : Any?> decodeSerializableValue(
         deserializer: DeserializationStrategy<T>,
-        @Suppress("UNUSED_PARAMETER") previousValue: T? = null,
+        @Suppress("UNUSED_PARAMETER") previousValue: T? = null
     ): T = decoder.decodeSerializableValue(deserializer)
 
     @ExperimentalSerializationApi
@@ -130,30 +130,28 @@ abstract class MyAbstractCompositeDecoder(
         descriptor: SerialDescriptor,
         index: Int,
         deserializer: DeserializationStrategy<T?>,
-        previousValue: T?,
+        previousValue: T?
     ): T? {
-        // currently, this is an exact copy of the AbstractDecoder implementation. It must at minimum be copied here to ensure I don't make calls directly to the delegate.
+        /* currently, this is an exact copy of the AbstractDecoder implementation. It must at minimum be copied here to ensure I don't make calls directly to the delegate. */
         val isNullabilitySupported = deserializer.descriptor.isNullable
         return if (isNullabilitySupported || decoder.decodeNotNullMark()) {
             decodeSerializableValue(
                 deserializer,
-                previousValue,
+                previousValue
             )
         } else {
             decoder.decodeNull()
         }
-
-        // return abstractDecoderDelegate.decodeNullableSerializableElement(descriptor, index, deserializer, previousValue)
     }
 
-    // based on AbstractDecoder implementation
+    /* based on AbstractDecoder implementation */
     final override fun <T> decodeSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
         deserializer: DeserializationStrategy<T>,
-        previousValue: T?,
+        previousValue: T?
     ): T = decodeSerializableValue(deserializer, previousValue)
 
-    // AbstractDecoder implementation does nothing
+    /* AbstractDecoder implementation does nothing */
     final override fun endStructure(descriptor: SerialDescriptor) {}
 }

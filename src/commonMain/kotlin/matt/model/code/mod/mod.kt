@@ -1,10 +1,12 @@
 package matt.model.code.mod
 
 import kotlinx.serialization.Serializable
-import matt.lang.SubRoots
 import matt.lang.anno.Open
 import matt.lang.assertions.require.requireContains
 import matt.lang.assertions.require.requireStartsWith
+import matt.lang.common.SubRoots
+import matt.lang.common.substringAfterSingular
+import matt.lang.model.file.ensureSuffix
 import matt.model.code.idea.ModIdea
 import matt.prim.str.ensurePrefix
 import kotlin.jvm.JvmInline
@@ -20,13 +22,23 @@ interface KMod : ModType
 interface RelativeToKMod : RelativeMod, KMod {
     val relToKNames: List<String>
 }
+/*
 
+ISSUE: Might not be unique in case-insensitive file systems!
+
+For example, will be the same for:
+
+:k:bat:man:fly
+:k:batman:fly
+
+*/
 val RelativeToKMod.uniqueCamelCaseName
-    get() = relToKNames.withIndex().joinToString("") {
-        if (it.index == 0) it.value else it.value
-            /*.cap(). ugh, I put .cap in prim not lang*/
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-    }
+    get() =
+        relToKNames.withIndex().joinToString("") {
+            if (it.index == 0) it.value else it.value
+                /*.cap(). ugh, I put .cap in prim not lang*/
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
 
 
 interface GradlePath {
@@ -43,6 +55,12 @@ interface GradleProjectPath : GradlePath, ModType {
 val GradleProjectPath.isRoot get() = path == GradleProjectPath.ROOT.path
 val GradleProjectPath.isSubRoot get() = path == ":${SubRoots.k.name}"
 fun GradleProjectPath.asKSubPath() = GradleKSubProjectPath(path)
+fun GradleProjectPath.isAncestorOf(other: GradleProjectPath): Boolean {
+    if (other.isRoot) return false
+    if (isRoot) return true
+    return other.path.startsWith(path.ensureSuffix(":"))
+}
+fun GradleProjectPath.isDescendentOf(other: GradleProjectPath) = other.isAncestorOf(this)
 
 
 @JvmInline
@@ -52,10 +70,11 @@ value class GradleProjectPathImpl(override val path: String) : GradleProjectPath
     }
 }
 
-fun RelativeToKMod.asGradleKSubProjectPath() = when (this) {
-    is GradleKSubProjectPath -> this
-    else                     -> GradleKSubProjectPath(gradlePath)
-}
+fun RelativeToKMod.asGradleKSubProjectPath() =
+    when (this) {
+        is GradleKSubProjectPath -> this
+        else                     -> GradleKSubProjectPath(gradlePath)
+    }
 
 
 @Serializable
@@ -79,8 +98,6 @@ value class GradleKSubProjectPath(override val path: String) : GradleProjectPath
             }
             return GradleKSubProjectPath(":${SubRoots.k.name}:${parts.joinToString(separator = ":")}")
         }
-
-
     }
 
     init {
@@ -98,8 +115,10 @@ val RelativeToKMod.jarBaseName get() = relToKNames.joinToString("-")
 val RelativeToKMod.jsFileName get() = "$jarBaseName.js"
 val RelativeToKMod.jsGzFileName get() = "$jarBaseName.js.gz"
 
-/*prefix with _ because \"lib\" will be appended to the file name*/
-/*replace - with _ because that replacement will happen automatically anyway (see KotlinNativeLink) so any code that uses this property should get the correct name fot what the file will actually be*/
+/*prefix with _ because \"lib\" will be appended to the file name
+
+
+replace - with _ because that replacement will happen automatically anyway (see KotlinNativeLink) so any code that uses this property should get the correct name fot what the file will actually be*/
 val RelativeToKMod.sharedLibBaseName get() = "_" + jarBaseName.replace("-", "_")
 
 
@@ -132,7 +151,7 @@ value class GradleTaskSelectorImpl(val selector: String) : GradleTask, GradleTas
         return GradleTaskPath(path = selector)
     }
 
-    override val taskName get() = selector.substringAfter(":")
+    override val taskName get() = selector.substringAfterSingular(":")
 
     override val selectorArgument get() = selector
 }
@@ -148,21 +167,22 @@ value class GradleTaskPath(val path: String) : GradleTask, GradleTaskSelector {
     }
 
     val gradleProjectPath
-        get() = when {
-            isTaskOfRootProject() -> GradleProjectPath.ROOT
-            else                  -> GradleProjectPathImpl(path.substringBeforeLast(":"))
-        }
+        get() =
+            when {
+                isTaskOfRootProject() -> GradleProjectPath.ROOT
+                else                  -> GradleProjectPathImpl(path.substringBeforeLast(":"))
+            }
 
     override fun toString(): String = path
 
     fun isTaskOfRootProject() = path.substringBeforeLast(":").isBlank()
 
+
     override val taskName get() = path.substringAfterLast(":")
 
     override val selectorArgument get() = path
 
-    fun asGradleTaskSelectorForAllProjects() = GradleTaskSelectorImpl(selector = path.substringAfter(":"))
-
+    fun asGradleTaskSelectorForAllProjects() = GradleTaskSelectorImpl(selector = path.substringAfterSingular(":"))
 }
 
 @Serializable

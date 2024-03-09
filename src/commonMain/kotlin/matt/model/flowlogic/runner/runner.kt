@@ -11,7 +11,7 @@ interface Runner {
 
 interface Run<R> {
     fun whenFinished(op: On<R>)
-    fun <RR> join(op: Convert<R,RR>): RR
+    fun <RR> join(op: Convert<R, RR>): RR
 }
 
 
@@ -27,5 +27,5 @@ class AlreadyFinishedRun<R> internal constructor(private val r: R): Run<R> {
         op(r)
     }
 
-    override fun <RR> join(op: Convert<R,RR>): RR = op(r)
+    override fun <RR> join(op: Convert<R, RR>): RR = op(r)
 }

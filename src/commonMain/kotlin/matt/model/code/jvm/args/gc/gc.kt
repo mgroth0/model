@@ -9,5 +9,5 @@ enum class GarbageCollector {
     Parallel,
     G1,
     ZG,
-    Shenandoah,
+    Shenandoah
 }

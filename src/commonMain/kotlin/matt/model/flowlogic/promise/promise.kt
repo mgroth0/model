@@ -4,13 +4,20 @@ import matt.lang.assertions.require.requireNot
 import matt.lang.function.Op
 import matt.lang.function.Produce
 import matt.lang.idea.ProceedingIdea
-import matt.lang.sync.ReferenceMonitor
-import matt.lang.sync.inSync
+import matt.lang.sync.common.ReferenceMonitor
+import matt.lang.sync.common.inSync
 import matt.model.flowlogic.await.ThreadAwaitable
 
-// Loosely based on the general computer science construct Promise and its javascript implementation and inspired by its name. For me, the name has literal significance too. Used in a case when an abstract function is supposed to do something asynchronously. But since there is sometimes nothing to return, there is less enforcement that the subclass actually implements the asynchronous function. The Commitment is a way for the subclass to "commit" that it is doing the async operation that it is supposed to be doing
+/*
 
-// why don't I just call these Promises...
+
+Loosely based on the general computer science construct Promise and its javascript implementation and inspired by its name. For me, the name has literal significance too. Used in a case when an abstract function is supposed to do something asynchronously. But since there is sometimes nothing to return, there is less enforcement that the subclass actually implements the asynchronous function. The Commitment is a way for the subclass to "commit" that it is doing the async operation that it is supposed to be doing
+
+
+why don't I just call these Promises...
+
+
+*/
 
 interface AwaitableCommitment : Commitment, ThreadAwaitable<Unit>
 
@@ -82,4 +89,12 @@ open class CommitmentMaker : Commitment, ReferenceMonitor {
             }
             return c
         }
+}
+
+
+
+fun commit(make: Commitment.() -> Unit): Commitment {
+    val commitment = CommitmentMaker()
+    commitment.make()
+    return MadeCommitment(commitment)
 }

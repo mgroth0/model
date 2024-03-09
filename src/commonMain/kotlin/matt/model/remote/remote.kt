@@ -7,5 +7,8 @@ interface HostAndUser {
 
 data class SimpleHostAndUser(
     override val host: String,
-    override val user: String,
+    override val user: String
 ) : HostAndUser
+
+
+val HostAndUser.sshPrefix get() = "$user@$host"

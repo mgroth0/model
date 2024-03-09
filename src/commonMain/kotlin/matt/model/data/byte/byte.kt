@@ -2,6 +2,7 @@ package matt.model.data.byte
 
 import kotlinx.serialization.Serializable
 import matt.lang.convert.BiConverter
+import matt.model.data.byte.ByteSize.BinaryByteUnit
 import matt.model.data.byte.ByteSize.BinaryByteUnit.B
 import matt.model.data.byte.ByteSize.BinaryByteUnit.GiB
 import matt.model.data.byte.ByteSize.BinaryByteUnit.KiB
@@ -13,8 +14,12 @@ import matt.model.data.byte.ByteSize.DecimalByteUnit.GB
 import matt.model.data.byte.ByteSize.DecimalByteUnit.KB
 import matt.model.data.byte.ByteSize.DecimalByteUnit.MB
 import matt.model.data.byte.ByteSize.DecimalByteUnit.TB
+import matt.model.data.byte.ByteUnitType.Binary
+import matt.model.data.byte.ByteUnitType.Decimal
 import matt.model.data.mathable.MathAndComparable
 import matt.model.data.mathable.NumberWrapper
+import matt.prim.str.upper
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -48,6 +53,33 @@ val Long.tebibytes get() = ByteSize(this * TiB.size)
 
 fun Double.isWhole() = ceil(this) == floor(this)
 
+enum class ByteUnitType {
+    Decimal, Binary
+}
+
+fun String.toByteSize(assumedUnitType: ByteUnitType): ByteSize {
+    val trimmedUpper = trim().upper()
+
+    val availableUnitsSortedBytesLast =
+        when (assumedUnitType) {
+            Decimal -> DecimalByteUnit.entries
+            Binary  -> BinaryByteUnit.entries
+        }.sortedByDescending {
+            it.size /*I want B to be last for the next step, otherwise it will be selected every time*/
+        }
+
+    val unit =
+        availableUnitsSortedBytesLast.firstOrNull {
+            trimmedUpper.endsWith(it.traditionalName)
+        } ?: error("Cannot figure out unit for byte size string: $trimmedUpper")
+
+    val numberPart = trimmedUpper.removeSuffix(unit.traditionalName)
+
+    val number = numberPart.toDouble()
+
+    return ByteSize(number * unit.size)
+}
+
 @Serializable
 data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrapper<ByteSize> {
 
@@ -61,25 +93,31 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
     interface ByteUnit {
         val name: String
         val size: Long
+        val traditionalName: String
     }
 
     enum class BinaryByteUnit(override val size: Long) : ByteUnit {
         B(1), KiB(1024), MiB(KiB.size * KiB.size), GiB(MiB.size * KiB.size), TiB(GiB.size * KiB.size);
 
 
+        override val traditionalName
+            get() =
+                when (this) {
+                    B   -> DecimalByteUnit.B.name
+                    KiB -> KB.name
+                    MiB -> MB.name
+                    GiB -> GB.name
+                    TiB -> TB.name
+                }
     }
 
-    val BinaryByteUnit.traditionalName
-        get() = when (this) {
-            B   -> DecimalByteUnit.B.name
-            KiB -> KB.name
-            MiB -> MB.name
-            GiB -> GB.name
-            TiB -> TB.name
-        }
+
 
     enum class DecimalByteUnit(override val size: Long) : ByteUnit {
         B(1), KB(1000), MB(KB.size * KB.size), GB(MB.size * KB.size), TB(GB.size * KB.size);
+
+        override val traditionalName: String
+            get() = name
     }
 
     private fun unitRep(u: ByteUnit) = bytes.toDouble() / u.size
@@ -197,12 +235,10 @@ data class ByteSize(val bytes: Long) : MathAndComparable<ByteSize>, NumberWrappe
         return if (bytes >= halfwayPoint) ByteSize(maxPossible * unit.size)
         else ByteSize(minPossible * unit.size)
     }
-
-
 }
 
 
-@OptIn(kotlin.experimental.ExperimentalTypeInference::class)
+@OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 @JvmName("sumOfBinaryByteSize")
 inline fun <T> Iterable<T>.sumOf(selector: (T) -> ByteSize): ByteSize {
@@ -221,8 +257,9 @@ class FormattedByteSize(
 ) {
     private val unitName = if (singleLetterUnit) unit.name.first() else unit.name
     private val space = if (includeSpace) ' '.toString() else ""
-    override fun toString(): String = if (unit == DecimalByteUnit.B) "$num$space$unitName"
-    else "${(num * 1000).roundToLong() / 1000}$space$unitName"
+    override fun toString(): String =
+        if (unit == DecimalByteUnit.B) "$num$space$unitName"
+        else "${(num * 1000).roundToLong() / 1000}$space$unitName"
 }
 
 
@@ -230,5 +267,4 @@ object BinaryByteSizeDoubleConverter : BiConverter<ByteSize, Double> {
     override fun convertToB(a: ByteSize): Double = a.bytes.toDouble()
 
     override fun convertToA(b: Double): ByteSize = ByteSize(b.toLong())
-
 }

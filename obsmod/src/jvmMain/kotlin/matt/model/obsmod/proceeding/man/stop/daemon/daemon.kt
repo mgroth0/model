@@ -6,12 +6,12 @@ import matt.log.profile.err.ExceptionHandler
 import matt.log.profile.err.ExceptionResponse
 import matt.log.profile.err.StructuredExceptionHandler
 import matt.log.profile.err.defaultExceptionHandler
-import matt.model.code.errreport.Report
+import matt.model.code.errreport.common.Report
 import matt.model.flowlogic.controlflowstatement.ControlFlow
 import matt.model.obsmod.proceeding.Proceeding.Status.OFF
 import matt.model.obsmod.proceeding.man.stop.StoppableManualProceeding
 import matt.obs.bindings.bool.ObsB
-import matt.obs.prop.VarProp
+import matt.obs.prop.writable.VarProp
 import matt.sys.loopthread.MutableRefreshTimeDaemonLoop
 import kotlin.time.Duration
 
@@ -31,13 +31,14 @@ class DaemonLoopSpawnerProceeding(
     private var loop: MutableRefreshTimeDaemonLoop? = null
 
     @Suppress("MemberVisibilityCanBePrivate")
-    val sleepIntervalProp = VarProp(sleepInterval).apply {
-        onChange {
-            synchronized(this@DaemonLoopSpawnerProceeding) {
-                loop?.sleepInterval = value
+    val sleepIntervalProp =
+        VarProp(sleepInterval).apply {
+            onChange {
+                synchronized(this@DaemonLoopSpawnerProceeding) {
+                    loop?.sleepInterval = value
+                }
             }
         }
-    }
 
     @Suppress("MemberVisibilityCanBePrivate")
     var sleepInterval by sleepIntervalProp
@@ -48,37 +49,38 @@ class DaemonLoopSpawnerProceeding(
     override fun Startup.startup() {
         requireNot(hadException)
         requireNull(loop)
-        loop = MutableRefreshTimeDaemonLoop(
-            sleepInterval = sleepInterval,
-            isDaemon = spawnDaemons,
-            op = { op() },
-            finalize = {
-                finalize()
-                synchronized(this@DaemonLoopSpawnerProceeding) {
-                    loop = null
-                    statusProp v OFF
-                }
-            },
-            uncaughtExceptionHandler = object : StructuredExceptionHandler() {
-                override fun handleException(
-                    t: Thread,
-                    e: Throwable,
-                    report: Report
-                ): ExceptionResponse {
-                    hadException = true
-                    val r = exceptionHandler(e, report)
+        loop =
+            MutableRefreshTimeDaemonLoop(
+                sleepInterval = sleepInterval,
+                isDaemon = spawnDaemons,
+                op = { op() },
+                finalize = {
+                    finalize()
                     synchronized(this@DaemonLoopSpawnerProceeding) {
                         loop = null
                         statusProp v OFF
                     }
-                    return r
-                }
+                },
+                uncaughtExceptionHandler =
+                    object : StructuredExceptionHandler() {
+                        override fun handleException(
+                            t: Thread,
+                            e: Throwable,
+                            report: Report
+                        ): ExceptionResponse {
+                            hadException = true
+                            val r = exceptionHandler(e, report)
+                            synchronized(this@DaemonLoopSpawnerProceeding) {
+                                loop = null
+                                statusProp v OFF
+                            }
+                            return r
+                        }
+                    }
+            ).also {
+                it.sendStartSignal()
             }
-        ).also {
-            it.sendStartSignal()
-        }
     }
 
     override fun stop() = loop!!.stopAndJoin()
-
 }

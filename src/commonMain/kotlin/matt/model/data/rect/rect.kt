@@ -37,7 +37,9 @@ fun UniformRectSize<Int>.toUnitRectangle(): IntRect {
 
 
 @JvmName("contains1")
-operator fun UniformRectangle<UInt>.contains(other: UniformRectangle<UInt>): Boolean = other.x >= x && other.y >= y && other.endX <= endX && other.endY <= endY
+operator fun UniformRectangle<UInt>.contains(
+    other: UniformRectangle<UInt>
+): Boolean = other.x >= x && other.y >= y && other.endX <= endX && other.endY <= endY
 
 @JvmName("contains2")
 operator fun UniformRectangle<Int>.contains(other: UniformRectangle<Int>): Boolean {
@@ -147,12 +149,13 @@ data class Rect<X, Y>(
 
 
 fun UniformRectangle<Int>.isAllEven() = x % 2 == 0 && y % 2 == 0 && width % 2 == 0 && height % 2 == 0
-fun UniformRectangle<Int>.verifyToUIntRect() = UIntRect(
-    x = x.verifyToUInt(),
-    y = y.verifyToUInt(),
-    width = width.verifyToUInt(),
-    height = height.verifyToUInt()
-)
+fun UniformRectangle<Int>.verifyToUIntRect() =
+    UIntRect(
+        x = x.verifyToUInt(),
+        y = y.verifyToUInt(),
+        width = width.verifyToUInt(),
+        height = height.verifyToUInt()
+    )
 
 fun UniformRectangle<Int>.checkAllNonNegative() {
     check(x >= 0)
@@ -187,6 +190,9 @@ data class DoublePoint(
     override val x: Double,
     override val y: Double
 ) : PointIdea3<Double>
+
+
+typealias BriarExtractionMaybeCropsList = List<Box?>
 
 @Serializable
 data class Box(

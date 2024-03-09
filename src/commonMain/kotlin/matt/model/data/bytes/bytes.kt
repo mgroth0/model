@@ -1,69 +1,24 @@
+
 package matt.model.data.bytes
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.serialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
-import matt.lang.assertions.require.requireEquals
-import matt.lang.assertions.require.requireZero
+import matt.prim.bytestr.toByteString
 
-fun ByteArray.toView(
-    offset: Int = 0,
-    length: Int = size
-) = BytesView(offset = offset, length = length, array = this)
+object ByteStringSerializer: KSerializer<ByteString> {
+    private val byteArraySerializer = serializer<ByteArray>()
+    override fun deserialize(decoder: Decoder): ByteString = decoder.decodeSerializableValue(byteArraySerializer).toByteString()
 
-
-object BytesViewSerializer : KSerializer<BytesView> {
-
-
-    private val byteArraySerializer by lazy {
-        serializer<ByteArray>()
-    }
-
-    override val descriptor by lazy {
-        byteArraySerializer.descriptor
-    }
-
+    override val descriptor = serialDescriptor<ByteArray>()
 
     override fun serialize(
         encoder: Encoder,
-        value: BytesView
+        value: ByteString
     ) {
-        encoder.encodeSerializableValue(byteArraySerializer, value.extractByteArray())
+        encoder.encodeSerializableValue(byteArraySerializer, value.toByteArray())
     }
-
-    override fun deserialize(decoder: Decoder): BytesView {
-        val byteArray = decoder.decodeSerializableValue(byteArraySerializer)
-        return byteArray.toView()
-    }
-
-
-}
-
-@Serializable(with = BytesViewSerializer::class)
-class BytesView(
-    val array: ByteArray,
-    val offset: Int,
-    val length: Int
-) {
-    fun asByteArray(): ByteArray {
-        requireZero(offset) {
-            "can only use asByteArray if offset is 0"
-        }
-        requireEquals(length, array.size) {
-            "can only use asByteArray if length is array.size"
-        }
-        return array
-    }
-
-    val size get() = length
-
-
-    fun extractByteArray(): ByteArray = if (offset == 0 && length == array.size) {
-        asByteArray()
-    } else {
-        array.copyOfRange(offset, offset + length)
-    }
-
 }

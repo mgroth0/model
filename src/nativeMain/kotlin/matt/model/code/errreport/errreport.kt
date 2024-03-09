@@ -1,3 +1,5 @@
 package matt.model.code.errreport
 
-actual fun throwReport(e: Throwable): CommonThrowReport = TODO()
+import matt.model.code.errreport.common.CommonThrowReport
+
+actual fun createThrowReport(e: Throwable): CommonThrowReport = TODO()

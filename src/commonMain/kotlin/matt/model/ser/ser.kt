@@ -10,30 +10,61 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
+import kotlinx.serialization.serializer
 import matt.lang.anno.SeeURL
-import matt.lang.classname.JvmQualifiedClassName
-import matt.lang.classname.SimpleClassName
+import matt.lang.classname.common.JvmQualifiedClassName
+import matt.lang.classname.common.SimpleClassName
 import matt.lang.model.file.UnsafeFilePath
+import matt.prim.converters.StringConverter
 
-/*Automatic serializer generation is not working for classes from another module. See links at top.*/
-/*@Serializer(forClass = UnsafeFilePath::class)*/
-object UnsafeFilePathSerializer : EncodedAsStringKSerializer<UnsafeFilePath>() {
+/*Automatic serializer generation is not working for classes from another module. See links at top.
+
+
+@Serializer(forClass = UnsafeFilePath::class)*/
+object UnsafeFilePathSerializer : EncodedAsStringSerializer<UnsafeFilePath>() {
     override fun String.decode() = UnsafeFilePath(this)
     override fun UnsafeFilePath.encodeToString() = path
 }
 
-object JvmQualifiedClassNameSerializer : EncodedAsStringKSerializer<JvmQualifiedClassName>() {
+object JvmQualifiedClassNameSerializer : EncodedAsStringSerializer<JvmQualifiedClassName>() {
     override fun String.decode() = JvmQualifiedClassName(this)
     override fun JvmQualifiedClassName.encodeToString() = name
 }
 
-object SimpleClassNameSerializer : EncodedAsStringKSerializer<SimpleClassName>() {
+object SimpleClassNameSerializer : EncodedAsStringSerializer<SimpleClassName>() {
     override fun String.decode() = SimpleClassName(this)
     override fun SimpleClassName.encodeToString() = name
 }
 
 
-abstract class EncodedAsStringKSerializer<T> : KSerializer<T> {
+abstract class EncodedAsBytesSerializer<T>: KSerializer<T> {
+    companion object {
+        private val DESCRIPTOR by lazy {
+            serialDescriptor<ByteArray>()
+        }
+        private val BYTE_ARRAY_SER by lazy {
+            serializer<ByteArray>()
+        }
+    }
+
+
+    final override val descriptor = DESCRIPTOR
+
+    final override fun deserialize(decoder: Decoder): T = decoder.decodeSerializableValue(BYTE_ARRAY_SER).decode()
+
+    final override fun serialize(
+        encoder: Encoder,
+        value: T
+    ) {
+        encoder.encodeSerializableValue(BYTE_ARRAY_SER, value.encodeToByteArray())
+    }
+
+    protected abstract fun T.encodeToByteArray(): ByteArray
+    protected abstract fun ByteArray.decode(): T
+}
+
+
+abstract class EncodedAsStringSerializer<T> : KSerializer<T>, StringConverter<T> {
     companion object {
         private val DESCRIPTOR by lazy {
             serialDescriptor<String>()
@@ -52,6 +83,10 @@ abstract class EncodedAsStringKSerializer<T> : KSerializer<T> {
 
     protected abstract fun T.encodeToString(): String
     protected abstract fun String.decode(): T
+
+    final override fun fromString(s: String): T = s.decode()
+
+    final override fun toString(t: T): String = t.encodeToString()
 }
 
 
@@ -75,7 +110,6 @@ data object NullableIntSerializer : KSerializer<Int?> {
     ) {
         encoder.encodeString(value?.toString() ?: "")
     }
-
 }
 
 data object NullableDoubleSerializer : KSerializer<Double?> {
@@ -89,7 +123,6 @@ data object NullableDoubleSerializer : KSerializer<Double?> {
     ) {
         encoder.encodeString(value?.toString() ?: "")
     }
-
 }
 
 
@@ -104,5 +137,4 @@ data object NullableStrictBooleanSerializer : KSerializer<Boolean?> {
     ) {
         encoder.encodeString(value?.toString() ?: "")
     }
-
 }

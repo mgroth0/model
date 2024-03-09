@@ -1,0 +1,29 @@
+{
+  "type": "MultiPlatformModule",
+  "dependencies": [
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:prim"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonJvmAndroidTestImplementation",
+      "path": ":k:test"
+    },
+    {
+      "type": "Project",
+      "cfg": "androidInstrumentedTestImplementation",
+      "path": ":k:test:ainstrument"
+    }
+  ],
+  "jvm": {
+  },
+  "js": {
+    "type": "lib"
+  },
+  "android": {
+    "type": "Lib"
+  },
+  "native": {"type":"Lib"}
+}

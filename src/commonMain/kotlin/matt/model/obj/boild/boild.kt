@@ -11,7 +11,7 @@ interface DefaultNewFactory<T: Any>: Builder<T> {
 }
 
 interface DefaultNewWithCfgFactory<T: Any>: Builder<T> {
-    fun defaultNew(cfg: T.()->Unit): T
+    fun defaultNew(cfg: T.() -> Unit): T
 }
 
 abstract class DumbBuilderEnforcer<T: Any, B: Builder<out T>> public constructor() {

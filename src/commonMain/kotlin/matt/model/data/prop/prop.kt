@@ -47,9 +47,10 @@ class ConvertedSuspendProperty<S : Any, T : Any>(
     private val prop: SimpleSuspendProperty<S>,
     private val converter: BiConverter<S, T>
 ) : SimpleSuspendProperty<T> {
-    override suspend fun get(): T? = prop.get()?.let {
-        converter.convertToB(it)
-    }
+    override suspend fun get(): T? =
+        prop.get()?.let {
+            converter.convertToB(it)
+        }
 
     override suspend fun set(value: T?) {
         prop.set(value?.let { converter.convertToA(it) })

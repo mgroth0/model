@@ -1,19 +1,9 @@
 package matt.model.obj.single
 
 import matt.lang.assertions.require.requireNot
-import matt.lang.sync.ReferenceMonitor
-import matt.lang.sync.inSync
+import matt.lang.sync.common.ReferenceMonitor
+import matt.lang.sync.common.inSync
 import kotlin.reflect.KClass
-
-//internal val singletons = mutableSetOf<KClass<*>>()
-//dd
-//@Synchronized
-//fun Any.registerSingleton() {
-//  require(this::class !in singletons) {
-//	"tried to create 2 of registered singleton ${this::class.simpleName}"
-//  }
-//  singletons += this::class
-//}
 
 open class Singleton {
 
@@ -40,26 +30,23 @@ abstract class SingleCallBase : ReferenceMonitor {
                 field = value
             }
         }
-
-
 }
 
 class SingleCall(protected val op: () -> Unit = {}) : SingleCallBase() {
 
-    operator fun invoke() = inSync {
-        requireNot(called)
-        op()
-        called = true
-    }
-
-
+    operator fun invoke() =
+        inSync {
+            requireNot(called)
+            op()
+            called = true
+        }
 }
 
 class SingleCallWithArg<A>(val op: (A) -> Unit = {}) : SingleCallBase() {
-    operator fun invoke(arg: A) = inSync {
-        requireNot(called)
-        op(arg)
-        called = true
-    }
-
+    operator fun invoke(arg: A) =
+        inSync {
+            requireNot(called)
+            op(arg)
+            called = true
+        }
 }

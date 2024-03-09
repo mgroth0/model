@@ -29,7 +29,6 @@ data class JProfilerAgentPathArg(
         val args = mutableListOf<String>()
         if (offline) {
             args += "offline"
-
         }
         if (port != null) {
             args += "port=$port"
@@ -57,11 +56,16 @@ const val DEFAULT_SAMPLE_IN_YOURKIT = false
 @SeeURL("https://www.yourkit.com/forum/viewtopic.php?t=43414")
 /*
 /Applications/YourKit-Java-Profiler-2022.9.app/Contents/Resources/bin/mac/libyjpagent.dylib=profiler_dir=/Applications/YourKit-Java-Profiler-2022.9.app/Contents/Resources
-*/
 
-/*"-agentpath:=exceptions=disable,delay=10000,listen=all"*/
-/*"=exceptions=disable,listen=all"*/
-/*port=${V==alJson.Port.profileAgent}*/
+
+
+"-agentpath:=exceptions=disable,delay=10000,listen=all"
+
+
+"=exceptions=disable,listen=all"
+
+
+port=${V==alJson.Port.profileAgent}*/
 @Serializable
 @SeeURL("https://www.yourkit.com/docs/java/help/agent.jsp")
 data class YourKitAgentPathArg(

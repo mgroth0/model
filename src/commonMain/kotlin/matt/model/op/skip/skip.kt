@@ -3,7 +3,7 @@ package matt.model.op.skip
 import matt.lang.assertions.require.requireNonNegative
 
 class Skipper(
-    val numElementsToSkip: Int = 0,
+    val numElementsToSkip: Int = 0
 ) {
     init {
         requireNonNegative(numElementsToSkip)

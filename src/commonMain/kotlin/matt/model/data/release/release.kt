@@ -72,6 +72,8 @@ object DefaultVersionSerializer
 @Serializer(forClass = FourLevelVersion::class)
 object DefaultVersionFourSerializer
 
+val CURRENT_JPROFILER_VERSION = Version(13, 0, 7)
+
 @Serializable(with = Version.Companion::class)
 data class Version(
     val first: Int,
@@ -79,15 +81,19 @@ data class Version(
     val third: Int
 ) : Comparable<Version> {
 
+    val major get() = first
 
     constructor(versionString: String) : this(
         versionString.split(".")[0].toInt(), versionString.split(".")[1].toInt(), versionString.split(".")[2].toInt()
     )
 
 
-    override operator fun compareTo(other: Version): Int = (first.compareTo(other.first))
-        .takeIf { it != 0 } ?: ((second.compareTo(other.second)).takeIf { it != 0 }
-        ?: (third.compareTo(other.third)))
+    override operator fun compareTo(other: Version): Int =
+        (first.compareTo(other.first))
+            .takeIf { it != 0 } ?: (
+            (second.compareTo(other.second)).takeIf { it != 0 }
+                ?: (third.compareTo(other.third))
+        )
 
     private val asString by lazy {
         listOf(first, second, third).joinToString(".")
@@ -95,11 +101,12 @@ data class Version(
 
     override fun toString(): String = asString
 
-    fun increment(level: UpdateLevel): Version = when (level) {
-        PUBLISH -> Version(first + 1, 0, 0)
-        FEATURE -> Version(first, second + 1, 0)
-        PATCH   -> Version(first, second, third + 1)
-    }
+    fun increment(level: UpdateLevel): Version =
+        when (level) {
+            PUBLISH -> Version(first + 1, 0, 0)
+            FEATURE -> Version(first, second + 1, 0)
+            PATCH   -> Version(first, second, third + 1)
+        }
 
     operator fun inc() = increment(PATCH)
 
@@ -109,9 +116,10 @@ data class Version(
         override val descriptor by lazy { serialDescriptor<String>() }
 
         @SeeURL("https://github.com/Kotlin/kotlinx.serialization/issues/1512")
-        private val secondaryJson = Json {
-            useAlternativeNames = false
-        }
+        private val secondaryJson =
+            Json {
+                useAlternativeNames = false
+            }
 
         override fun deserialize(decoder: Decoder): Version {
             val e = (decoder as JsonDecoder).decodeJsonElement()
@@ -129,11 +137,8 @@ data class Version(
             value: Version
         ) {
             encoder.encodeSerializableValue(DefaultVersionSerializer, value)
-//            encoder.encodeString(value.asString)
         }
-
     }
-
 }
 
 enum class UpdateLevel {
@@ -160,9 +165,10 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
         override val descriptor by lazy { serialDescriptor<String>() }
 
         @SeeURL("https://github.com/Kotlin/kotlinx.serialization/issues/1512")
-        private val secondaryJson = Json {
-            useAlternativeNames = false
-        }
+        private val secondaryJson =
+            Json {
+                useAlternativeNames = false
+            }
 
         override fun deserialize(decoder: Decoder): FourLevelVersion {
             val e = (decoder as JsonDecoder).decodeJsonElement()
@@ -180,13 +186,13 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
             value: FourLevelVersion
         ) {
             encoder.encodeSerializableValue(DefaultVersionFourSerializer, value)
-//            encoder.encodeString(value.version)
         }
 
-        private val COMPARATOR = Comparator<FourLevelVersion> { a, b -> a[0].compareTo(b[0]) }
-            .then { a, b -> a[1].compareTo(b[1]) }
-            .then { a, b -> a[2].compareTo(b[2]) }
-            .then { a, b -> a[3].compareTo(b[3]) }
+        private val COMPARATOR =
+            Comparator<FourLevelVersion> { a, b -> a[0].compareTo(b[0]) }
+                .then { a, b -> a[1].compareTo(b[1]) }
+                .then { a, b -> a[2].compareTo(b[2]) }
+                .then { a, b -> a[3].compareTo(b[3]) }
     }
 
     init {
@@ -205,8 +211,6 @@ class FourLevelVersion(val version: String) : Comparable<FourLevelVersion> {
     operator fun get(index: Int): Int = theSplitInts[index]
 
     override fun compareTo(other: FourLevelVersion) = COMPARATOR.compare(this, other)
-
-
 }
 
 

@@ -18,35 +18,47 @@ data class Sarif(
     operator fun plus(other: Sarif): Sarif {
         check(other.schema == schema)
         check(other.version == version)
-        if (other.issueCount == 0u) return this
-        if (issueCount == 0u) return other
-        if (other.issueCount == 0u && issueCount == 0u) return this
-        val allRuns = (runs + other.runs).toList()
-        if (allRuns.isNotEmpty()) {
-            val firstRun = allRuns.first()
-            val firstTool = firstRun.tool
-            check(allRuns.all { it.tool == firstTool })
-            val mergedRun = firstRun.copy(
-                results = allRuns.flatMapTo(mutableSetOf()) { it.results }
-            )
-            return copy(runs = setOf(mergedRun))
-        }
-        return copy(runs = allRuns.toSet())
+        return copy(
+            runs =
+                (runs + other.runs).groupBy {
+                    it.mergeGroup
+                }.map {
+                    it.value.reduce { acc, analysisRun -> acc + analysisRun }
+                }.toSet()
+        )
     }
-
 }
 
 
 @Serializable
 data class AnalysisRun(
     val results: Set<AnalysisResult> /*idk*/,
-    val tool: AnalysisTool
+    val tool: AnalysisTool,
+    val originalUriBaseIds: UriBaseIds? = null
 ) {
     val issueCount by lazy {
         results.sumOf { it.issueCount }
     }
+    val mergeGroup: AnalysisTool get() = tool
+    fun canMergeWith(run: AnalysisRun) = tool == run.tool
+    operator fun plus(run: AnalysisRun): AnalysisRun {
+        require(canMergeWith(run))
+        return copy(results = results + run.results)
+    }
 }
 
+
+@Serializable
+data class UriBaseIds(
+    @Suppress("SpellCheckingInspection")
+    @SerialName("%SRCROOT%")
+    val srcRoot: SrcRoot
+)
+
+@Serializable
+data class SrcRoot(
+    val uri: String
+)
 
 @Serializable
 data class AnalysisResult(
@@ -74,13 +86,14 @@ data class PhysicalLocation(
 
 @Serializable
 data class ArtifactLocation(
-    val uri: String
+    val uri: String,
+    val uriBaseId: String? = null
 )
 
 @Serializable
 data class PhysicalRegion(
-    val endColumn: Int,
-    val endLine: Int,
+    val endColumn: Int? = null,
+    val endLine: Int? = null,
     val startColumn: Int,
     val startLine: Int
 )
@@ -94,26 +107,35 @@ data class AnalysisTool(
 data class AnalysisDriver(
     val downloadUri: String,
     val fullName: String,
-    val guid: String,
+    val guid: String? = null,
     val informationUri: String,
     val language: String,
     val name: String,
     val organization: String,
     val rules: Set<AnalysisRule>,
-    val semanticVersion: String,
-    val version: String
+    val semanticVersion: String? = null,
+    val version: String? = null
 )
+
 
 @Serializable
 data class AnalysisRule(
     val helpUri: String,
     val id: String,
     val name: String,
-    val shortDescription: Description
+    val shortDescription: Description,
+    val defaultConfiguration: DefaultConfiguration? = null
 )
 
+@Serializable
+data class DefaultConfiguration(
+    val level: String
+)
 
 @Serializable
 data class Description(
     val text: String
 )
+
+
+

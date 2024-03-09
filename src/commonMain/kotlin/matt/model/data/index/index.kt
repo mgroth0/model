@@ -33,9 +33,10 @@ interface IndexLike {
     val redisArgument: Int
 }
 
-val IndexLike.pythonArgument get() = redisArgument /*they are the same*/
+val IndexLike.pythonArgument get() = redisArgument /*they are the same
 
-/*should be a value class*/
+should be a value class*/
+
 @Serializable
 data class Index(val i: Int) : IntWrapper<Index>, RemovalIndex, AdditionIndex, IndexLike {
 
@@ -57,14 +58,12 @@ object IndexWrapperConverter : BiConverter<Index, Double> {
     override fun convertToB(a: Index): Double = a.asInt.toDouble()
 
     override fun convertToA(b: Double): Index = Index(b.toInt())
-
 }
 
 object IndexWrapperIntConverter : BiConverter<Index, Int> {
     override fun convertToB(a: Index): Int = a.asInt
 
     override fun convertToA(b: Int): Index = Index(b)
-
 }
 
 

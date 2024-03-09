@@ -1,10 +1,9 @@
-@file:JvmName("LatchJvmAndroidKt")
 
-package matt.model.flowlogic.latch
+package matt.model.flowlogic.latch.j
 
+import matt.lang.common.go
 import matt.lang.function.Op
 import matt.lang.function.Produce
-import matt.lang.go
 import matt.model.code.successorfail.CodeFailedReturn
 import matt.model.code.successorfail.Fail
 import matt.model.code.successorfail.FailableReturn
@@ -12,8 +11,11 @@ import matt.model.code.successorfail.Success
 import matt.model.code.successorfail.SuccessOrFail
 import matt.model.code.successorfail.SuccessfulReturn
 import matt.model.flowlogic.await.ThreadAwaitable
+import matt.model.flowlogic.latch.LatchAwaitResult
 import matt.model.flowlogic.latch.LatchAwaitResult.LATCH_OPENED
 import matt.model.flowlogic.latch.LatchAwaitResult.TIMEOUT
+import matt.model.flowlogic.latch.LatchCancelled
+import matt.model.flowlogic.latch.SimpleLatch
 import matt.model.flowlogic.latch.asyncloaded.LoadedValueSlot
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -46,12 +48,13 @@ class SimpleThreadLatch : SimpleLatch, ThreadAwaitable<Unit> {
         failure?.go { throw it }
     }
 
-    fun await(timeout: Duration): LatchAwaitResult = if (latch.await(timeout.inWholeMilliseconds, MILLISECONDS)) {
-        failure?.go { throw it }
-        LATCH_OPENED
-    } else {
-        TIMEOUT
-    }
+    fun await(timeout: Duration): LatchAwaitResult =
+        if (latch.await(timeout.inWholeMilliseconds, MILLISECONDS)) {
+            failure?.go { throw it }
+            LATCH_OPENED
+        } else {
+            TIMEOUT
+        }
 
     fun awaitOrThrow(timeout: Duration) {
         when (await(timeout)) {
@@ -61,9 +64,6 @@ class SimpleThreadLatch : SimpleLatch, ThreadAwaitable<Unit> {
     }
 
     override fun open() = latch.countDown()
-//    override fun awaitBlocking() {
-//        await()
-//    }
 
     val isOpen get() = latch.count == 0L
     val isClosed get() = !isOpen

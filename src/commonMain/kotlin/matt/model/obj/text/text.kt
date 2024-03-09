@@ -10,6 +10,8 @@ interface HasText {
     val text: String
 }
 
+
+
 interface HasBytes {
     val bytes: ByteArray
 }
@@ -58,3 +60,5 @@ interface WritableFile<F: WritableFile<F>> : ReadableFile<F>, WritableBytes, Wri
         text = s
     }
 }
+
+

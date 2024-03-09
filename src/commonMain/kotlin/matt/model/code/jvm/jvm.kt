@@ -1,15 +1,15 @@
 package matt.model.code.jvm
 
 import kotlinx.serialization.Serializable
-import matt.lang.If
 import matt.lang.anno.Open
 import matt.lang.anno.SeeURL
 import matt.lang.assertions.require.requireEmpty
 import matt.lang.assertions.require.requireEquals
 import matt.lang.charset.DEFAULT_CHARSET_NAME_CAP
-import matt.lang.ifTrue
-import matt.lang.opt
-import matt.lang.optArray
+import matt.lang.common.If
+import matt.lang.common.ifTrue
+import matt.lang.common.opt
+import matt.lang.common.optArray
 import matt.lang.sysprop.props.JmxRemoteAuthenticate
 import matt.lang.sysprop.props.JmxRemotePort
 import matt.lang.sysprop.props.JmxRemoteSsl
@@ -45,18 +45,38 @@ interface CommonJvmArgs {
     val addOpens: List<String>?
 
     @Open
-    fun getExportArgs(exports: List<String>?) = optArray(addExports) {
-        map { "--add-exports=$it" }.toTypedArray()
-    }
+    fun getExportArgs(exports: List<String>?) =
+        optArray(addExports) {
+            map { "--add-exports=$it" }.toTypedArray()
+        }
 
     @Open
-    fun getOpenArgs(opens: List<String>?) = optArray(addOpens) {
-        map { "--add-opens=$it" }.toTypedArray()
-    }
+    fun getOpenArgs(opens: List<String>?) =
+        optArray(addOpens) {
+            map { "--add-opens=$it" }.toTypedArray()
+        }
 }
 
 const val miscModule = "java.base/jdk.internal.misc=ALL-UNNAMED"
+const val langModule = "java.base/java.lang=ALL-UNNAMED"
 
+/*
+
+Just a note on "ExitOnOutOfMemoryError":
+
+    I have looked into this, and decided I should not use it.
+
+    Pros:
+        - Fail fast
+        - Prevent corrupted runtime behavior
+
+    Cons:
+        - Data loss (system might attempt fewer or no exit hooks)
+ *** - Removes ability to get heap dump or analyze memory
+
+That last con is the main reason I will not implement this. Maybe in some specialized context in the future it will be helpful, but in general if I get an OOM error I need to be able to debug it.
+
+*/
 
 @Serializable
 data class JavaExecArgs(
@@ -68,8 +88,10 @@ data class JavaExecArgs(
     @SeeURL("https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/topics/debugging.md#stacktrace-recovery")
     val enableAssertionsAndCoroutinesDebugMode: Boolean = true,
     val maxStackTraceDepth: Int? = null,
-    /*JVM will fail to start if less than 208K*/
-    /*nvm, I just programmatically print both the top and bottom of the stack now. Much better.*/
+    /*JVM will fail to start if less than 208K
+
+
+    nvm, I just programmatically print both the top and bottom of the stack now. Much better.*/
     val maxStackSize: ByteSize? = null,
 
     val prism: Boolean = true,
@@ -106,7 +128,7 @@ data class JavaExecArgs(
 
     val log4jConfigFactory: String? = null,
 
-    val otherArgs: List<JvmArg> = listOf(),
+    val otherArgs: List<JvmArg> = listOf()
 
 
 ) : CommonJvmArgs {
@@ -180,26 +202,27 @@ data class JavaExecArgs(
             *opt(kotlinDaemonAutoShutdownTimeout) {
                 @SeeURL("https://youtrack.jetbrains.com/issue/KT-55322/Kotlin-daemon-Cannot-perform-operation-requested-state-Alive-actual-LastSession")
                 KotlinDaemonOptions to "autoshutdownIdleSecond=${
-                    this.inWholeSeconds.also {
+                    inWholeSeconds.also {
                         require(it > 0)
                     }
                 }"
             }
 
         )
-
     }
 
     private val jvmArgs by lazy {
         arrayOf(
-            /*OmitStackTraceInFastThrow: makes sure that exceptions get a full stack trace always.*/
-            /*https://stackoverflow.com/questions/2411487/nullpointerexception-in-java-with-no-stacktrace*/
+            /*OmitStackTraceInFastThrow: makes sure that exceptions get a full stack trace always.
+
+
+            https://stackoverflow.com/questions/2411487/nullpointerexception-in-java-with-no-stacktrace*/
             *ifTrue(stackTraceInFastThrow) { "-OmitStackTraceInFastThrow" },
             /*VM option 'ShowHiddenFrames' is diagnostic and must be enabled via -XX:+UnlockDiagnosticVMOptions.*/
             *If(unlockDiagnosticVmOptions).then("+UnlockDiagnosticVMOptions"),
             *If(showHiddenFrames).then("+ShowHiddenFrames"),
             *ifTrue(diagnosticVMOptions) { "+UnlockDiagnosticVMOptions" },
-            *opt(gc) { "+Use${this.name}GC" },
+            *opt(gc) { "+Use${name}GC" },
             *opt(maxStackTraceDepth) { "MaxJavaStackTraceDepth=$this" },
 
 
@@ -216,7 +239,7 @@ data class JavaExecArgs(
             *If(printTenuringDistribution).then(
                 @SeeURL("https://devcenter.heroku.com/articles/java-support#monitoring-resource-usage") "+PrintTenuringDistribution"
             ),
-            *opt(compilerThreadCount) { "CICompilerCount=$this" },
+            *opt(compilerThreadCount) { "CICompilerCount=$this" }
         )
     }
 
@@ -229,7 +252,6 @@ data class JavaExecArgs(
                 } else {
                     "-D${it.key.key}=${it.value}"
                 }
-
             }.toTypedArray(),
             *opt(xms) { Xms(this).toRawArg() },
             *opt(xmx) { Xmx(this).toRawArg() },
@@ -250,7 +272,7 @@ data class JavaExecArgs(
             *getOpenArgs(addOpens),
 
 
-            *otherArgs.map { it.toRawArg() }.toTypedArray(),
+            *otherArgs.map { it.toRawArg() }.toTypedArray()
 
         )
     }

@@ -29,7 +29,6 @@ object HzSerializer : KSerializer<Hz> {
     ) {
         encoder.encodeDouble(value.asDouble)
     }
-
 }
 
 @Serializable(with = HzSerializer::class)
