@@ -2,7 +2,7 @@ package matt.model.data.mathable
 
 import matt.lang.anno.Open
 import matt.lang.jpy.ExcludeFromPython
-import matt.model.data.interp.BasicInterpolatable
+import matt.model.data.interp.BasicInterpolatator
 import kotlin.jvm.JvmInline
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -42,20 +42,23 @@ interface NumberWrapper<N : NumberWrapper<N>> : MathAndComparable<N> {
 val NumberWrapper<*>.isNegative get() = !(isPositive || isZero || isNaN)
 
 
-interface DoubleWrapper<M : DoubleWrapper<M>> : MathAndComparable<M>, BasicInterpolatable<M>, NumberWrapper<M> {
-
-    @Open
-    @ExcludeFromPython
+class DoubleWrapperInterpolator<D: DoubleWrapper<D>>: BasicInterpolatator<D> {
     override fun interpolate(
-        endValue: BasicInterpolatable<*>,
-        t: Double
-    ): M {
-
-        @Suppress("UNCHECKED_CAST") if (t <= 0.0) return this as M
-        @Suppress("UNCHECKED_CAST") return if (t >= 1.0) (endValue as M) else fromDouble(
-            asDouble + ((endValue as DoubleWrapper<M>).asDouble - asDouble) * t
-        )
+        start: D,
+        end: D,
+        fraction: Double
+    ): D {
+        if (fraction <= 0.0) return start
+        return if (fraction >= 1.0) end else {
+            val diff = (end.asDouble - start.asDouble)
+            val diffFractioned = diff * fraction
+            val theDouble = start.asDouble + diffFractioned
+            start.fromDouble(theDouble)
+        }
     }
+}
+
+interface DoubleWrapper<M : DoubleWrapper<M>> : MathAndComparable<M>, NumberWrapper<M> {
 
     @Open
     override fun compareTo(other: M): Int = asDouble.compareTo(other.asDouble)

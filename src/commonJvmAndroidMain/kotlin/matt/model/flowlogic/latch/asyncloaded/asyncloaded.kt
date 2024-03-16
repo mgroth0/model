@@ -56,8 +56,8 @@ open class SyncLoadedValueOp<T>(private val op: () -> T) : Async<T>() {
         require(latch!!.isClosed)
         value = op()
         openAndDisposeLatch()
-        @Suppress("UNCHECKED_CAST")
-        return value as T
+
+        return value!!
     }
 }
 
@@ -124,7 +124,7 @@ abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
     }
 
 
-    @Suppress("UNCHECKED_CAST")
+
     protected var value: T? = null
         @Synchronized
         get() {
@@ -137,7 +137,7 @@ abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
                 setListeners?.go {
                     if (it.isInitialized()) {
                         it.value.forEach { operation ->
-                            operation(value as T)
+                            operation(value!!)
                         }
                     }
                     setListeners = null
@@ -155,8 +155,8 @@ abstract class Async<T> : AsyncBase<T>(), ValueWrapperIdea {
 
     final override fun await(): T {
         latch?.await()
-        @Suppress("UNCHECKED_CAST")
-        return value as T
+
+        return value!!
     }
 
     @Synchronized

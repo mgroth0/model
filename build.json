@@ -14,17 +14,17 @@
     {
       "type": "Project",
       "cfg": "commonMainApi",
-      "path": ":k:image"
-    },
-    {
-      "type": "Project",
-      "cfg": "commonMainApi",
       "path": ":k:math:langg"
     },
     {
       "type": "Project",
       "cfg": "commonMainApi",
       "path": ":k:report"
+    },
+    {
+      "type": "Project",
+      "cfg": "commonMainApi",
+      "path": ":k:prim"
     },
     {
       "type": "Lib",

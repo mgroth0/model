@@ -19,6 +19,7 @@ interface GitHubKeys {
     val apiKey: String
     val apiOrgKey: String
     val ghaUsageAuditKey: String
+    val notificationsKey: String
 }
 
 @Serializable
@@ -27,7 +28,8 @@ data class ActualGitHubKeys(
     override val pushReleasesForever: String,
     override val apiKey: String,
     override val apiOrgKey: String,
-    override val ghaUsageAuditKey: String
+    override val ghaUsageAuditKey: String,
+    override val notificationsKey: String
 ) : GitHubKeys
 
 
@@ -36,13 +38,15 @@ class LazyGitHubKeys(
     private val pushReleasesForeverProv: Lazy<String>,
     private val apiKeyProv: Lazy<String>,
     private val apiOrgKeyProv: Lazy<String>,
-    private val ghaUsageAuditKeyProv: Lazy<String>
+    private val ghaUsageAuditKeyProv: Lazy<String>,
+    private val notificationsKeyProv: Lazy<String>
 ) : GitHubKeys {
     override val readPackagesForever: String get() = readPackagesForeverProv.value
     override val pushReleasesForever: String get() = pushReleasesForeverProv.value
     override val apiKey: String get() = apiKeyProv.value
     override val apiOrgKey: String get() = apiOrgKeyProv.value
     override val ghaUsageAuditKey: String get() = ghaUsageAuditKeyProv.value
+    override val notificationsKey: String get() = notificationsKeyProv.value
 
     fun actualize() =
         ActualGitHubKeys(
@@ -50,7 +54,8 @@ class LazyGitHubKeys(
             pushReleasesForever = pushReleasesForever,
             apiKey = apiKey,
             apiOrgKey = apiOrgKey,
-            ghaUsageAuditKey = ghaUsageAuditKey
+            ghaUsageAuditKey = ghaUsageAuditKey,
+            notificationsKey = notificationsKey
         )
 }
 
