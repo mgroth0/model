@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package matt.model.flowlogic.keypass
 
 import matt.lang.assertions.require.requireNot
 import matt.lang.sync.common.ReferenceMonitor
 import matt.lang.sync.common.inSync
+import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 

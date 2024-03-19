@@ -15,6 +15,7 @@ import kotlin.enums.enumEntries
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalStdlibApi::class)
 class ModelTests {
     @Test
     fun initObjects() {

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package matt.model.code.args.mydecoder
 
 import kotlinx.serialization.DeserializationStrategy
